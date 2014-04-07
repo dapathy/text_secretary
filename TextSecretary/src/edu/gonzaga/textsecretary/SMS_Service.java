@@ -1,5 +1,6 @@
 package edu.gonzaga.textsecretary;
 
+import android.R.string;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 public class SMS_Service extends Service{
 
+	String TAG = "TAG";
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -43,20 +45,27 @@ public class SMS_Service extends Service{
 				Bundle bundle = intent.getExtras();
 				SmsMessage[] msgs = null;
 				String msg_from;
+				Log.d(TAG, "we're here");
 				if (bundle != null){
 					try{
+						Log.d(TAG, "trying");
 						Object[] pdus = (Object[]) bundle.get("pdus");
 	                    msgs = new SmsMessage[pdus.length];
+	    				Log.d(TAG, "created msgs");
 						for(int i = 0; i < msgs.length; i++){
+							Log.d(TAG, "in the for");
 	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 	                        msg_from = msgs[i].getOriginatingAddress();
+	        				Log.d(TAG, "finished for");
 	                        //String msgBody = msgs[i].getMessageBody();
 	                    }
 					} catch(Exception e){
+						Log.d(TAG, "cought");
 						Log.d("SMS", e.getMessage());
 					}
 				}
 			}
+			Log.d(TAG, "DONE WITH ONRECEIVE");
 		}
 	};
 	
