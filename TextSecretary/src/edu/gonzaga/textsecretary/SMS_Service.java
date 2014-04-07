@@ -4,10 +4,12 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.widget.Toast;
 
 public class SMS_Service extends Service{
 
@@ -19,14 +21,25 @@ public class SMS_Service extends Service{
 
 	@Override
 	public void onCreate(){
+		super.onCreate();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		
+		registerReceiver (smsListener, filter);
 	}
 	
-	public class SMS_Listener extends BroadcastReceiver {
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		unregisterReceiver(smsListener);
+	}
+	
+	private BroadcastReceiver smsListener = new BroadcastReceiver(){
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
+				Toast.makeText(getApplicationContext(), "test", Toast.LENGTH_SHORT).show();
 				Bundle bundle = intent.getExtras();
 				SmsMessage[] msgs = null;
 				String msg_from;
@@ -45,8 +58,6 @@ public class SMS_Service extends Service{
 				}
 			}
 		}
-		
-		
-	}
+	};
 	
 }
