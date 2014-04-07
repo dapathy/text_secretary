@@ -64,7 +64,7 @@ public class SMS_Service extends Service{
 						Log.d(TAG, "cought");
 					}
 				}
-				//Toast.makeText(getApplicationContext(), msg_from, Toast.LENGTH_SHORT).show();
+
 			}
 			
 			Log.d(TAG, "DONE WITH ONRECEIVE");
