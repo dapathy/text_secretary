@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}
-		System.out.println("tejughkuhkuh");
+		System.out.println("tyler sucks");
 	}
 
 	@Override
