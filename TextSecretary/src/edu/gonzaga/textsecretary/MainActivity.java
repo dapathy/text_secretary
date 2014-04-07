@@ -1,17 +1,13 @@
 package edu.gonzaga.textsecretary;
 
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
-import android.app.IntentService;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 
 public class MainActivity extends Activity {
 
@@ -44,19 +40,6 @@ public class MainActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	public class SMSService extends IntentService {
-	    public SMSService(String name) {
-			super(name);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-	    protected void onHandleIntent(Intent workIntent) {
-	        // Gets data from the incoming Intent
-	        //String dataString = workIntent.getDataString();
-	    }
 	}
 	
 	/**
