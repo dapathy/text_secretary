@@ -8,8 +8,10 @@ public class StartOnBoot extends BroadcastReceiver{
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Intent startServiceIntent = new Intent(context, SMS_Service.class);
-        context.startService(startServiceIntent);
+		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+			Intent pushIntent = new Intent(context, SMS_Service.class);
+			context.startService(pushIntent);
+		}
 	}
 
 }
