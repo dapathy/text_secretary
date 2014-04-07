@@ -3,7 +3,8 @@
     package="edu.gonzaga.textsecretary"
     android:versionCode="1"
     android:versionName="1.0" >
-
+    
+	<uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-sdk
         android:minSdkVersion="15"
@@ -17,12 +18,6 @@
         <service
             android:name=".SMS_Service"
             android:exported="false"/>
-        
-        <receiver android:name=".listener.SmsListener">
-    		<intent-filter>
-        		<action android:name="android.provider.Telephony.SMS_RECEIVED" />
-    		</intent-filter>
-		</receiver>
         
         <activity
             android:name="edu.gonzaga.textsecretary.MainActivity"

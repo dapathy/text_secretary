@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
 
 public class SMS_Service extends Service{
 
+	
 	String TAG = "TAG";
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -37,7 +39,9 @@ public class SMS_Service extends Service{
 	}
 	
 	private BroadcastReceiver smsListener = new BroadcastReceiver(){
-
+		// Get the object of SmsManager
+		final SmsManager sms = SmsManager.getDefault();
+		
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
@@ -65,8 +69,10 @@ public class SMS_Service extends Service{
 					}
 				}
 			}
+			
 			Log.d(TAG, "DONE WITH ONRECEIVE");
 		}
+
 	};
 	
 }
