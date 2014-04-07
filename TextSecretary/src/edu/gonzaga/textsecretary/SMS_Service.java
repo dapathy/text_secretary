@@ -39,9 +39,6 @@ public class SMS_Service extends Service{
 	}
 	
 	private BroadcastReceiver smsListener = new BroadcastReceiver(){
-		// Get the object of SmsManager
-		final SmsManager sms = SmsManager.getDefault();
-		
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){

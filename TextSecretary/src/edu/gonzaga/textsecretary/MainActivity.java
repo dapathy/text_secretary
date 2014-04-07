@@ -51,6 +51,11 @@ public class MainActivity extends Activity {
 		Log.d(TAG, "Started service");
 	}
 	
+	public void stopService (View event){
+		stopService (new Intent(this, SMS_Service.class));
+		Log.d(TAG, "Stoppped service");
+	}
+	
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
