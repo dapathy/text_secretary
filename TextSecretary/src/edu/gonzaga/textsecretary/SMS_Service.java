@@ -45,10 +45,9 @@ public class SMS_Service extends Service{
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
-				Toast.makeText(getApplicationContext(), "test", Toast.LENGTH_SHORT).show();
 				Bundle bundle = intent.getExtras();
 				SmsMessage[] msgs = null;
-				String msg_from;
+				String msg_from = "empty";
 				Log.d(TAG, "we're here");
 				if (bundle != null){
 					try{
@@ -62,15 +61,22 @@ public class SMS_Service extends Service{
 	                        msg_from = msgs[i].getOriginatingAddress();
 	        				Log.d(TAG, "finished for");
 	                        //String msgBody = msgs[i].getMessageBody();
+	        				sendSMS(msg_from);
 	                    }
 					} catch(Exception e){
 						Log.d(TAG, "cought");
-						Log.d("SMS", e.getMessage());
 					}
 				}
+				//Toast.makeText(getApplicationContext(), msg_from, Toast.LENGTH_SHORT).show();
 			}
 			
 			Log.d(TAG, "DONE WITH ONRECEIVE");
+		}
+		
+		public void sendSMS(String phoneNumber){
+			String message = "test_response";
+			SmsManager sms = SmsManager.getDefault();
+			sms.sendTextMessage(phoneNumber, null, message, null, null);
 		}
 
 	};
