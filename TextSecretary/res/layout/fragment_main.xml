@@ -12,14 +12,24 @@
         android:id="@+id/start_service"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/start_service"
-        android:onClick="startService"/>
-    
+        android:onClick="startService"
+        android:text="@string/start_service" />
+
     <Button
+        android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/stop_service"
         android:layout_toRightOf="@id/start_service"
-        android:onClick="stopService"/>
+        android:onClick="stopService"
+        android:text="@string/stop_service" />
+
+    <ImageButton
+        android:id="@+id/imageButtonState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/start_service"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/button_on" />
 
 </RelativeLayout>

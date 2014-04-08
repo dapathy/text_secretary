@@ -10,21 +10,41 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 public class MainActivity extends Activity {
 	
 	String TAG = "TAG";
+	ImageButton button;
+	Boolean SMS_Service_State = true;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
+
+		button= (ImageButton)findViewById(R.id.imageButtonState);
+		button.setOnClickListener(imgButtonHandler);
+
 	}
+	
+	View.OnClickListener imgButtonHandler = new View.OnClickListener() {
+	    public void onClick(View v) {
+			if(SMS_Service_State == true){			//if service is on -> turn off
+				stopService(v);
+		        button.setImageResource(R.drawable.button_off);
+		        SMS_Service_State = false;
+			}
+			else{						//else service is off -> turn on
+				startService(v);
+		        button.setImageResource(R.drawable.button_on);
+		        SMS_Service_State = true;
+			}
+
+	    }
+	};
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -56,21 +76,4 @@ public class MainActivity extends Activity {
 		Log.d(TAG, "Stoppped service");
 	}
 	
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			return rootView;
-		}
-	}
-
 }

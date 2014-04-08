@@ -14,7 +14,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class SMS_Service extends Service{
-
 	
 	String TAG = "TAG";
 	@Override
