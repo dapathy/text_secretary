@@ -3,7 +3,9 @@ package edu.gonzaga.textsecretary;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +27,9 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SMS_Service_State = settings.getBoolean("smsState", true);
+
 		button= (ImageButton)findViewById(R.id.imageButtonState);
 		button.setOnClickListener(imgButtonHandler);
 
@@ -33,12 +38,12 @@ public class MainActivity extends Activity {
 	View.OnClickListener imgButtonHandler = new View.OnClickListener() {
 	    public void onClick(View v) {
 			if(SMS_Service_State == true){			//if service is on -> turn off
-				stopService(v);
+				stopService();
 		        button.setImageResource(R.drawable.button_off);
 		        SMS_Service_State = false;
 			}
 			else{						//else service is off -> turn on
-				startService(v);
+				startService();
 		        button.setImageResource(R.drawable.button_on);
 		        SMS_Service_State = true;
 			}
@@ -46,6 +51,34 @@ public class MainActivity extends Activity {
 	    }
 	};
 
+    @Override
+    protected void onStop(){
+    	super.onStop();
+    	// We need an Editor object to make preference changes.
+    	// All objects are from android.context.Context
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+    	SharedPreferences.Editor editor = settings.edit();
+    	editor.putBoolean("smsState", SMS_Service_State);
+
+    	// Commit the edits!
+    	editor.commit();
+    }
+    
+    @Override
+    protected void onResume(){
+    	super.onStop();
+    	// We need an Editor object to make preference changes.
+    	// All objects are from android.context.Context
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+    	SMS_Service_State = settings.getBoolean("smsState", true);
+    	if(SMS_Service_State)
+	        button.setImageResource(R.drawable.button_on);
+    	
+    	else
+	        button.setImageResource(R.drawable.button_off);    	
+
+    }
+    
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -66,12 +99,12 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	public void startService(View event){
+	public void startService(){
 		startService(new Intent(this, SMS_Service.class));
 		Log.d(TAG, "Started service");
 	}
 	
-	public void stopService (View event){
+	public void stopService (){
 		stopService (new Intent(this, SMS_Service.class));
 		Log.d(TAG, "Stoppped service");
 	}
