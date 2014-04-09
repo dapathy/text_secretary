@@ -1,6 +1,5 @@
 package edu.gonzaga.textsecretary;
 
-import android.R.string;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
-import android.widget.Toast;
 
 public class SMS_Service extends Service{
 	

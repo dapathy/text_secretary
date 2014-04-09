@@ -1,16 +1,33 @@
 package edu.gonzaga.textsecretary;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
-import android.provider.CalendarContract;
 import android.provider.CalendarContract.Calendars;
 
-public class Calendar_Service extends Activity{
 
+public class Calendar_Service extends Activity {
+	String[] calendars;
+	
+	public void getCalendars(){
+		calendars = new String[]{
+	            Calendars._ID, 
+	            Calendars.NAME, 
+	            Calendars.ACCOUNT_NAME, 
+	            Calendars.ACCOUNT_TYPE};
+		Cursor calCursor = 
+			      getContentResolver().
+			            query(Calendars.CONTENT_URI, 
+			                  calendars, 
+			                  Calendars.VISIBLE + " = 1", 
+			                  null, 
+			                  Calendars._ID + " ASC");
+		if (calCursor.moveToFirst()) {
+		   do {
+		      long id = calCursor.getLong(0);
+		      String displayName = calCursor.getString(1);
+		      // ...
+		   } while (calCursor.moveToNext());
+		}
+
+	}
 }
