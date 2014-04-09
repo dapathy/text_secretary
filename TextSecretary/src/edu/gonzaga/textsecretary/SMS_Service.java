@@ -14,6 +14,8 @@ import android.util.Log;
 public class SMS_Service extends Service{
 	
 	String TAG = "TAG";
+	Calendar_Service calendar;
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -26,6 +28,9 @@ public class SMS_Service extends Service{
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		
+		
+		calendar = new Calendar_Service(SMS_Service.this);
+		calendar.getCalendars();
 		registerReceiver (smsListener, filter);
 	}
 	
