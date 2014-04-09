@@ -30,7 +30,7 @@ public class SMS_Service extends Service{
 		
 		
 		calendar = new Calendar_Service(SMS_Service.this);
-		calendar.getCalendars();
+		calendar.inEvent();
 		registerReceiver (smsListener, filter);
 	}
 	
@@ -58,18 +58,17 @@ public class SMS_Service extends Service{
 							Log.d(TAG, "in the for");
 	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 	                        msg_from = msgs[i].getOriginatingAddress();
-	        				Log.d(TAG, "finished for");
 	                        //String msgBody = msgs[i].getMessageBody();
-	        				sendSMS(msg_from);
+	        				
+	        				if (calendar.inEvent()){
+	        					sendSMS(msg_from);
+	        				}
 	                    }
 					} catch(Exception e){
 						Log.d(TAG, "cought");
 					}
 				}
-
 			}
-			
-			Log.d(TAG, "DONE WITH ONRECEIVE");
 		}
 		
 		public void sendSMS(String phoneNumber){

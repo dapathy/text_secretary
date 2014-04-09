@@ -5,12 +5,9 @@ import java.util.Calendar;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
-import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
 import android.util.Log;
 import android.widget.Toast;
-
 
 public class Calendar_Service extends Activity {
 	private Context context;
@@ -19,7 +16,7 @@ public class Calendar_Service extends Activity {
 		this.context = context;
 	}
 	
-	public void getCalendars(){
+	boolean inEvent(){
 		String [] projection = new String[]{
 				Events.DTSTART,
 				Events.DTEND,
@@ -30,21 +27,18 @@ public class Calendar_Service extends Activity {
 		cEnd.add(Calendar.HOUR, 2);
 		
 		String selection = "((dtstart >= " + cStart.getTimeInMillis() + ") AND (dtend <= " + cEnd.getTimeInMillis() + ") AND (availability == 0))";
-		//String[] selectionArgs = new String[] {startString, endString};
 		
 		Cursor calendarCursor = context.getContentResolver().query(Events.CONTENT_URI, projection, selection, null, null);
 		
 		if (calendarCursor.moveToFirst()){
 			Toast.makeText(context, "Event Present", Toast.LENGTH_SHORT).show();
 			Log.d("CALENDAR", "event present");
+			return false;
 		}
 		else{
 			Toast.makeText(context, "Event not present", Toast.LENGTH_SHORT).show();
 			Log.d("CALENDAR", "not event");
+			return true;
 		}
-	}
-	
-	public void getCurrentEvent(){
-		
 	}
 }
