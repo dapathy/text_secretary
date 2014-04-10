@@ -32,12 +32,12 @@ public class Calendar_Service {
 		if (calendarCursor.moveToFirst()){
 			Toast.makeText(context, "Event Present", Toast.LENGTH_SHORT).show();
 			Log.d("CALENDAR", "event present");
-			return false;
+			return true;
 		}
 		else{
 			Toast.makeText(context, "Event not present", Toast.LENGTH_SHORT).show();
 			Log.d("CALENDAR", "not event");
-			return true;
+			return false;
 		}
 	}
 }
