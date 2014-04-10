@@ -17,27 +17,33 @@ public class Calendar_Service {
 	
 	boolean inEvent(){
 		String [] projection = new String[]{
+				Events.TITLE,
 				Events.DTSTART,
 				Events.DTEND,
 				Events.AVAILABILITY};
 		
+		long start, end;
+		Calendar current = Calendar.getInstance();
 		Calendar cStart = Calendar.getInstance();
 		Calendar cEnd = Calendar.getInstance();
-		cEnd.add(Calendar.HOUR, 2);
+		cStart.roll(Calendar.DATE, false);
+		cEnd.roll(Calendar.DATE, true);
 		
 		String selection = "((dtstart >= " + cStart.getTimeInMillis() + ") AND (dtend <= " + cEnd.getTimeInMillis() + ") AND (availability == 0))";
-		
 		Cursor calendarCursor = context.getContentResolver().query(Events.CONTENT_URI, projection, selection, null, null);
 		
-		if (calendarCursor.moveToFirst()){
-			Toast.makeText(context, "Event Present", Toast.LENGTH_SHORT).show();
-			Log.d("CALENDAR", "event present");
-			return true;
+		while (calendarCursor.moveToNext()){
+			start = calendarCursor.getLong(1);
+			end = calendarCursor.getLong(2);
+			if (start <= current.getTimeInMillis() && end >= current.getTimeInMillis()){
+				Toast.makeText(context, "Event Present", Toast.LENGTH_SHORT).show();
+				Log.d("CALENDAR", "event present");
+				return true;
+			}
 		}
-		else{
-			Toast.makeText(context, "Event not present", Toast.LENGTH_SHORT).show();
-			Log.d("CALENDAR", "not event");
-			return false;
-		}
+		
+		Toast.makeText(context, "Event not present", Toast.LENGTH_SHORT).show();
+		Log.d("CALENDAR", "not event");
+		return false;
 	}
 }
