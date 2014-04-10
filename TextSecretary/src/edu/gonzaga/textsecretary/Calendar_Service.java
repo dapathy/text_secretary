@@ -2,14 +2,13 @@ package edu.gonzaga.textsecretary;
 
 import java.util.Calendar;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.CalendarContract.Events;
 import android.util.Log;
 import android.widget.Toast;
 
-public class Calendar_Service extends Activity {
+public class Calendar_Service {
 	private Context context;
 	
 	public Calendar_Service(Context context){
