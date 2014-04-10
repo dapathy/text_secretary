@@ -43,7 +43,7 @@ public class SMS_Service extends Service{
 	private BroadcastReceiver smsListener = new BroadcastReceiver(){
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
+			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && calendar.inEvent()){
 				Bundle bundle = intent.getExtras();
 				SmsMessage[] msgs = null;
 				String msg_from = "empty";
@@ -60,9 +60,7 @@ public class SMS_Service extends Service{
 	                        msg_from = msgs[i].getOriginatingAddress();
 	                        //String msgBody = msgs[i].getMessageBody();
 	        				
-	        				if (calendar.inEvent()){
-	        					sendSMS(msg_from);
-	        				}
+	        				sendSMS(msg_from);
 	                    }
 					} catch(Exception e){
 						Log.d(TAG, "cought");
