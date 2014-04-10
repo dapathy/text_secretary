@@ -43,7 +43,7 @@ public class SMS_Service extends Service{
 	private BroadcastReceiver smsListener = new BroadcastReceiver(){
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && !calendar.inEvent()){
+			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && calendar.inEvent()){
 				Bundle bundle = intent.getExtras();
 				SmsMessage[] msgs = null;
 				String msg_from = "empty";
