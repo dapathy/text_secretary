@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 public class MainActivity extends Activity {
@@ -17,18 +18,24 @@ public class MainActivity extends Activity {
 	ImageButton button;
 	Boolean SMS_Service_State = true;
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		final Notification_Service mnotification = new Notification_Service();
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SMS_Service_State = settings.getBoolean("smsState", true);
 
 		button= (ImageButton)findViewById(R.id.imageButtonState);
 		button.setOnClickListener(imgButtonHandler);
+		
+	      Button startBtn = (Button) findViewById(R.id.button1);
+	      startBtn.setOnClickListener(new View.OnClickListener() {
+	         public void onClick(View view) {
+	            mnotification.displayNotification(getBaseContext(), "9364467121");
+	         }
+	      });
 
 	}
 	
