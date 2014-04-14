@@ -23,11 +23,11 @@ public class Notification_Service{
 		      /* Invoking the default notification service */
 		      NotificationCompat.Builder  mBuilder = 
 		      new NotificationCompat.Builder(cx);	
-
-		      mBuilder.setContentTitle("Auto Replied");
-		      mBuilder.setContentText("Text Secretary auto replied to: " + number);
-		      mBuilder.setTicker("Text Secretary Auto Reply");
-		      mBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
+		      	mBuilder.setContentTitle("Auto Replied");
+		      	mBuilder.setContentText("Text Secretary auto replied to: " + number);
+		      	mBuilder.setTicker("Text Secretary Auto Reply");
+		      	mBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
+		      	mBuilder.setAutoCancel(true);
 		      
 		      /* Creates an explicit intent for an Activity in your app */
 		      Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null));

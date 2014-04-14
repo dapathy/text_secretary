@@ -30,7 +30,6 @@ public class SMS_Service extends Service{
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");		
 
 		calendar = new Calendar_Service(SMS_Service.this);
-		calendar.inEvent();
 		registerReceiver (smsListener, filter);
 	}
 	
