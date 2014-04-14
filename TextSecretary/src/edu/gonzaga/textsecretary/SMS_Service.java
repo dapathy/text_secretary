@@ -2,9 +2,11 @@ package edu.gonzaga.textsecretary;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsManager;
@@ -60,6 +62,7 @@ public class SMS_Service extends Service{
 	                        //String msgBody = msgs[i].getMessageBody();
 	        				
 	        				sendSMS(msg_from);
+	        				storeMessage(msg_from, "Sorry I'm busy. I'll get back to you as soon as possible.");
 	                    }
 					} catch(Exception e){
 						Log.d(TAG, "cought");
@@ -75,5 +78,12 @@ public class SMS_Service extends Service{
             mnotification.displayNotification(getBaseContext(), phoneNumber);
 		}
 	};
+	
+    private void storeMessage(String mobNo, String msg) { 
+    	ContentValues values = new ContentValues(); 
+    	values.put("address", mobNo); 
+    	values.put("body", msg); 
+    	getContentResolver().insert(Uri.parse("content://sms/sent"), values); 
+  } 
 	
 }
