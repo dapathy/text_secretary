@@ -1,5 +1,8 @@
 package edu.gonzaga.textsecretary;
 
+import java.util.Calendar;
+import java.util.HashMap;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -15,9 +18,11 @@ import android.util.Log;
 
 public class SMS_Service extends Service{
 	
+	final long REPEAT_TIME = 1800000;	//30 minutes
 	String TAG = "TAG";
 	Calendar_Service calendar;
 	final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
+	HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -61,8 +66,10 @@ public class SMS_Service extends Service{
 	                        msg_from = msgs[i].getOriginatingAddress();
 	                        //String msgBody = msgs[i].getMessageBody();
 	        				
-	        				sendSMS(msg_from);
-	        				storeMessage(msg_from, "Sorry I'm busy. I'll get back to you as soon as possible.");
+	        				if (!isRecent(msg_from)){
+	        					sendSMS(msg_from);
+		        				storeMessage(msg_from, "Sorry, I'm busy. I'll get back to you as soon as possible.");
+	        				}
 	                    }
 					} catch(Exception e){
 						Log.d(TAG, "cought");
@@ -70,14 +77,34 @@ public class SMS_Service extends Service{
 				}
 			}
 		}
-		
-		public void sendSMS(String phoneNumber){
-			String message = "Sorry I'm busy. I'll get back to you as soon as possible.";
-			SmsManager sms = SmsManager.getDefault();
-			sms.sendTextMessage(phoneNumber, null, message, null, null);
-            mnotification.displayNotification(phoneNumber);
-		}
 	};
+	
+	private boolean isRecent(String phoneNumber){
+		//if number is new
+		long currentTime = Calendar.getInstance().getTimeInMillis();
+		if (!recentNumbers.containsKey(phoneNumber)){
+			recentNumbers.put(phoneNumber, currentTime);
+			return false;
+		}
+		//if number is already in map
+		else{
+			long time = recentNumbers.get(phoneNumber);
+			recentNumbers.put(phoneNumber, currentTime);
+			if ((currentTime - time) > REPEAT_TIME){
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+	}
+	
+	private void sendSMS(String phoneNumber){
+		String message = "Sorry I'm busy. I'll get back to you as soon as possible.";
+		SmsManager sms = SmsManager.getDefault();
+		sms.sendTextMessage(phoneNumber, null, message, null, null);
+        mnotification.displayNotification(phoneNumber);
+	}
 	
     private void storeMessage(String mobNo, String msg) { 
     	ContentValues values = new ContentValues(); 
