@@ -1,8 +1,5 @@
 package edu.gonzaga.textsecretary;
 
-import edu.gonzaga.textsecretary.R.string;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
@@ -16,7 +13,6 @@ public class Notification_Service{
 	   private NotificationManager mNotificationManager;
 	   Context mContext;
 	   
-	   @SuppressLint("NewApi")
 	public void displayNotification(Context cx, String number) {
 		      Log.d("TAG", "notification");
 
@@ -43,13 +39,10 @@ public class Notification_Service{
 		            PendingIntent.FLAG_UPDATE_CURRENT
 		         );
 		         
-
 		      mBuilder.setContentIntent(resultPendingIntent);
-		      
 
 		      mNotificationManager =
 		      (NotificationManager) cx.getSystemService(Context.NOTIFICATION_SERVICE);
-		      
 
 		      int notificationID = 100;
 			/* notificationID allows you to update the notification later on. */
