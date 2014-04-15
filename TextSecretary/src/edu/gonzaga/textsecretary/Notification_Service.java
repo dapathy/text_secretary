@@ -5,7 +5,9 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -16,14 +18,36 @@ public class Notification_Service{
 	public Notification_Service (Context context){
 		mContext = context;
 	}
+	
+	private String getId(String number){
+		String id = "";
+		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+		String[] projection = new String[]{
+				PhoneLookup.DISPLAY_NAME,
+				PhoneLookup.PHOTO_THUMBNAIL_URI
+		};
+		Cursor contactCursor = mContext.getContentResolver().query(uri, projection, null, null, null);
+		
+		if (contactCursor.moveToFirst()){
+			id = contactCursor.getString(0);
+		}
+		else{
+			id = number;
+		}
+		contactCursor.close();
+		return id;
+	}
+
 	public void displayNotification(String number) {
 		Log.d("TAG", "notification");
-
+		
+		String id = getId(number);
+		
 		/* Invoking the default notification service */
 		NotificationCompat.Builder  mBuilder = 
 				new NotificationCompat.Builder(mContext);	
 		mBuilder.setContentTitle("Auto Replied");
-		mBuilder.setContentText("Text Secretary auto replied to: " + number);
+		mBuilder.setContentText("Text Secretary auto replied to: " + id);
 		mBuilder.setTicker("Text Secretary Auto Reply");
 		mBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
 		mBuilder.setAutoCancel(true);

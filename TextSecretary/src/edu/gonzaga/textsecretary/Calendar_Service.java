@@ -38,12 +38,14 @@ public class Calendar_Service {
 			if (start <= current.getTimeInMillis() && end >= current.getTimeInMillis()){
 				Toast.makeText(context, "Event Present", Toast.LENGTH_SHORT).show();
 				Log.d("CALENDAR", "event present");
+				calendarCursor.close();
 				return true;
 			}
 		}
 		
 		Toast.makeText(context, "Event not present", Toast.LENGTH_SHORT).show();
 		Log.d("CALENDAR", "not event");
+		calendarCursor.close();
 		return false;
 	}
 }
