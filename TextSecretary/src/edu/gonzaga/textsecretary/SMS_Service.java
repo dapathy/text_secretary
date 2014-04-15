@@ -17,7 +17,7 @@ public class SMS_Service extends Service{
 	
 	String TAG = "TAG";
 	Calendar_Service calendar;
-	final Notification_Service mnotification = new Notification_Service();
+	final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -75,7 +75,7 @@ public class SMS_Service extends Service{
 			String message = "Sorry I'm busy. I'll get back to you as soon as possible.";
 			SmsManager sms = SmsManager.getDefault();
 			sms.sendTextMessage(phoneNumber, null, message, null, null);
-            mnotification.displayNotification(getBaseContext(), phoneNumber);
+            mnotification.displayNotification(phoneNumber);
 		}
 	};
 	

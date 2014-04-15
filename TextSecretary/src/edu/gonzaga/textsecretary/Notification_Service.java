@@ -13,12 +13,15 @@ public class Notification_Service{
 	   private NotificationManager mNotificationManager;
 	   Context mContext;
 	   
-	public void displayNotification(Context cx, String number) {
+public Notification_Service (Context context){
+	mContext = context;
+}
+	public void displayNotification(String number) {
 		      Log.d("TAG", "notification");
 
 		      /* Invoking the default notification service */
 		      NotificationCompat.Builder  mBuilder = 
-		      new NotificationCompat.Builder(cx);	
+		      new NotificationCompat.Builder(mContext);	
 		      	mBuilder.setContentTitle("Auto Replied");
 		      	mBuilder.setContentText("Text Secretary auto replied to: " + number);
 		      	mBuilder.setTicker("Text Secretary Auto Reply");
@@ -28,7 +31,7 @@ public class Notification_Service{
 		      /* Creates an explicit intent for an Activity in your app */
 		      Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null));
 
-		      TaskStackBuilder stackBuilder = TaskStackBuilder.create(cx);
+		      TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
 		      //stackBuilder.addParentStack(NotificationView.class);
 
 		      /* Adds the Intent that starts the Activity to the top of the stack */
@@ -42,7 +45,7 @@ public class Notification_Service{
 		      mBuilder.setContentIntent(resultPendingIntent);
 
 		      mNotificationManager =
-		      (NotificationManager) cx.getSystemService(Context.NOTIFICATION_SERVICE);
+		      (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		      int notificationID = 100;
 			/* notificationID allows you to update the notification later on. */

@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		final Notification_Service mnotification = new Notification_Service();
+		final Notification_Service mnotification = new Notification_Service(MainActivity.this);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SMS_Service_State = settings.getBoolean("smsState", true);
@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 	      Button startBtn = (Button) findViewById(R.id.button1);
 	      startBtn.setOnClickListener(new View.OnClickListener() {
 	         public void onClick(View view) {
-	            mnotification.displayNotification(getBaseContext(), "9364467121");
+	            mnotification.displayNotification("9364467121");
 	         }
 	      });
 
