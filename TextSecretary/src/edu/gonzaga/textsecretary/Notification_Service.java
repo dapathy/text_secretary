@@ -27,7 +27,7 @@ public class Notification_Service{
 				PhoneLookup.PHOTO_THUMBNAIL_URI
 		};
 		Cursor contactCursor = mContext.getContentResolver().query(uri, projection, null, null, null);
-		
+		Log.d("CONTACT", "query completed");
 		if (contactCursor.moveToFirst()){
 			id = contactCursor.getString(0);
 		}

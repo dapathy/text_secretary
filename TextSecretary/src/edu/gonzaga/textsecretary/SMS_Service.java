@@ -66,7 +66,7 @@ public class SMS_Service extends Service{
 	                        msg_from = msgs[i].getOriginatingAddress();
 	                        //String msgBody = msgs[i].getMessageBody();
 	        				
-	        				if (!isRecent(msg_from)){
+	        				if (/*!isRecent(msg_from)*/ true){
 	        					sendSMS(msg_from);
 		        				storeMessage(msg_from, "Sorry, I'm busy. I'll get back to you as soon as possible.");
 	        				}
