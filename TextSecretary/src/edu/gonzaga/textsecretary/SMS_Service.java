@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -64,11 +65,17 @@ public class SMS_Service extends Service{
 							Log.d(TAG, "in the for");
 	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 	                        msg_from = msgs[i].getOriginatingAddress();
+	                        final String from = msg_from;
 	                        //String msgBody = msgs[i].getMessageBody();
 	        				
 	        				if (/*!isRecent(msg_from)*/ true){
 	        					sendSMS(msg_from);
-		        				storeMessage(msg_from, "Sorry, I'm busy. I'll get back to you as soon as possible.");
+	        				    new Handler().postDelayed(new Runnable() {
+	        				        @Override
+	        				        public void run() {
+	    		        				storeMessage(from, "Sorry, I'm busy. I'll get back to you as soon as possible.");
+	        				        }
+	        				    }, 1000);
 	        				}
 	                    }
 					} catch(Exception e){

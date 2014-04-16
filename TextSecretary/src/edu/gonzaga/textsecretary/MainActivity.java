@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 	      Button startBtn = (Button) findViewById(R.id.button1);
 	      startBtn.setOnClickListener(new View.OnClickListener() {
 	         public void onClick(View view) {
-	            mnotification.displayNotification("9364467121");
+	            mnotification.displayNotification("2086201873");
 	         }
 	      });
 
