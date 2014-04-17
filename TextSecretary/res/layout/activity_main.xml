@@ -17,30 +17,31 @@
         android:layout_alignParentTop="true"
         android:background="@drawable/shapes" >
 
-        <ImageButton
-            android:id="@+id/imageButtonState"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="40dp"
-            android:background="@null"
-            android:src="@drawable/switch_on" />
-
         <ImageSwitcher
             android:id="@+id/imageSwitcher1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
         </ImageSwitcher>
+<!--  
+        <ImageButton
+            android:id="@+id/imageButtonState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="32dp"
+            android:layout_toLeftOf="@+id/stateImage"
+            android:background="@null"
+            android:src="@drawable/switch_on" />
+-->
 
-        <ImageView
+        <ImageButton
             android:id="@+id/stateImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_marginRight="32dp"
-            android:layout_marginTop="7dp"
+            android:paddingTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:background="@null"
             android:src="@drawable/button_on" />
 
     </RelativeLayout>

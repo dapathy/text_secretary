@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -13,26 +12,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.ViewSwitcher.ViewFactory;
 
 public class MainActivity extends Activity {
 	
 	String TAG = "TAG";
 	String customMessage;
-	ImageButton button;
+	//ImageButton button;
 	Boolean SMS_Service_State = true;
-	RelativeLayout lowerBar;
-	ImageView imageState;
+	RelativeLayout lowerBar, lowerHalf;
+	ImageButton imageState;
 	Animation in; 
 	Animation out;
 	EditText custom;
@@ -46,10 +39,11 @@ public class MainActivity extends Activity {
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         SMS_Service_State = settings.getBoolean("smsState", true);
-		button= (ImageButton)findViewById(R.id.imageButtonState);
-		button.setOnClickListener(imgButtonHandler);
+		//button.setOnClickListener(imgButtonHandler);
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
-		imageState = (ImageView) findViewById(R.id.stateImage);
+		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
+		imageState = (ImageButton) findViewById(R.id.stateImage);
+		imageState.setOnClickListener(imgButtonHandler);
 		
 		custom = (EditText) findViewById(R.id.customMessage);
 		custom.setOnClickListener(new View.OnClickListener() {
@@ -70,20 +64,21 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 			if(SMS_Service_State == true){			//if service is on -> turn off
 				stopService();
-		        button.setImageResource(R.drawable.switch_off);
+				//button.setImageResource(R.drawable.switch_off);
 		        SMS_Service_State = false;
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
 		        jiggleLayout(lowerBar);
+		        jiggleLayout(lowerHalf);
 			}
 			else{						//else service is off -> turn on
 				startService();
-		        button.setImageResource(R.drawable.switch_on);
-		        //imageSwitcher.setImageResource(R.drawable.button_on);
+				//button.setImageResource(R.drawable.switch_on);
 		        SMS_Service_State = true;
 		        lowerBar.setBackgroundResource(R.drawable.lowbaron);
 		        imageState.setImageResource(R.drawable.button_on);
 		        jiggleLayout(lowerBar);
+		        jiggleLayout(lowerHalf);
 			}
 
 	    }
@@ -113,13 +108,13 @@ public class MainActivity extends Activity {
         custom.setText(customMessage.toString());
 
     	if(SMS_Service_State){
-	        button.setImageResource(R.drawable.switch_on);
+    		//button.setImageResource(R.drawable.switch_on);
 	        imageState.setImageResource(R.drawable.button_on);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaron);
     	}
     	
     	else{
-	        button.setImageResource(R.drawable.switch_off);
+    		//button.setImageResource(R.drawable.switch_off);
 	        imageState.setImageResource(R.drawable.button_off);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
     	}
