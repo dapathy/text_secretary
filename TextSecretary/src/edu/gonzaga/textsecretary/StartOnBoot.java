@@ -13,13 +13,15 @@ public class StartOnBoot extends BroadcastReceiver{
 	public void onReceive(Context context, Intent intent) {
 		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
 			Intent pushIntent = new Intent(context, SMS_Service.class);
-			context.startService(pushIntent);
 			
-	    	SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 	    	SharedPreferences.Editor editor = settings.edit();
-	    	editor.putBoolean("smsState", true);
-
-	    	editor.commit();
+			
+	    	if(settings.getBoolean("start_on_boot_preference", true)){
+				context.startService(pushIntent);
+		    	editor.putBoolean("smsState", true);
+		    	editor.commit();
+	    	}
 		}
 	}
 

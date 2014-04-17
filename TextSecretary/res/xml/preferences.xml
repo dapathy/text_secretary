@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <PreferenceCategory
+            android:title="Start On Boot">
+            
+        <CheckBoxPreference
+                android:key="start_on_boot_preference"
+                android:title="Enable"
+                android:summary="Automatically start TextSecretary when you first power your device." />
+
+    </PreferenceCategory>
+                
+    <PreferenceCategory
+            android:title="Customizable Response">
+
+        <EditTextPreference
+                android:key="custom_message_preference"
+                android:title="Custom Response"
+                android:summary="This is the message that your recipient will receive when TextSecretary replies for you."
+                android:dialogTitle="Enter your custom message:" />
+    </PreferenceCategory>
+    
+    
+    <PreferenceCategory
+            android:title="Sleep Timer">
+    
+        <CheckBoxPreference
+                android:key="sleep_timer_preference"
+                android:title="Enable"
+                android:summary="This enables a minimum time between responses to avoid spamming the recipient." />
+
+        <ListPreference
+                android:key="list_preference"
+                android:dependency="sleep_timer_preference"
+                android:layout="?android:attr/preferenceLayoutChild"
+                android:title="Sleep Length"
+                android:summary="Customize the minimum length of time between responses."
+                android:entries="@array/entries_list_preference"
+                android:entryValues="@array/entryvalues_list_preference"
+                android:dialogTitle="Sleep timer delay:" />
+            
+    </PreferenceCategory>
+    
+</PreferenceScreen>

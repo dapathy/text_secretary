@@ -9,10 +9,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
@@ -22,6 +23,7 @@ public class SMS_Service extends Service{
 	final long REPEAT_TIME = 1800000;	//30 minutes
 	String TAG = "TAG";
 	Calendar_Service calendar;
+	String message = "Sorry, I'm busy. I'll get back to you as soon as possible.";
 	final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
 	HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	
@@ -65,17 +67,14 @@ public class SMS_Service extends Service{
 							Log.d(TAG, "in the for");
 	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 	                        msg_from = msgs[i].getOriginatingAddress();
-	                        final String from = msg_from;
 	                        //String msgBody = msgs[i].getMessageBody();
 	        				
-	        				if (/*!isRecent(msg_from)*/ true){
+	        				if (!isRecent(msg_from)){
+	        					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	        			        message = prefs.getString("custom_message_preference", "test");
+	        			        Log.d("SDF", message);
 	        					sendSMS(msg_from);
-	        				    new Handler().postDelayed(new Runnable() {
-	        				        @Override
-	        				        public void run() {
-	    		        				storeMessage(from, "Sorry, I'm busy. I'll get back to you as soon as possible.");
-	        				        }
-	        				    }, 1000);
+		        				storeMessage(msg_from, message);
 	        				}
 	                    }
 					} catch(Exception e){
@@ -101,13 +100,13 @@ public class SMS_Service extends Service{
 				return false;
 			}
 			else{
+				Log.d("SDF", "recent");
 				return true;
 			}
 		}
 	}
 	
 	private void sendSMS(String phoneNumber){
-		String message = "Sorry I'm busy. I'll get back to you as soon as possible.";
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
         mnotification.displayNotification(phoneNumber);

@@ -40,8 +40,7 @@ public class Notification_Service{
 
 	public void displayNotification(String number) {
 		Log.d("TAG", "notification");
-		Intent notificationIntent = new Intent(mContext, Intent_Handler.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		
 		String id = getId(number);
 		
 		/* Invoking the default notification service */
@@ -50,7 +49,6 @@ public class Notification_Service{
 		mBuilder.setContentTitle("Auto Replied");
 		mBuilder.setContentText("Text Secretary auto replied to: " + id);
 		mBuilder.setTicker("Text Secretary Auto Reply");
-		mBuilder.addAction(R.drawable.ic_action_volume_muted, "Snooze for Contact", pendingIntent);
 		mBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
 		mBuilder.setAutoCancel(true);
 	      
@@ -58,7 +56,7 @@ public class Notification_Service{
 		Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null));
 	
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-		stackBuilder.addParentStack(MainActivity.class);
+		//stackBuilder.addParentStack(NotificationView.class);
 	
 		/* Adds the Intent that starts the Activity to the top of the stack */
 		stackBuilder.addNextIntent(resultIntent);
