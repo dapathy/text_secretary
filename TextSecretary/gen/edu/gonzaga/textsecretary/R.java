@@ -8,7 +8,26 @@
 package edu.gonzaga.textsecretary;
 
 public final class R {
+    public static final class anim {
+        public static final int animationout=0x7f040000;
+    }
+    public static final class array {
+        public static final int entries_list_preference=0x7f060000;
+        public static final int entryvalues_list_preference=0x7f060001;
+        public static final int pref_example_list_titles=0x7f060002;
+        public static final int pref_example_list_values=0x7f060003;
+        public static final int pref_sync_frequency_titles=0x7f060004;
+        public static final int pref_sync_frequency_values=0x7f060005;
+    }
     public static final class attr {
+    }
+    public static final class color {
+        public static final int grey=0x7f070004;
+        public static final int orange=0x7f070000;
+        public static final int orangeOff=0x7f070001;
+        public static final int stateOff=0x7f070003;
+        public static final int stateOn=0x7f070002;
+        public static final int white=0x7f070005;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -18,33 +37,68 @@ public final class R {
          would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively).
     
          */
-        public static final int activity_horizontal_margin=0x7f040000;
-        public static final int activity_vertical_margin=0x7f040001;
+        public static final int activity_horizontal_margin=0x7f080000;
+        public static final int activity_vertical_margin=0x7f080001;
     }
     public static final class drawable {
         public static final int button_off=0x7f020000;
         public static final int button_on=0x7f020001;
         public static final int ic_action_notification_holo_light=0x7f020002;
-        public static final int ic_launcher=0x7f020003;
+        public static final int ic_action_volume_muted=0x7f020003;
+        public static final int ic_launcher=0x7f020004;
+        public static final int lowbaroff=0x7f020005;
+        public static final int lowbaron=0x7f020006;
+        public static final int secondbox=0x7f020007;
+        public static final int shapes=0x7f020008;
+        public static final int switch_off=0x7f020009;
+        public static final int switch_on=0x7f02000a;
     }
     public static final class id {
-        public static final int action_settings=0x7f080003;
-        public static final int button1=0x7f080001;
-        public static final int imageButtonState=0x7f080000;
-        public static final int start_service=0x7f080002;
+        public static final int action_settings=0x7f0c0009;
+        public static final int bottomBar=0x7f0c0005;
+        public static final int bottomHalf=0x7f0c0004;
+        public static final int container=0x7f0c0008;
+        public static final int customMessage=0x7f0c0007;
+        public static final int customTextTitle=0x7f0c0006;
+        public static final int imageButtonState=0x7f0c0001;
+        public static final int imageSwitcher1=0x7f0c0002;
+        public static final int relativeLayout1=0x7f0c0000;
+        public static final int stateImage=0x7f0c0003;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int fragment_main=0x7f030001;
+        public static final int activity_pref_frag=0x7f030001;
     }
     public static final class menu {
-        public static final int main=0x7f070000;
+        public static final int main=0x7f0b0000;
     }
     public static final class string {
-        public static final int action_settings=0x7f050001;
-        public static final int app_name=0x7f050000;
-        public static final int start_service=0x7f050002;
-        public static final int stop_service=0x7f050003;
+        public static final int action_settings=0x7f090001;
+        public static final int app_name=0x7f090000;
+        public static final int current_message=0x7f090003;
+        public static final int pref_default_display_name=0x7f090009;
+        public static final int pref_description_social_recommendations=0x7f090007;
+        /**  Example settings for Data & Sync 
+         */
+        public static final int pref_header_data_sync=0x7f09000b;
+        /**  Strings related to Settings 
+ Example General settings 
+         */
+        public static final int pref_header_general=0x7f090005;
+        /**  Example settings for Notifications 
+         */
+        public static final int pref_header_notifications=0x7f09000e;
+        public static final int pref_ringtone_silent=0x7f090011;
+        public static final int pref_title_add_friends_to_messages=0x7f09000a;
+        public static final int pref_title_display_name=0x7f090008;
+        public static final int pref_title_new_message_notifications=0x7f09000f;
+        public static final int pref_title_ringtone=0x7f090010;
+        public static final int pref_title_social_recommendations=0x7f090006;
+        public static final int pref_title_sync_frequency=0x7f09000c;
+        public static final int pref_title_system_sync_settings=0x7f09000d;
+        public static final int pref_title_vibrate=0x7f090012;
+        public static final int title_activity_pref_frag=0x7f090002;
+        public static final int title_activity_settings=0x7f090004;
     }
     public static final class style {
         /** 
@@ -68,10 +122,13 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f060000;
+        public static final int AppBaseTheme=0x7f0a0000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f060001;
+        public static final int AppTheme=0x7f0a0001;
+    }
+    public static final class xml {
+        public static final int preferences=0x7f050000;
     }
 }

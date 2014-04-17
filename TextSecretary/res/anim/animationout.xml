@@ -2,19 +2,19 @@
 <set xmlns:android="http://schemas.android.com/apk/res/android"  
    android:shareInterpolator="false">    
    <translate   
-     android:toYDelta="25"  
+     android:toYDelta="45"  
      android:fillAfter="true"  
-     android:duration="120"/>  
+     android:duration="150"/>  
      
     <translate
-     android:startOffset="120"   
-     android:toYDelta="-35"  
+     android:startOffset="150"   
+     android:toYDelta="-60"  
      android:fillAfter="true" 
-     android:duration="80"/>  
+     android:duration="150"/>  
      
 	<translate
-     android:startOffset="200"   
-     android:toYDelta="10"  
+     android:startOffset="300"   
+     android:toYDelta="15"  
      android:fillAfter="true" 
-     android:duration="25"/>  
+     android:duration="150"/>  
 </set>  

@@ -71,7 +71,7 @@ public class SMS_Service extends Service{
 	        				
 	        				if (!isRecent(msg_from)){
 	        					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-	        			        message = prefs.getString("custom_message_preference", "test");
+	        			        message = prefs.getString("custom_message_preference", message);
 	        			        Log.d("SDF", message);
 	        					sendSMS(msg_from);
 		        				storeMessage(msg_from, message);

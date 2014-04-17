@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -16,34 +17,51 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.ViewSwitcher.ViewFactory;
 
 public class MainActivity extends Activity {
 	
 	String TAG = "TAG";
+	String customMessage;
 	ImageButton button;
 	Boolean SMS_Service_State = true;
 	RelativeLayout lowerBar;
 	ImageView imageState;
 	Animation in; 
 	Animation out;
+	EditText custom;
+	SharedPreferences settings;
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
         SMS_Service_State = settings.getBoolean("smsState", true);
 		button= (ImageButton)findViewById(R.id.imageButtonState);
 		button.setOnClickListener(imgButtonHandler);
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		imageState = (ImageView) findViewById(R.id.stateImage);
+		
+		custom = (EditText) findViewById(R.id.customMessage);
+		custom.setOnClickListener(new View.OnClickListener() {
+	        @Override
+	        public void onClick(View v) {
+				startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+	        }
 
+	    });
+
+        customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
+        custom.setText(customMessage.toString());
 
 	}
 	
@@ -53,13 +71,10 @@ public class MainActivity extends Activity {
 			if(SMS_Service_State == true){			//if service is on -> turn off
 				stopService();
 		        button.setImageResource(R.drawable.switch_off);
-		        //imageSwitcher.setImageResource(R.drawable.button_off);
 		        SMS_Service_State = false;
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
 		        jiggleLayout(lowerBar);
-		        jiggleImage(imageState);
-
 			}
 			else{						//else service is off -> turn on
 				startService();
@@ -69,7 +84,6 @@ public class MainActivity extends Activity {
 		        lowerBar.setBackgroundResource(R.drawable.lowbaron);
 		        imageState.setImageResource(R.drawable.button_on);
 		        jiggleLayout(lowerBar);
-		        jiggleImage(imageState);
 			}
 
 	    }
@@ -80,7 +94,7 @@ public class MainActivity extends Activity {
     	super.onStop();
     	// We need an Editor object to make preference changes.
     	// All objects are from android.context.Context
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     	SharedPreferences.Editor editor = settings.edit();
     	editor.putBoolean("smsState", SMS_Service_State);
 
@@ -93,8 +107,11 @@ public class MainActivity extends Activity {
     	super.onStop();
     	// We need an Editor object to make preference changes.
     	// All objects are from android.context.Context
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     	SMS_Service_State = settings.getBoolean("smsState", true);
+        customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
+        custom.setText(customMessage.toString());
+
     	if(SMS_Service_State){
 	        button.setImageResource(R.drawable.switch_on);
 	        imageState.setImageResource(R.drawable.button_on);
@@ -141,21 +158,18 @@ public class MainActivity extends Activity {
 	}
 	
 	public void jiggleLayout(final RelativeLayout l){
-		 in = AnimationUtils.loadAnimation(this,R.anim.animationin);
 		 out = AnimationUtils.loadAnimation(this,R.anim.animationout);
+		 Handler handler = new Handler();
+		 final Runnable r = new Runnable()
+		 {
+		     public void run() 
+		     {
+				 l.setAnimation(out);
+				 l.animate();
+		     }
+		 };
+		 r.run();
 
-		 l.setAnimation(out);
-		 l.animate();
 
-	}
-	
-	public void jiggleImage(final ImageView i){
-		 in = AnimationUtils.loadAnimation(this,R.anim.animationin);
-		 out = AnimationUtils.loadAnimation(this,R.anim.animationout);
-
-		 i.setAnimation(out);
-		 i.animate();
-
-	}
-	
+	}	
 }
