@@ -52,22 +52,25 @@ public final class R {
         public static final int shapes=0x7f020008;
         public static final int switch_off=0x7f020009;
         public static final int switch_on=0x7f02000a;
+        public static final int widgeton=0x7f02000b;
+        public static final int widgetpreview=0x7f02000c;
     }
     public static final class id {
         public static final int action_settings=0x7f0c0009;
-        public static final int bottomBar=0x7f0c0005;
-        public static final int bottomHalf=0x7f0c0004;
-        public static final int container=0x7f0c0008;
-        public static final int customMessage=0x7f0c0007;
-        public static final int customTextTitle=0x7f0c0006;
-        public static final int imageButtonState=0x7f0c0001;
-        public static final int imageSwitcher1=0x7f0c0002;
+        public static final int bottomBar=0x7f0c0004;
+        public static final int bottomHalf=0x7f0c0003;
+        public static final int container=0x7f0c0007;
+        public static final int customMessage=0x7f0c0006;
+        public static final int customTextTitle=0x7f0c0005;
+        public static final int imageSwitcher1=0x7f0c0001;
+        public static final int imageview_icon=0x7f0c0008;
         public static final int relativeLayout1=0x7f0c0000;
-        public static final int stateImage=0x7f0c0003;
+        public static final int stateImage=0x7f0c0002;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int activity_pref_frag=0x7f030001;
+        public static final int widgetlayout=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f0b0000;
@@ -130,5 +133,6 @@ public final class R {
     }
     public static final class xml {
         public static final int preferences=0x7f050000;
+        public static final int widgetmetdata=0x7f050001;
     }
 }
