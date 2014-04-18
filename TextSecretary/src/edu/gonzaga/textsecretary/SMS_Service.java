@@ -1,7 +1,9 @@
 package edu.gonzaga.textsecretary;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -12,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
@@ -29,7 +32,6 @@ public class SMS_Service extends Service{
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -73,8 +75,18 @@ public class SMS_Service extends Service{
 	        					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	        			        message = prefs.getString("custom_message_preference", message);
 	        			        Log.d("SDF", message);
-	        					sendSMS(msg_from);
-		        				storeMessage(msg_from, message);
+	        			        String newMessage = getNewMessage(message);
+	        					sendSMS(msg_from, newMessage);
+		        				storeMessage(msg_from, newMessage);
+ 		        				final String savefrom = msg_from;
+ 		        				final String savemessage = newMessage;
+ 		        				
+	        				    new Handler().postDelayed(new Runnable() {
+ 	        				        @Override
+ 	        				        public void run() {
+										storeMessage(savefrom , savemessage);
+ 	        				        }
+ 	        				    }, 2000);
 	        				}
 	                    }
 					} catch(Exception e){
@@ -106,7 +118,22 @@ public class SMS_Service extends Service{
 		}
 	}
 	
-	private void sendSMS(String phoneNumber){
+	private String getNewMessage(String oldMessage){
+		String newMessage;
+		
+		newMessage = oldMessage.replace("[end]", getDate(calendar.getEventEnd()));
+		newMessage = newMessage.replace("[name]", calendar.getEventName());
+		return newMessage;
+	}
+	
+	private String getDate (long date){
+		SimpleDateFormat dateFormat = new SimpleDateFormat ("hh:mm a", Locale.US);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(date);
+		return dateFormat.format (calendar.getTime());
+	}
+	
+	private void sendSMS(String phoneNumber, String message){
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
         mnotification.displayNotification(phoneNumber);

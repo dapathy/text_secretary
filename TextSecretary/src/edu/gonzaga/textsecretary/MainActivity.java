@@ -2,6 +2,8 @@ package edu.gonzaga.textsecretary;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,6 +19,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
+import android.widget.RemoteViews.RemoteView;
 
 public class MainActivity extends Activity {
 	
@@ -26,10 +30,12 @@ public class MainActivity extends Activity {
 	Boolean SMS_Service_State = true;
 	RelativeLayout lowerBar, lowerHalf;
 	ImageButton imageState;
-	Animation in; 
 	Animation out;
 	EditText custom;
 	SharedPreferences settings;
+	RemoteViews remoteViews;
+	ComponentName widget;
+	AppWidgetManager appWidgetManager;
 
 
 	@Override
@@ -39,12 +45,18 @@ public class MainActivity extends Activity {
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         SMS_Service_State = settings.getBoolean("smsState", true);
-		//button.setOnClickListener(imgButtonHandler);
+		
+        //GUI stuff
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		imageState = (ImageButton) findViewById(R.id.stateImage);
 		imageState.setOnClickListener(imgButtonHandler);
 		
+		//WidgetStuff
+        remoteViews = new RemoteViews(getBaseContext().getPackageName(), R.layout.widgetlayout);
+        widget = new ComponentName(getBaseContext(), Widget.class);
+        appWidgetManager = AppWidgetManager.getInstance(getBaseContext());
+
 		custom = (EditText) findViewById(R.id.customMessage);
 		custom.setOnClickListener(new View.OnClickListener() {
 	        @Override
@@ -68,8 +80,10 @@ public class MainActivity extends Activity {
 		        SMS_Service_State = false;
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
+	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
 		        jiggleLayout(lowerBar);
 		        jiggleLayout(lowerHalf);
+		        appWidgetManager.updateAppWidget(widget, remoteViews);
 			}
 			else{						//else service is off -> turn on
 				startService();
@@ -77,8 +91,10 @@ public class MainActivity extends Activity {
 		        SMS_Service_State = true;
 		        lowerBar.setBackgroundResource(R.drawable.lowbaron);
 		        imageState.setImageResource(R.drawable.button_on);
+	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
 		        jiggleLayout(lowerBar);
 		        jiggleLayout(lowerHalf);
+		        appWidgetManager.updateAppWidget(widget, remoteViews);
 			}
 
 	    }
@@ -108,13 +124,11 @@ public class MainActivity extends Activity {
         custom.setText(customMessage.toString());
 
     	if(SMS_Service_State){
-    		//button.setImageResource(R.drawable.switch_on);
 	        imageState.setImageResource(R.drawable.button_on);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaron);
     	}
     	
     	else{
-    		//button.setImageResource(R.drawable.switch_off);
 	        imageState.setImageResource(R.drawable.button_off);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
     	}
@@ -153,11 +167,13 @@ public class MainActivity extends Activity {
 	}
 	
 	public void jiggleLayout(final RelativeLayout l){
-		 out = AnimationUtils.loadAnimation(this,R.anim.animationout);
-		 Handler handler = new Handler();
+		l.clearAnimation(); 
+		out = AnimationUtils.loadAnimation(this,R.anim.animationout);
+		 Log.d("TAG", "animation");
+		 //Handler handler = new Handler();
 		 final Runnable r = new Runnable()
 		 {
-		     public void run() 
+		    public void run() 
 		     {
 				 l.setAnimation(out);
 				 l.animate();

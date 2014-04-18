@@ -24,10 +24,11 @@
         android:label="@string/app_name"
         android:logo="@drawable/ic_action_notification_holo_light"
         android:theme="@style/AppTheme" >
+
         <service
             android:name=".SMS_Service"
             android:exported="false"/>
-        
+                    
         <receiver android:name=".StartOnBoot">  
     		<intent-filter>  
         		<action android:name="android.intent.action.BOOT_COMPLETED" />  

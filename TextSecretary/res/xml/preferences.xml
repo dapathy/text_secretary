@@ -17,7 +17,7 @@
         <EditTextPreference
                 android:key="custom_message_preference"
                 android:title="Custom Response"
-                android:summary="This is the message that your recipient will receive when TextSecretary replies for you."
+                android:summary="This is the message that your recipient will receive when TextSecretary replies for you. In your custom message, enter [end] to have the end time of your event inserted.  Similarly, enter [name] to have the name of the your event inserted."
                 android:dialogTitle="Enter your custom message:" />
     </PreferenceCategory>
     
