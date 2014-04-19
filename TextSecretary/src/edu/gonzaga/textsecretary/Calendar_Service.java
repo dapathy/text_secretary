@@ -6,10 +6,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.CalendarContract.Events;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Calendar_Service {
 	private Context context;
+	private long eventEnd;
+	private String eventName;
 	
 	public Calendar_Service(Context context){
 		this.context = context;
@@ -36,16 +37,25 @@ public class Calendar_Service {
 			start = calendarCursor.getLong(1);
 			end = calendarCursor.getLong(2);
 			if (start <= current.getTimeInMillis() && end >= current.getTimeInMillis()){
-				Toast.makeText(context, "Event Present", Toast.LENGTH_SHORT).show();
 				Log.d("CALENDAR", "event present");
+				eventEnd = end;
+				eventName = calendarCursor.getString(0);
 				calendarCursor.close();
 				return true;
 			}
 		}
 		
-		Toast.makeText(context, "Event not present", Toast.LENGTH_SHORT).show();
 		Log.d("CALENDAR", "not event");
 		calendarCursor.close();
 		return false;
 	}
+
+	public long getEventEnd() {
+		return eventEnd;
+	}
+
+	public String getEventName() {
+		return eventName;
+	}
+	
 }
