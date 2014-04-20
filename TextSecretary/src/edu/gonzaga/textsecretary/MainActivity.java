@@ -2,11 +2,13 @@ package edu.gonzaga.textsecretary;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -26,9 +28,9 @@ public class MainActivity extends Activity {
 	
 	String TAG = "TAG";
 	String customMessage;
-	//ImageButton button;
 	Boolean SMS_Service_State = true;
-	RelativeLayout lowerBar, lowerHalf;
+	Boolean remindToggleDialogue;
+	RelativeLayout lowerBar, lowerHalf, listFragment;
 	ImageButton imageState;
 	Animation out;
 	EditText custom;
@@ -40,7 +42,6 @@ public class MainActivity extends Activity {
 	FragmentManager fragmentManager;
 	FragmentTransaction fragmentTransaction;
 	ServiceListFragment myFragment;
-	RelativeLayout list;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class MainActivity extends Activity {
         //GUI stuff
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
-		list = (RelativeLayout) findViewById(R.id.listFragmentLayout);
+		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
 		imageState = (ImageButton) findViewById(R.id.stateImage);
 		imageState.setOnClickListener(imgButtonHandler);
 		
@@ -83,7 +84,10 @@ public class MainActivity extends Activity {
         fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
         fragmentTransaction.commit();
 
-
+        //Remind users how to use toggle
+		remindToggleDialogue = settings.getBoolean("remindToggleDialogue", true);
+		if(remindToggleDialogue)
+			showToggleDialogue();
 	}
 	
 	
@@ -99,6 +103,7 @@ public class MainActivity extends Activity {
 	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
 		        jiggleLayout(lowerBar);
 		        jiggleLayout(lowerHalf);
+		        jiggleLayout(listFragment);
 		        appWidgetManager.updateAppWidget(widget, remoteViews);
 			}
 			else{						//else service is off -> turn on
@@ -110,6 +115,7 @@ public class MainActivity extends Activity {
 	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
 		        jiggleLayout(lowerBar);
 		        jiggleLayout(lowerHalf);
+		        jiggleLayout(listFragment);
 		        appWidgetManager.updateAppWidget(widget, remoteViews);
 			}
 
@@ -151,7 +157,7 @@ public class MainActivity extends Activity {
     	}
 
     }
-    
+        
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -200,4 +206,26 @@ public class MainActivity extends Activity {
 
 
 	}	
+	
+	public void showToggleDialogue(){
+
+		new AlertDialog.Builder(this)
+	    .setTitle("How to toggle ON/OFF")
+	    .setMessage("Press the typewriter to toggle the Text Secretary ON/OFF")
+	    .setPositiveButton("Dismiss Forever", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) { 
+	        	SharedPreferences.Editor editor = settings.edit();
+	        	editor.putBoolean("remindToggleDialogue", false);
+	        	// Commit the edits!
+	        	editor.commit();
+	        }
+	     })
+	    .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) { 
+	            // do nothing
+	        }
+	     })
+	    .setIcon(android.R.drawable.ic_dialog_alert)
+	     .show();
+	}
 }
