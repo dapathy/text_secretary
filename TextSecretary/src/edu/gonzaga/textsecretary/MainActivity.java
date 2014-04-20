@@ -2,6 +2,9 @@ package edu.gonzaga.textsecretary;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -33,13 +36,16 @@ public class MainActivity extends Activity {
 	RemoteViews remoteViews;
 	ComponentName widget;
 	AppWidgetManager appWidgetManager;
-
+	ListFragment serviceListFragment;
+	FragmentManager fragmentManager;
+	FragmentTransaction fragmentTransaction;
+	ServiceListFragment myFragment;
+	RelativeLayout list;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         SMS_Service_State = settings.getBoolean("smsState", true);
@@ -47,6 +53,7 @@ public class MainActivity extends Activity {
         //GUI stuff
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
+		list = (RelativeLayout) findViewById(R.id.listFragmentLayout);
 		imageState = (ImageButton) findViewById(R.id.stateImage);
 		imageState.setOnClickListener(imgButtonHandler);
 		
@@ -66,8 +73,19 @@ public class MainActivity extends Activity {
 
         customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
         custom.setText(customMessage.toString());
+        
+        // get an instance of FragmentTransaction from your Activity
+        fragmentManager = getFragmentManager();
+        fragmentTransaction = fragmentManager.beginTransaction();
+
+        //add a fragment
+        myFragment = new ServiceListFragment();
+        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
+        fragmentTransaction.commit();
+
 
 	}
+	
 	
 	View.OnClickListener imgButtonHandler = new View.OnClickListener() {
 	    @SuppressLint("ResourceAsColor")
@@ -109,6 +127,7 @@ public class MainActivity extends Activity {
 
     	// Commit the edits!
     	editor.commit();
+    	fragmentTransaction.remove(myFragment);
     }
     
     @Override
