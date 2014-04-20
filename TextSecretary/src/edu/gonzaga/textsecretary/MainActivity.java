@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         SMS_Service_State = settings.getBoolean("smsState", true);
