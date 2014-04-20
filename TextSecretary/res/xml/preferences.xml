@@ -1,35 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     
-    <PreferenceCategory
-            android:title="Start On Boot">
-            
-        <CheckBoxPreference
-                android:key="start_on_boot_preference"
-                android:title="Enable"
-                android:summary="Automatically start TextSecretary when you first power your device." />
-
-    </PreferenceCategory>
-                
-    <PreferenceCategory
+	<PreferenceCategory
             android:title="Customizable Response">
 
         <EditTextPreference
                 android:key="custom_message_preference"
                 android:title="Custom Response"
-                android:summary="This is the message that your recipient will receive when TextSecretary replies for you. In your custom message, enter [end] to have the end time of your event inserted.  Similarly, enter [name] to have the name of the your event inserted."
-                android:dialogTitle="Enter your custom message:" />
+                android:summary="This is the message that your recipient will receive when TextSecretary replies for you."
+                android:dialogTitle="Enter your custom message:"
+                android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you as soon as possible."/>
     </PreferenceCategory>
     
-    
     <PreferenceCategory
-            android:title="Sleep Timer">
+            android:title="General">
+            
+        <CheckBoxPreference
+                android:key="start_on_boot_preference"
+                android:title="Start Service on Boot"
+                android:summary="Automatically start Text Secretary when you power on your device."
+                android:defaultValue="false"/>
+        
+        <CheckBoxPreference 
+            android:key="calendar_preference"
+            android:title="Calendar Integration"
+            android:summary="Only auto responds if you are currently in an event. In your Custom Response above, you can enter [end] to have the end time of your event inserted.  Similarly, enter [name] to have the name of the your event inserted."
+            android:defaultValue="true"/>
     
         <CheckBoxPreference
+            android:key="notification_preference"
+            android:title="Notifications"
+            android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
+            android:defaultValue="true"/>
+        
+        <CheckBoxPreference
                 android:key="sleep_timer_preference"
-                android:title="Enable"
-                android:summary="This enables a minimum time between responses to avoid spamming the recipient." />
-
+                android:title="Sleep Timer"
+                android:summary="Enables a minimum time between responses to a single contact to avoid spamming the recipient."
+                android:defaultValue="true"/>
+        
         <ListPreference
                 android:key="list_preference"
                 android:dependency="sleep_timer_preference"
@@ -38,7 +47,8 @@
                 android:summary="Customize the minimum length of time between responses."
                 android:entries="@array/entries_list_preference"
                 android:entryValues="@array/entryvalues_list_preference"
-                android:dialogTitle="Sleep timer delay:" />
+                android:dialogTitle="Sleep timer delay:"
+                android:defaultValue="1800000"/>
             
     </PreferenceCategory>
     

@@ -25,7 +25,7 @@ public class SMS_Service extends Service{
 	
 	String TAG = "TAG";
 	Calendar_Service calendar;
-	String message = "Sorry, I'm busy. I'll get back to you as soon as possible.";
+	String message = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
 	HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	
@@ -53,7 +53,9 @@ public class SMS_Service extends Service{
 	private BroadcastReceiver smsListener = new BroadcastReceiver(){
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && calendar.inEvent()){
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			//check if action is sms and (calendar integration is disabled or is in event)
+			if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
 				Bundle bundle = intent.getExtras();
 				SmsMessage[] msgs = null;
 				String msg_from = "empty";
@@ -66,7 +68,6 @@ public class SMS_Service extends Service{
 	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 	                        msg_from = msgs[i].getOriginatingAddress();
 	                        
-	                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	                        //if timer is disabled or is recent
 	        				if (!prefs.getBoolean("sleep_timer_preference", true) || !isRecent(msg_from, Long.valueOf(prefs.getString("list_preference", "1800000")))){
 	        			        message = prefs.getString("custom_message_preference", message);
@@ -74,6 +75,10 @@ public class SMS_Service extends Service{
 	        			        String newMessage = getNewMessage(message);
 	        					sendSMS(msg_from, newMessage);
 		        				
+	        					//create notification
+	        					if(prefs.getBoolean("notification_preference", true))
+	        						mnotification.displayNotification(msg_from);
+	        					
  		        				final String savefrom = msg_from;
  		        				final String savemessage = newMessage;
 	        				    new Handler().postDelayed(new Runnable() {
@@ -132,7 +137,6 @@ public class SMS_Service extends Service{
 	private void sendSMS(String phoneNumber, String message){
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
-        mnotification.displayNotification(phoneNumber);
 	}
 	
     private void storeMessage(String mobNo, String msg) { 
