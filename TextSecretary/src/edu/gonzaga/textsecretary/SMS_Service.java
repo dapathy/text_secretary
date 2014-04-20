@@ -23,7 +23,6 @@ import android.util.Log;
 
 public class SMS_Service extends Service{
 	
-	final long REPEAT_TIME = 1800000;	//30 minutes
 	String TAG = "TAG";
 	Calendar_Service calendar;
 	String message = "Sorry, I'm busy. I'll get back to you as soon as possible.";
@@ -58,29 +57,25 @@ public class SMS_Service extends Service{
 				Bundle bundle = intent.getExtras();
 				SmsMessage[] msgs = null;
 				String msg_from = "empty";
-				Log.d(TAG, "we're here");
 				if (bundle != null){
 					try{
-						Log.d(TAG, "trying");
 						Object[] pdus = (Object[]) bundle.get("pdus");
 	                    msgs = new SmsMessage[pdus.length];
 	    				Log.d(TAG, "created msgs");
 						for(int i = 0; i < msgs.length; i++){
-							Log.d(TAG, "in the for");
 	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
 	                        msg_from = msgs[i].getOriginatingAddress();
-	                        //String msgBody = msgs[i].getMessageBody();
-	        				
-	        				if (!isRecent(msg_from)){
-	        					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	                        
+	                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	                        //if timer is disabled or is recent
+	        				if (!prefs.getBoolean("sleep_timer_preference", true) || !isRecent(msg_from, Long.valueOf(prefs.getString("list_preference", "1800000")))){
 	        			        message = prefs.getString("custom_message_preference", message);
-	        			        Log.d("SDF", message);
+	        			        Log.d(TAG, message);
 	        			        String newMessage = getNewMessage(message);
 	        					sendSMS(msg_from, newMessage);
-		        				storeMessage(msg_from, newMessage);
+		        				
  		        				final String savefrom = msg_from;
  		        				final String savemessage = newMessage;
- 		        				
 	        				    new Handler().postDelayed(new Runnable() {
  	        				        @Override
  	        				        public void run() {
@@ -97,7 +92,7 @@ public class SMS_Service extends Service{
 		}
 	};
 	
-	private boolean isRecent(String phoneNumber){
+	private boolean isRecent(String phoneNumber, long repeatTime){
 		//if number is new
 		long currentTime = Calendar.getInstance().getTimeInMillis();
 		if (!recentNumbers.containsKey(phoneNumber)){
@@ -108,7 +103,7 @@ public class SMS_Service extends Service{
 		else{
 			long time = recentNumbers.get(phoneNumber);
 			recentNumbers.put(phoneNumber, currentTime);
-			if ((currentTime - time) > REPEAT_TIME){
+			if ((currentTime - time) > repeatTime){
 				return false;
 			}
 			else{
@@ -118,14 +113,15 @@ public class SMS_Service extends Service{
 		}
 	}
 	
+	//parses message for [end] and [name]
 	private String getNewMessage(String oldMessage){
 		String newMessage;
-		
 		newMessage = oldMessage.replace("[end]", getDate(calendar.getEventEnd()));
 		newMessage = newMessage.replace("[name]", calendar.getEventName());
 		return newMessage;
 	}
 	
+	//converts milliseconds to date
 	private String getDate (long date){
 		SimpleDateFormat dateFormat = new SimpleDateFormat ("hh:mm a", Locale.US);
 		Calendar calendar = Calendar.getInstance();
