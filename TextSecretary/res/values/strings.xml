@@ -4,6 +4,7 @@
     <string name="app_name">Text Secretary</string>
     <string name="action_settings">Settings</string>
    	<string name="title_activity_pref_frag">PrefFrag</string>
+   	<string name="image_state">Image state</string>
    	<string name="current_message">Current custom message:</string>
    	<string name="current_services">Current services:</string>
 
