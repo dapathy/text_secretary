@@ -63,6 +63,7 @@ public class MainActivity extends Activity {
         widget = new ComponentName(getBaseContext(), Widget.class);
         appWidgetManager = AppWidgetManager.getInstance(getBaseContext());
 
+        //Set the on click listener for the custom message
 		custom = (EditText) findViewById(R.id.customMessage);
 		custom.setOnClickListener(new View.OnClickListener() {
 	        @Override
@@ -72,6 +73,7 @@ public class MainActivity extends Activity {
 
 	    });
 
+		// Put the custom Message in the Edit Text
         customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
         custom.setText(customMessage.toString());
         
@@ -96,7 +98,6 @@ public class MainActivity extends Activity {
 		public void onClick(View v) {
 			if(SMS_Service_State == true){			//if service is on -> turn off
 				stopService();
-				//button.setImageResource(R.drawable.switch_off);
 		        SMS_Service_State = false;
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
@@ -108,7 +109,6 @@ public class MainActivity extends Activity {
 			}
 			else{						//else service is off -> turn on
 				startService();
-				//button.setImageResource(R.drawable.switch_on);
 		        SMS_Service_State = true;
 		        lowerBar.setBackgroundResource(R.drawable.lowbaron);
 		        imageState.setImageResource(R.drawable.button_on);
@@ -155,7 +155,7 @@ public class MainActivity extends Activity {
 	        imageState.setImageResource(R.drawable.button_off);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
     	}
-
+    	
     }
         
 	@Override
@@ -173,6 +173,7 @@ public class MainActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
+			//fragmentTransaction.remove(serviceListFragment).commit();
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 			return true;
 		}
@@ -210,7 +211,7 @@ public class MainActivity extends Activity {
 	public void showToggleDialogue(){
 
 		new AlertDialog.Builder(this)
-	    .setTitle("How to toggle ON/OFF")
+	    .setTitle("How to use Text Secretary")
 	    .setMessage("Press the typewriter to toggle the Text Secretary ON/OFF")
 	    .setPositiveButton("Dismiss Forever", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) { 
@@ -225,7 +226,6 @@ public class MainActivity extends Activity {
 	            // do nothing
 	        }
 	     })
-	    .setIcon(android.R.drawable.ic_dialog_alert)
 	     .show();
 	}
 }
