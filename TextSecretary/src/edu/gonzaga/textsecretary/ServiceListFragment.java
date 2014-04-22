@@ -1,31 +1,26 @@
 package edu.gonzaga.textsecretary;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
 
 import android.app.ListFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class ServiceListFragment extends ListFragment{
       ArrayAdapter<String> adapter;
-      ArrayList<String> settingValues = new ArrayList<String>();
+      ArrayList<String> settingValues;
       
 	  @Override
 	  public void onActivityCreated(Bundle savedInstanceState) {
 	    super.onActivityCreated(savedInstanceState);
 	    
-	    //String[] values = new String[] { "There has been an error"};
-	    	
-	    //values = setString();
-	    setValues();
+	    settingValues = new ArrayList<String>();
 	    adapter = new ArrayAdapter<String>(getActivity(),
 	        android.R.layout.simple_list_item_1, settingValues);
 	    
@@ -42,8 +37,9 @@ public class ServiceListFragment extends ListFragment{
 		  super.onResume();
 		  adapter.clear();
 		  setValues();
-		  adapter.addAll(settingValues);
+		  Log.d("SDF", String.valueOf(settingValues.size()));
 		  adapter.notifyDataSetChanged();
+		  
 	  }
 
 	  private void setValues(){
@@ -58,7 +54,8 @@ public class ServiceListFragment extends ListFragment{
 			//Sleep
 			if(prefs .getBoolean("sleep_timer_preference", true)){
 	    		settingValues.add("Sleep Timer: ON");
-	    		settingValues.add("Sleep Length: " + getDate(Long.valueOf(prefs.getString("list_preference", "1800000"))) + " minutes");
+	    		settingValues.add("Sleep Length: " +
+	    				Long.valueOf(prefs.getString("list_preference", "1800000"))/60000 + " minutes");
 			}
 			
 			else
@@ -76,12 +73,5 @@ public class ServiceListFragment extends ListFragment{
 			else
 				settingValues.add("Start Service on Boot: OFF");
 	  }
-	  
-	  //converts milliseconds to minutes
-	  private String getDate (long date){
-		  SimpleDateFormat dateFormat = new SimpleDateFormat ("mm", Locale.US);
-		  Calendar calendar = Calendar.getInstance();
-		  calendar.setTimeInMillis(date);
-		  return dateFormat.format (calendar.getTime());
-	  }
+
 }
