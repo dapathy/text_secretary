@@ -1,9 +1,6 @@
 package edu.gonzaga.textsecretary;
 
 import android.annotation.TargetApi;
-import android.app.ListActivity;
-import android.app.ListFragment;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;

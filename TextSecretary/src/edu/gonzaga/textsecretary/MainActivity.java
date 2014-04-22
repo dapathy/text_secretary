@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ListFragment;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.DialogInterface;
@@ -38,7 +37,6 @@ public class MainActivity extends Activity {
 	RemoteViews remoteViews;
 	ComponentName widget;
 	AppWidgetManager appWidgetManager;
-	ListFragment serviceListFragment;
 	FragmentManager fragmentManager;
 	FragmentTransaction fragmentTransaction;
 	ServiceListFragment myFragment;
@@ -47,6 +45,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         SMS_Service_State = settings.getBoolean("smsState", true);
@@ -133,7 +132,6 @@ public class MainActivity extends Activity {
 
     	// Commit the edits!
     	editor.commit();
-    	fragmentTransaction.remove(myFragment);
     }
     
     @Override
@@ -145,7 +143,7 @@ public class MainActivity extends Activity {
     	SMS_Service_State = settings.getBoolean("smsState", true);
         customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
         custom.setText(customMessage.toString());
-
+        
     	if(SMS_Service_State){
 	        imageState.setImageResource(R.drawable.button_on);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaron);
