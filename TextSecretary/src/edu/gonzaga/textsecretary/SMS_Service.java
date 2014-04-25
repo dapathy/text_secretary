@@ -124,13 +124,19 @@ public class SMS_Service extends Service{
 	private String getNewMessage(String oldMessage, boolean calendarOn){
 		String newMessage;
 		
+		CharSequence end = "[end]";
+		CharSequence name = "[name]";
+		
 		//if tags are included and is off, default message is used
-		if (!calendarOn && (oldMessage.contains("[end]") || oldMessage.contains("[name]"))){
+		if (!calendarOn && (oldMessage.contains(end) || oldMessage.contains(name))){
 			newMessage = defMessage;
 		}
+		else if(!calendarOn){
+			newMessage = oldMessage;
+		}
 		else{
-			newMessage = oldMessage.replace("[end]", getDate(calendar.getEventEnd()));
-			newMessage = newMessage.replace("[name]", calendar.getEventName());
+			newMessage = oldMessage.replace(end, getDate(calendar.getEventEnd()));
+			newMessage = newMessage.replace(name, calendar.getEventName());
 		}
 		return newMessage;
 	}
