@@ -24,7 +24,7 @@
         <CheckBoxPreference 
             android:key="calendar_preference"
             android:title="Calendar Integration"
-            android:summary="Only auto responds if you are currently in an event. In your Custom Response above, you can enter [end] to have the end time of your event inserted.  Similarly, enter [name] to have the name of the your event inserted."
+            android:summary="Only auto responds if you are currently in an event marked as busy. In your Custom Response above, you can enter [end] to have the end time of your event inserted.  Similarly, enter [name] to have the name of the your event inserted."
             android:defaultValue="true"/>
     
         <CheckBoxPreference

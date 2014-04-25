@@ -25,7 +25,7 @@ public class SMS_Service extends Service{
 	
 	String TAG = "TAG";
 	Calendar_Service calendar;
-	String message = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
+	String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
 	HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	
@@ -70,9 +70,9 @@ public class SMS_Service extends Service{
 	                        
 	                        //if timer is disabled or is recent
 	        				if (!prefs.getBoolean("sleep_timer_preference", true) || !isRecent(msg_from, Long.valueOf(prefs.getString("list_preference", "1800000")))){
-	        			        message = prefs.getString("custom_message_preference", message);
+	        			        String message = prefs.getString("custom_message_preference", defMessage);
 	        			        Log.d(TAG, message);
-	        			        String newMessage = getNewMessage(message);
+	        			        String newMessage = getNewMessage(message, prefs.getBoolean("calendar_preference", true));
 	        					sendSMS(msg_from, newMessage);
 		        				
 	        					//create notification
@@ -97,6 +97,8 @@ public class SMS_Service extends Service{
 		}
 	};
 	
+	//checks if sender has sent a text recently (determined by settings)
+	//stores and updates information in hashmap
 	private boolean isRecent(String phoneNumber, long repeatTime){
 		//if number is new
 		long currentTime = Calendar.getInstance().getTimeInMillis();
@@ -118,11 +120,18 @@ public class SMS_Service extends Service{
 		}
 	}
 	
-	//parses message for [end] and [name]
-	private String getNewMessage(String oldMessage){
+	//parses message for [end] and [name] and replaces with info from calendar
+	private String getNewMessage(String oldMessage, boolean calendarOn){
 		String newMessage;
-		newMessage = oldMessage.replace("[end]", getDate(calendar.getEventEnd()));
-		newMessage = newMessage.replace("[name]", calendar.getEventName());
+		
+		//if tags are included and is off, default message is used
+		if (!calendarOn && (oldMessage.contains("[end]") || oldMessage.contains("[name]"))){
+			newMessage = defMessage;
+		}
+		else{
+			newMessage = oldMessage.replace("[end]", getDate(calendar.getEventEnd()));
+			newMessage = newMessage.replace("[name]", calendar.getEventName());
+		}
 		return newMessage;
 	}
 	
@@ -134,11 +143,13 @@ public class SMS_Service extends Service{
 		return dateFormat.format (calendar.getTime());
 	}
 	
+	//sends auto reply
 	private void sendSMS(String phoneNumber, String message){
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
 	}
 	
+	//puts auto reply in conversation
     private void storeMessage(String mobNo, String msg) { 
     	ContentValues values = new ContentValues(); 
     	values.put("address", mobNo); 
