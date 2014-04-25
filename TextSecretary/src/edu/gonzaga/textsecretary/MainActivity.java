@@ -86,9 +86,11 @@ public class MainActivity extends Activity {
         fragmentTransaction = fragmentManager.beginTransaction();
 
         //add a fragment
-        myFragment = new ServiceListFragment();
-        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
-        fragmentTransaction.commit();
+        if(fragmentTransaction.isEmpty()){
+	        myFragment = new ServiceListFragment();
+	        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
+	        fragmentTransaction.commit();
+        }
 
         //Remind users how to use toggle
 		remindToggleDialogue = settings.getBoolean("remindToggleDialogue", true);
