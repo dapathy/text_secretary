@@ -9,8 +9,8 @@ import android.util.Log;
 
 public class Calendar_Service {
 	private Context context;
-	private long eventEnd;
-	private String eventName;
+	private long eventEnd = Long.MAX_VALUE;
+	private String eventName = "";
 	
 	public Calendar_Service(Context context){
 		this.context = context;

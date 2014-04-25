@@ -25,11 +25,16 @@ public class Widget extends AppWidgetProvider {
         settings = PreferenceManager.getDefaultSharedPreferences(context);
         SMS_Service_State = settings.getBoolean("smsState", true);
         
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName widget = new ComponentName(context, Widget.class);
+        
         if(SMS_Service_State)
         	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
         
         else
         	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
+        
+        appWidgetManager.updateAppWidget(widget, remoteViews);
 
     }
     
@@ -44,7 +49,6 @@ public class Widget extends AppWidgetProvider {
         watchWidget = new ComponentName(context, Widget.class);
 
         remoteViews.setOnClickPendingIntent(R.id.imageview_icon, getPendingSelfIntent(context, SYNC_CLICKED));
-        appWidgetManager.updateAppWidget(watchWidget, remoteViews);
         
         settings = PreferenceManager.getDefaultSharedPreferences(context);
         SMS_Service_State = settings.getBoolean("smsState", true);
@@ -54,6 +58,8 @@ public class Widget extends AppWidgetProvider {
         
         else
         	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
+        
+        appWidgetManager.updateAppWidget(watchWidget, remoteViews);
         
     }
 
