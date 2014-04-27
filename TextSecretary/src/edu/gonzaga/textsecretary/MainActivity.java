@@ -182,6 +182,9 @@ public class MainActivity extends Activity {
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 			return true;
 		}
+		if(id == R.id.action_help){
+			startActivity(new Intent(getApplicationContext(), Help_Activity.class));
+		}
 		return super.onOptionsItemSelected(item);
 	}
 	

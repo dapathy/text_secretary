@@ -24,8 +24,12 @@
         <CheckBoxPreference 
             android:key="calendar_preference"
             android:title="Calendar Integration"
+            android:summary="Only auto responds if you are currently in an event marked as busy. You can further customize your message with the name and end time of your event with [name] and [end] respectively. View the help page for an example."
+			android:defaultValue="true"/>
+			<!-- 
             android:summary="Only auto responds if you are currently in an event marked as busy. In your Custom Response above, you can enter [end] to have the end time of your event inserted.  Similarly, enter [name] to have the name of the your event inserted."
-            android:defaultValue="true"/>
+            -->
+           
     
         <CheckBoxPreference
             android:key="notification_preference"
@@ -36,7 +40,7 @@
         <CheckBoxPreference
                 android:key="sleep_timer_preference"
                 android:title="Sleep Timer"
-                android:summary="Enables a minimum time between responses to a single contact to avoid spamming the recipient."
+                android:summary="Enables a minimum time between responses to a single contact to avoid spamming the recipient. View the help page for more information and an example."
                 android:defaultValue="true"/>
         
         <ListPreference

@@ -94,6 +94,7 @@
         android:layout_height="fill_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:paddingRight="12dp"
         android:layout_below="@+id/bottomHalf" >
 
     </RelativeLayout>
