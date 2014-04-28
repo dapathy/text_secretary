@@ -131,21 +131,16 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop(){
     	super.onStop();
-    	// We need an Editor object to make preference changes.
-    	// All objects are from android.context.Context
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     	SharedPreferences.Editor editor = settings.edit();
     	editor.putBoolean("smsState", SMS_Service_State);
 
-    	// Commit the edits!
     	editor.commit();
     }
     
     @Override
     protected void onResume(){
     	super.onStop();
-    	// We need an Editor object to make preference changes.
-    	// All objects are from android.context.Context
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     	SMS_Service_State = settings.getBoolean("smsState", true);
         customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
@@ -165,7 +160,6 @@ public class MainActivity extends Activity {
         
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
@@ -178,12 +172,12 @@ public class MainActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			//fragmentTransaction.remove(serviceListFragment).commit();
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 			return true;
 		}
 		if(id == R.id.action_help){
 			startActivity(new Intent(getApplicationContext(), Help_Activity.class));
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -199,10 +193,11 @@ public class MainActivity extends Activity {
 	}
 	
 	public void jiggleLayout(final RelativeLayout l){
-		l.clearAnimation(); 
-		out = AnimationUtils.loadAnimation(this,R.anim.animationout);
-		 Log.d("TAG", "animation");
-		 //Handler handler = new Handler();
+		 l.clearAnimation(); 
+		 //load the "bounce" animation
+		 out = AnimationUtils.loadAnimation(this,R.anim.animationout);
+		 //run the animation on a thread other than the
+		 //main UI thread
 		 final Runnable r = new Runnable()
 		 {
 		    public void run() 
@@ -216,8 +211,8 @@ public class MainActivity extends Activity {
 
 	}	
 	
+	//This dialogue is here to teach users how to toggle the service on and off
 	public void showToggleDialogue(){
-
 		new AlertDialog.Builder(this)
 	    .setTitle("How to use Text Secretary")
 	    .setMessage("Press the typewriter to toggle the Text Secretary ON/OFF")
@@ -225,7 +220,6 @@ public class MainActivity extends Activity {
 	        public void onClick(DialogInterface dialog, int which) { 
 	        	SharedPreferences.Editor editor = settings.edit();
 	        	editor.putBoolean("remindToggleDialogue", false);
-	        	// Commit the edits!
 	        	editor.commit();
 	        }
 	     })

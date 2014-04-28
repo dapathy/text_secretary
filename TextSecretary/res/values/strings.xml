@@ -16,5 +16,5 @@
     <string name="action_help">Help</string>
     <string name="calendar_body">When enabled, Text Secretary will only auto respond if the user is in a calendar event. Text Secretary will check all of the available calendars in the user’s device. Text Secretary will also enter the name and end time of the event if the user puts [name] and/or [end] into their custom message. For example:</string>
     <string name="sleep_body">Text Secretary’s Sleep capability is used to prevent auto responding too quickly to the same contact. In other words, when Text Secretary auto responds to a contact, Text Secretary will not auto respond to that same contact for a certain amount of time. For example:</string>
-
+    <string name="about_body">Text Secretary was made by three Gonzaga students: Tyler Doster, Cameron Aubert, and Collin Walker. This app was created for CPSCI 461 Mobile Computing. GO ZAGS!</string>
 </resources>
