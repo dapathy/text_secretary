@@ -44,13 +44,15 @@ public class Notification_Service{
 		String id = getId(number);
 		
 		/* Invoking the default notification service */
-		NotificationCompat.Builder  mBuilder = 
-				new NotificationCompat.Builder(mContext);	
+		NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(mContext);	
+		
 		mBuilder.setContentTitle("Auto Replied");
 		mBuilder.setContentText("Text Secretary auto replied to: " + id);
 		mBuilder.setTicker("Text Secretary Auto Reply");
 		mBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
 		mBuilder.setAutoCancel(true);
+		mBuilder.setNumber(3);
+
 	      
 		/* Creates an explicit intent for an Activity in your app */
 		Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null));
@@ -70,10 +72,11 @@ public class Notification_Service{
 
 		mNotificationManager =
 				(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-
-		int notificationID = 100;
+		
+	    int randomInt = (int)(1000.0 * Math.random());
+		//int notificationID = 100;
 		/* notificationID allows you to update the notification later on. */
-		mNotificationManager.notify(notificationID , mBuilder.build());
+		mNotificationManager.notify(randomInt , mBuilder.build());
 	}
 
 }

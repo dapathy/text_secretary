@@ -3,15 +3,15 @@
     tools:context="edu.gonzaga.textsecretary.MainActivity" >
 
     <item
+        android:id="@+id/action_help"
+        android:orderInCategory="99"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_help"/>
+    
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/action_settings"/>
-    
-	<item
-        android:id="@+id/action_help"
-        android:orderInCategory="101"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_help"/>
 
 </menu>

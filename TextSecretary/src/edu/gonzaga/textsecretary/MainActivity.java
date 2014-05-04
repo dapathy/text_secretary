@@ -77,9 +77,7 @@ public class MainActivity extends Activity {
 
 	    });
 
-		// Put the custom Message in the Edit Text
-        customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
-        custom.setText(customMessage.toString());
+		setMessage();
         
         // get an instance of FragmentTransaction from your Activity
         fragmentManager = getFragmentManager();
@@ -98,6 +96,14 @@ public class MainActivity extends Activity {
 			showToggleDialogue();
 	}
 	
+	// Put the custom Message in the Edit Text
+	public void setMessage(){
+		if (settings.getBoolean("calendar_preference", true))
+			customMessage = settings.getString("custom_calendar_message_preference", "You can change custom message in Settings");
+		else
+			customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
+        custom.setText(customMessage.toString());
+	}
 	
 	View.OnClickListener imgButtonHandler = new View.OnClickListener() {
 	    @SuppressLint("ResourceAsColor")
@@ -143,8 +149,8 @@ public class MainActivity extends Activity {
     	super.onStop();
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     	SMS_Service_State = settings.getBoolean("smsState", true);
-        customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
-        custom.setText(customMessage.toString());
+    	
+		setMessage();
         
     	if(SMS_Service_State){
 	        imageState.setImageResource(R.drawable.button_on);

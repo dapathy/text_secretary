@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class StartOnBoot extends BroadcastReceiver{
-    public static final String PREFS_NAME = "TextSecretaryFiles";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {

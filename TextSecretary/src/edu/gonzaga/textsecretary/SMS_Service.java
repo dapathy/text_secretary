@@ -66,29 +66,37 @@ public class SMS_Service extends Service{
 	    				Log.d(TAG, "created msgs");
 						for(int i = 0; i < msgs.length; i++){
 	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
-	                        msg_from = msgs[i].getOriginatingAddress();
-	                        
-	                        //if timer is disabled or is recent
-	        				if (!prefs.getBoolean("sleep_timer_preference", true) || !isRecent(msg_from, Long.valueOf(prefs.getString("list_preference", "1800000")))){
-	        			        String message = prefs.getString("custom_message_preference", defMessage);
-	        			        Log.d(TAG, message);
-	        			        String newMessage = getNewMessage(message, prefs.getBoolean("calendar_preference", true));
-	        					sendSMS(msg_from, newMessage);
-		        				
-	        					//create notification
-	        					if(prefs.getBoolean("notification_preference", true))
-	        						mnotification.displayNotification(msg_from);
-	        					
- 		        				final String savefrom = msg_from;
- 		        				final String savemessage = newMessage;
-	        				    new Handler().postDelayed(new Runnable() {
- 	        				        @Override
- 	        				        public void run() {
-										storeMessage(savefrom , savemessage);
- 	        				        }
- 	        				    }, 2000);
-	        				}
+	                        msg_from = msgs[i].getOriginatingAddress(); 
 	                    }
+						
+						//if timer is disabled or is recent
+        				if (!prefs.getBoolean("sleep_timer_preference", true) || !isRecent(msg_from, Long.valueOf(prefs.getString("list_preference", "1800000")))){
+        			        String message;
+        			        
+        			        //retrieves correct message
+        			        if(prefs.getBoolean("calendar_preference", true)){
+        			        	message = prefs.getString("custom_calendar_message_preference", defMessage);
+        			        	message = getNewMessage(message);	//replaces insertables
+        			        }
+        			        else{
+        			        	message = prefs.getString("custom_message_preference", defMessage);
+        			        }
+        					sendSMS(msg_from, message);
+	        				
+        					//create notification
+        					if(prefs.getBoolean("notification_preference", true))
+        						mnotification.displayNotification(msg_from);
+        					
+		        				final String savefrom = msg_from;
+		        				final String savemessage = message;
+        				    new Handler().postDelayed(new Runnable() {
+	        				        @Override
+	        				        public void run() {
+									storeMessage(savefrom , savemessage);
+	        				        }
+	        				    }, 2000);
+        				}
+						
 					} catch(Exception e){
 						Log.d(TAG, "cought");
 					}
@@ -121,23 +129,14 @@ public class SMS_Service extends Service{
 	}
 	
 	//parses message for [end] and [name] and replaces with info from calendar
-	private String getNewMessage(String oldMessage, boolean calendarOn){
+	private String getNewMessage(String oldMessage){
 		String newMessage;
-		
 		CharSequence end = "[end]";
 		CharSequence name = "[name]";
 		
-		//if tags are included and is off, default message is used
-		if (!calendarOn && (oldMessage.contains(end) || oldMessage.contains(name))){
-			newMessage = defMessage;
-		}
-		else if(!calendarOn){
-			newMessage = oldMessage;
-		}
-		else{
-			newMessage = oldMessage.replace(end, getDate(calendar.getEventEnd()));
-			newMessage = newMessage.replace(name, calendar.getEventName());
-		}
+		newMessage = oldMessage.replace(end, getDate(calendar.getEventEnd()));
+		newMessage = newMessage.replace(name, calendar.getEventName());
+			
 		return newMessage;
 	}
 	
