@@ -40,6 +40,7 @@ public class MainActivity extends Activity {
 	FragmentManager fragmentManager;
 	FragmentTransaction fragmentTransaction;
 	ServiceListFragment myFragment;
+	Register task;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +50,14 @@ public class MainActivity extends Activity {
         settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         SMS_Service_State = settings.getBoolean("smsState", true);
-		
+
+        task = new Register(getBaseContext());
+        
         if(SMS_Service_State && !settings.getBoolean("start_on_boot_preference", false)){
         	startService();
         }
         
+        task.execute();
         
         //GUI stuff
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
