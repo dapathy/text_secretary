@@ -76,7 +76,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	}
 	
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
-		if(key.toString().equals("Activate Text Secretary")){
+		if(key.toString().equals("Unlock Text Secretary")){
 			doPurchaseStuff();
 		}
 		return false;

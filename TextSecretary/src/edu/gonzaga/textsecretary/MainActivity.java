@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 
         SMS_Service_State = settings.getBoolean("smsState", true);
 
-        task = new Register(getBaseContext());
+        task = new Register(getBaseContext(), false);
         
         if(SMS_Service_State && !settings.getBoolean("start_on_boot_preference", false)){
         	startService();

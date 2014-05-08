@@ -63,9 +63,9 @@
     </PreferenceCategory>
     
         <PreferenceCategory
-	android:title="Activaton">
-        <Prefernece
-            android:title="Activate Text Secretart"/>
+		android:title="Activation">
+        	<Preference
+            	android:title="Unlock Text Secretary"/>
     </PreferenceCategory>
     
 </PreferenceScreen>
