@@ -1,6 +1,8 @@
 package edu.gonzaga.textsecretary;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -17,11 +19,12 @@ import android.widget.Toast;
 
 public class Register extends AsyncTask<String, String, String> {
 	private Context mContext;
-	private UserEmailFetcher userEmailFetcher = null;
+	private Boolean mPay;
 	private String userEmail = null;
 	
-    public Register (Context context){
+    public Register (Context context, Boolean pay){
          mContext = context;
+         mPay = pay;
     }
 	private String paid = null;
 	private String TAG = "Register";
@@ -43,7 +46,12 @@ public class Register extends AsyncTask<String, String, String> {
 	@Override
 	protected String doInBackground(String... args) {
         int success;
-        paid = "1";
+        if(mPay)
+        	paid = "1";
+        
+        else
+        	paid = "0";
+        
         userEmail = UserEmailFetcher.getEmail(mContext);
         try {
             // Building Parameters
@@ -65,13 +73,16 @@ public class Register extends AsyncTask<String, String, String> {
 
             success = json.getInt(TAG_SUCCESS);
             if (success == 1) {
-            	return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
-            	}
+            	//return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
+            	return(json.getString(TAG_DATE));
+           	}
             else if(success == 2){
-            	return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
+            	//return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
+            	return(json.getString(TAG_DATE));
            	}
             else{
-            	return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
+            	//return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
+            	return(json.getString(TAG_DATE));
             }
         } catch (JSONException e) {
         	Log.d(TAG, "CATCH");
@@ -87,10 +98,38 @@ public class Register extends AsyncTask<String, String, String> {
 
     protected void onPostExecute(String file_url) {
         if (file_url != null){
-        	Log.d(TAG, "onPostExecute: " + file_url);
-        	Toast.makeText(mContext, file_url, Toast.LENGTH_LONG).show();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        	String currentDateandTime = sdf.format(new Date());
+        	compareDate(file_url, currentDateandTime);
+        	Log.d(TAG, "onPostExecute: " + file_url + "  " + currentDateandTime);
+
         }
+        
     }
+    
+    public void compareDate(String endTrial, String currentDate) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date end = sdf.parse(endTrial);
+            Date current = sdf.parse(currentDate);
+
+            if(end.compareTo(current)>0){
+                Log.v(TAG,"end is after current");
+            	Toast.makeText(mContext, "WITHIN TRIAL DATE", Toast.LENGTH_LONG).show();
+            }else if(end.compareTo(current)<0){
+                Log.v(TAG,"end is before current");
+            	Toast.makeText(mContext, "TRIAL OVER" , Toast.LENGTH_LONG).show();
+
+            }else if(end.compareTo(current)==0){
+                Log.v(TAG,"end is equal to current");
+            	Toast.makeText(mContext, "TRIAL?" , Toast.LENGTH_LONG).show();
+            }
+        } catch(Exception e) {
+        	Log.d(TAG, "CATCH compare" + e.toString());
+        }
+        
+    }
+
     
     public static class UserEmailFetcher {
         
