@@ -62,4 +62,10 @@
             
     </PreferenceCategory>
     
+        <PreferenceCategory
+	android:title="Activaton">
+        <Prefernece
+            android:title="Activate Text Secretart"/>
+    </PreferenceCategory>
+    
 </PreferenceScreen>
