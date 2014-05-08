@@ -1,12 +1,45 @@
 package edu.gonzaga.textsecretary;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.android.vending.billing.IInAppBillingService;
+
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentSender.SendIntentException;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.util.Log;
 
 public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceChangeListener{
+	
+	IInAppBillingService mService;
+	String PACKAGE_NAME;
+
+	ServiceConnection mServiceConn = new ServiceConnection() {
+	   @Override
+	   public void onServiceDisconnected(ComponentName name) {
+	       mService = null;
+	   }
+
+	   @Override
+	   public void onServiceConnected(ComponentName name, 
+	      IBinder service) {
+	       mService = IInAppBillingService.Stub.asInterface(service);
+	   }
+	};
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -16,6 +49,11 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 			Preference preference = findPreference("custom_message_preference");
 	        preference.setEnabled(false);
 		}
+		
+		PACKAGE_NAME = getActivity().getPackageName();
+		getActivity().bindService(new 
+		        Intent("com.android.vending.billing.InAppBillingService.BIND"),
+		                mServiceConn, Context.BIND_AUTO_CREATE);
 	}
 	
 	@Override
@@ -27,6 +65,14 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	public void onPause(){
 	    super.onPause();
 	    getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+	}
+	
+	@Override
+	public void onDestroy() {
+	    super.onDestroy();
+	    if (mService != null) {
+	    	getActivity().unbindService(mServiceConn);
+	    }   
 	}
 	
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
