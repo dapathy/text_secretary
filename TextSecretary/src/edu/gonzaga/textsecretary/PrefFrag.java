@@ -29,11 +29,60 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	    getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 	}
 	
+	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
+		if(key.toString().equals("Activate Text Secretary")){
+			doPurchaseStuff();
+		}
+		return false;
+	}
+	
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
 	    if (key.equals("calendar_preference")){
 	        Preference preference = findPreference("custom_message_preference");
 	        preference.setEnabled(!sharedPreferences.getBoolean("calendar_preference", false));
 	    }
+	}
+	
+	//TODO: add payload string to identify user
+	private void doPurchaseStuff(){
+		try {
+			Bundle buyIntentBundle = mService.getBuyIntent(3, PACKAGE_NAME, "text_secretary_unlock", "inapp", null);
+			PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
+			
+			getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(),
+					   1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
+					   Integer.valueOf(0));
+				
+		}catch (SendIntentException e) {
+			Log.e("PURCHASE", "didn't start activity");
+			e.printStackTrace();
+		}
+		 catch (RemoteException e) {
+			Log.e("PURCHASE", "getting intent failed");
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	//I'm not sure why this is useful
+	public void onActivityResult(int requestCode, int resultCode, Intent data) { 
+	   if (requestCode == 1001) {           
+	      int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
+	      String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
+	      String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
+	        
+	      if (resultCode == Activity.RESULT_OK) {
+	         try {
+	            JSONObject jo = new JSONObject(purchaseData);
+	            String sku = jo.getString("productId");
+	            Log.d("PURCHASE", "You have bought the " + sku + ". Excellent choice, adventurer!");
+	          }
+	          catch (JSONException e) {
+	             Log.e("PURCHASE", "Failed to parse purchase data.");
+	             e.printStackTrace();
+	          }
+	      }
+	   }
 	}
 }
