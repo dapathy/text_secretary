@@ -154,7 +154,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	        
 	      if (resultCode == Activity.RESULT_OK) {
 	         try {
-	        	task = new Register(getActivity(), true, getActivity());
+	        	task = new Register(getActivity().getApplicationContext(), true);
 	            JSONObject jo = new JSONObject(purchaseData);
 	            String sku = jo.getString("productId");
 	            Log.d("PURCHASE", "You have bought the " + sku + ". Excellent choice, adventurer!");

@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,13 +24,11 @@ import android.widget.Toast;
 public class Register extends AsyncTask<String, String, String> {
 	private Context mContext;
 	private Boolean mPay;
-	private Activity mActivity;
 	private String userEmail = null;
 	
-    public Register (Context context, Boolean pay, Activity act){
+    public Register (Context context, Boolean pay){
          mContext = context;
          mPay = pay;
-         mActivity = act;
     }
 	private String paid = null;
 	private String TAG = "Register";
@@ -44,7 +41,7 @@ public class Register extends AsyncTask<String, String, String> {
 
     //ids
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_PAID = "paid";
+   // private static final String TAG_PAID = "paid";
     private static final String TAG_DATE = "trialEND";
 
 	boolean failure = false;
@@ -105,7 +102,9 @@ public class Register extends AsyncTask<String, String, String> {
 
     protected void onPostExecute(String file_url) {
         boolean inTrial = true;
-
+        
+       //TODO: do paid check here if true, skip calendar check?
+        
         if (file_url != null){
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         	String currentDateandTime = sdf.format(new Date());
@@ -113,10 +112,12 @@ public class Register extends AsyncTask<String, String, String> {
         	Log.d(TAG, "onPostExecute: " + file_url + "  " + currentDateandTime);
         }
         
-        if(!inTrial);
+        //TODO: include paid status in check or do earlier if possible
+        if(!inTrial)
+        	showTrialOver();
     }
     
-    public boolean isInTrialDate(String endTrial, String currentDate) {
+    private boolean isInTrialDate(String endTrial, String currentDate) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
             Date end = sdf.parse(endTrial);
@@ -125,7 +126,6 @@ public class Register extends AsyncTask<String, String, String> {
             if(end.compareTo(current)>0){
                 Log.v(TAG,"end is after current");
             	Toast.makeText(mContext, "WITHIN TRIAL DATE", Toast.LENGTH_LONG).show();
-            	showTrialOver();
             	return true;
             }else if(end.compareTo(current)<=0){
                 Log.v(TAG,"end is before current");
@@ -140,23 +140,23 @@ public class Register extends AsyncTask<String, String, String> {
     }
 
 	//This dialogue informs user that they're period is over
-	public void showTrialOver(){
+	private void showTrialOver(){
         Intent serviceIntent = new Intent(mContext, SMS_Service.class);
         mContext.stopService(serviceIntent);
 		
-		new AlertDialog.Builder(mActivity)
+		new AlertDialog.Builder(mContext)
 	    .setTitle("End of Trial Period")
 	    .setMessage("You 30 day trial period of Text Secretary is over. Would you like to unlock for life?")
 	    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int which) { 
-	        	//TODO: purchase
-	        	//PrefFrag myPrefFrag = new PrefFrag();
-	        	//myPrefFrag.doPurchaseStuff();
+	        public void onClick(DialogInterface dialog, int which) {
+	        	//go to settings intent to purchase
+	        	Intent intent = new Intent(mContext, SettingsActivity.class);
+	        	mContext.startActivity(intent);
 	        }
 	     })
 	    .setNegativeButton("No", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) {
-	        	mActivity.finish();
+	        	System.exit(1);
 	        }
 	     })
 	     .show();
@@ -164,7 +164,7 @@ public class Register extends AsyncTask<String, String, String> {
     
     public static class UserEmailFetcher {
         
-        static String getEmail(Context context) {
+        static public String getEmail(Context context) {
           AccountManager accountManager = AccountManager.get(context); 
           Account account = getAccount(accountManager);
 
