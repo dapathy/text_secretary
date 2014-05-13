@@ -62,10 +62,11 @@
             
     </PreferenceCategory>
     
-        <PreferenceCategory
-		android:title="Activation">
+	<PreferenceCategory
+			android:title="Activation">
         	<Preference
-            	android:title="Unlock Text Secretary"/>
+            	android:title="Unlock Text Secretary"
+            	android:key="unlock_preference"/>
     </PreferenceCategory>
     
 </PreferenceScreen>

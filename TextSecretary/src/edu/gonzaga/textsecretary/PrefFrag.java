@@ -1,5 +1,7 @@
 package edu.gonzaga.textsecretary;
 
+import java.util.ArrayList;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,6 +28,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	
 	IInAppBillingService mService;
 	String PACKAGE_NAME;
+	boolean unlockPurchased = false;
 
 	ServiceConnection mServiceConn = new ServiceConnection() {
 	   @Override
@@ -37,6 +40,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	   public void onServiceConnected(ComponentName name, 
 	      IBinder service) {
 	       mService = IInAppBillingService.Stub.asInterface(service);
+	       unlockPurchased = alreadyPurchased();	//queries purchases
 	   }
 	};
 	
@@ -45,15 +49,25 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
 		
+		//set message disability based on calendar selection
 		if(getPreferenceManager().getSharedPreferences().getBoolean("calendar_preference", true)){
-			Preference preference = findPreference("custom_message_preference");
-	        preference.setEnabled(false);
+			Preference messagePreference = findPreference("custom_message_preference");
+	        messagePreference.setEnabled(false);
 		}
 		
+		//bind service?
 		PACKAGE_NAME = getActivity().getPackageName();
 		getActivity().bindService(new 
 		        Intent("com.android.vending.billing.InAppBillingService.BIND"),
 		                mServiceConn, Context.BIND_AUTO_CREATE);
+		
+		//set visibility of unlock
+		Preference unlockPreference = findPreference("unlock_preference");
+		if(!unlockPurchased){
+	        unlockPreference.setEnabled(false);
+			unlockPreference.setTitle("Unlock Already Purchased");
+		}
+			
 	}
 	
 	@Override
@@ -77,7 +91,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
 		if(key.toString().equals("Unlock Text Secretary")){
-			doPurchaseStuff();
+			purchaseUnlock();
 		}
 		return false;
 	}
@@ -90,8 +104,30 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	    }
 	}
 	
+	//checks if unlock has already been purchased
+	private boolean alreadyPurchased(){
+		try {
+			Bundle ownedItems = mService.getPurchases(3, PACKAGE_NAME, "inapp", null);
+			
+			int response = ownedItems.getInt("RESPONSE_CODE");
+			if (response == 0) {
+			   ArrayList<String> ownedSkus =
+			      ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+			   
+			   if(ownedSkus.isEmpty())
+				   return false;
+			   else
+				   return true;
+			}
+		} catch (RemoteException e) {
+			Log.e("PURCHASE", "query failed");
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	//TODO: add payload string to identify user
-	private void doPurchaseStuff(){
+	private void purchaseUnlock(){
 		try {
 			Bundle buyIntentBundle = mService.getBuyIntent(3, PACKAGE_NAME, "text_secretary_unlock", "inapp", null);
 			PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
@@ -99,7 +135,6 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 			getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(),
 					   1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
 					   Integer.valueOf(0));
-				
 		}catch (SendIntentException e) {
 			Log.e("PURCHASE", "didn't start activity");
 			e.printStackTrace();
