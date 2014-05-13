@@ -26,9 +26,10 @@ import android.util.Log;
 
 public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceChangeListener{
 	
-	IInAppBillingService mService;
-	String PACKAGE_NAME;
-	boolean unlockPurchased = false;
+	private IInAppBillingService mService;
+	private String PACKAGE_NAME;
+	private boolean unlockPurchased = false;
+	private Register task;
 
 	ServiceConnection mServiceConn = new ServiceConnection() {
 	   @Override
@@ -149,17 +150,18 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	//I'm not sure why this is useful
 	public void onActivityResult(int requestCode, int resultCode, Intent data) { 
 	   if (requestCode == 1001) {           
-	      int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
 	      String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-	      String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
 	        
 	      if (resultCode == Activity.RESULT_OK) {
 	         try {
+	        	task = new Register(getActivity(), true, getActivity());
 	            JSONObject jo = new JSONObject(purchaseData);
 	            String sku = jo.getString("productId");
 	            Log.d("PURCHASE", "You have bought the " + sku + ". Excellent choice, adventurer!");
+	            task.execute();
 	          }
 	          catch (JSONException e) {
+	        	 //task set false?
 	             Log.e("PURCHASE", "Failed to parse purchase data.");
 	             e.printStackTrace();
 	          }

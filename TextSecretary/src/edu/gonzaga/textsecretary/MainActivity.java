@@ -25,22 +25,22 @@ import android.widget.RemoteViews;
 
 public class MainActivity extends Activity {
 	
-	String TAG = "TAG";
-	String customMessage;
-	Boolean SMS_Service_State = true;
-	Boolean remindToggleDialogue;
-	RelativeLayout lowerBar, lowerHalf, listFragment;
-	ImageButton imageState;
-	Animation out;
-	EditText custom;
-	SharedPreferences settings;
-	RemoteViews remoteViews;
-	ComponentName widget;
-	AppWidgetManager appWidgetManager;
-	FragmentManager fragmentManager;
-	FragmentTransaction fragmentTransaction;
-	ServiceListFragment myFragment;
-	Register task;
+	private String TAG = "TAG";
+	private String customMessage;
+	private Boolean SMS_Service_State = true;
+	private Boolean remindToggleDialogue;
+	private RelativeLayout lowerBar, lowerHalf, listFragment;
+	private ImageButton imageState;
+	private Animation out;
+	private EditText custom;
+	private SharedPreferences settings;
+	private RemoteViews remoteViews;
+	private ComponentName widget;
+	private AppWidgetManager appWidgetManager;
+	private FragmentManager fragmentManager;
+	private FragmentTransaction fragmentTransaction;
+	private ServiceListFragment myFragment;
+	private Register task;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
