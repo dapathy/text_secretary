@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -12,7 +13,11 @@ import org.json.JSONObject;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,11 +25,13 @@ import android.widget.Toast;
 public class Register extends AsyncTask<String, String, String> {
 	private Context mContext;
 	private Boolean mPay;
+	private Activity mActivity;
 	private String userEmail = null;
 	
-    public Register (Context context, Boolean pay){
+    public Register (Context context, Boolean pay, Activity act){
          mContext = context;
          mPay = pay;
+         mActivity = act;
     }
 	private String paid = null;
 	private String TAG = "Register";
@@ -97,39 +104,63 @@ public class Register extends AsyncTask<String, String, String> {
 	}
 
     protected void onPostExecute(String file_url) {
-        if (file_url != null){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        	String currentDateandTime = sdf.format(new Date());
-        	compareDate(file_url, currentDateandTime);
-        	Log.d(TAG, "onPostExecute: " + file_url + "  " + currentDateandTime);
+        boolean inTrial = true;
 
+        if (file_url != null){
+        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        	String currentDateandTime = sdf.format(new Date());
+        	inTrial = isInTrialDate(file_url, currentDateandTime);
+        	Log.d(TAG, "onPostExecute: " + file_url + "  " + currentDateandTime);
         }
         
+        if(!inTrial);
     }
     
-    public void compareDate(String endTrial, String currentDate) {
+    public boolean isInTrialDate(String endTrial, String currentDate) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
             Date end = sdf.parse(endTrial);
             Date current = sdf.parse(currentDate);
 
             if(end.compareTo(current)>0){
                 Log.v(TAG,"end is after current");
             	Toast.makeText(mContext, "WITHIN TRIAL DATE", Toast.LENGTH_LONG).show();
-            }else if(end.compareTo(current)<0){
+            	showTrialOver();
+            	return true;
+            }else if(end.compareTo(current)<=0){
                 Log.v(TAG,"end is before current");
             	Toast.makeText(mContext, "TRIAL OVER" , Toast.LENGTH_LONG).show();
-
-            }else if(end.compareTo(current)==0){
-                Log.v(TAG,"end is equal to current");
-            	Toast.makeText(mContext, "TRIAL?" , Toast.LENGTH_LONG).show();
+            	return false;
             }
         } catch(Exception e) {
-        	Log.d(TAG, "CATCH compare" + e.toString());
+        	Log.d(TAG, "CATCH compare " + e.toString());
         }
+        return true;
         
     }
 
+	//This dialogue informs user that they're period is over
+	public void showTrialOver(){
+        Intent serviceIntent = new Intent(mContext, SMS_Service.class);
+        mContext.stopService(serviceIntent);
+		
+		new AlertDialog.Builder(mActivity)
+	    .setTitle("End of Trial Period")
+	    .setMessage("You 30 day trial period of Text Secretary is over. Would you like to unlock for life?")
+	    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) { 
+	        	//TODO: purchase
+	        	//PrefFrag myPrefFrag = new PrefFrag();
+	        	//myPrefFrag.doPurchaseStuff();
+	        }
+	     })
+	    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) {
+	        	mActivity.finish();
+	        }
+	     })
+	     .show();
+	}
     
     public static class UserEmailFetcher {
         
