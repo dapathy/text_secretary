@@ -47,12 +47,12 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-
+        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        
+        task = new Register(this, false);
+        
         SMS_Service_State = settings.getBoolean("smsState", true);
 
-        task = new Register(getBaseContext(), false, this);
-        
         if(SMS_Service_State && !settings.getBoolean("start_on_boot_preference", false)){
         	startService();
         }
@@ -67,9 +67,9 @@ public class MainActivity extends Activity {
 		imageState.setOnClickListener(imgButtonHandler);
 		
 		//WidgetStuff
-        remoteViews = new RemoteViews(getBaseContext().getPackageName(), R.layout.widgetlayout);
-        widget = new ComponentName(getBaseContext(), Widget.class);
-        appWidgetManager = AppWidgetManager.getInstance(getBaseContext());
+        remoteViews = new RemoteViews(getApplicationContext().getPackageName(), R.layout.widgetlayout);
+        widget = new ComponentName(getApplicationContext(), Widget.class);
+        appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 
         //Set the on click listener for the custom message
 		custom = (EditText) findViewById(R.id.customMessage);
@@ -141,7 +141,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop(){
     	super.onStop();
-        settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     	SharedPreferences.Editor editor = settings.edit();
     	editor.putBoolean("smsState", SMS_Service_State);
 
@@ -151,7 +151,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume(){
     	super.onStop();
-        settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     	SMS_Service_State = settings.getBoolean("smsState", true);
     	
 		setMessage();
