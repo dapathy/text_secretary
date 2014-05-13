@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
         fragmentTransaction = fragmentManager.beginTransaction();
 
         //add a fragment
-        if(fragmentTransaction.isEmpty()){
+        if(savedInstanceState == null){
 	        myFragment = new ServiceListFragment();
 	        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
 	        fragmentTransaction.commit();
