@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     
+    <PreferenceCategory
+			android:title="Activation"
+			android:key="Activation">
+        	<Preference
+            	android:title="Unlock Text Secretary"/>
+    </PreferenceCategory>
+    
 	<PreferenceCategory
             android:title="Customizable Response">
             
@@ -60,13 +67,6 @@
                 android:dialogTitle="Sleep timer delay:"
                 android:defaultValue="1800000"/>
             
-    </PreferenceCategory>
-    
-	<PreferenceCategory
-			android:title="Activation">
-        	<Preference
-            	android:title="Unlock Text Secretary"
-            	android:key="unlock_preference"/>
     </PreferenceCategory>
     
 </PreferenceScreen>

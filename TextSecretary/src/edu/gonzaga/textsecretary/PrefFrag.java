@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.util.Log;
@@ -63,10 +64,9 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 		                mServiceConn, Context.BIND_AUTO_CREATE);
 		
 		//set visibility of unlock
-		Preference unlockPreference = findPreference("unlock_preference");
 		if(!unlockPurchased){
-	        unlockPreference.setEnabled(false);
-			unlockPreference.setTitle("Unlock Already Purchased");
+			PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("Activation");
+			getPreferenceScreen().removePreference(preferenceCategory);
 		}
 			
 	}
