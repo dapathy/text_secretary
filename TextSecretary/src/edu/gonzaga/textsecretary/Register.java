@@ -22,15 +22,17 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Register extends AsyncTask<String, String, String> {
+	
 	private Context mContext;
 	private Boolean mPay;
 	private String userEmail = null;
+	private String paid = null;
 	
     public Register (Context context, Boolean pay){
          mContext = context;
          mPay = pay;
     }
-	private String paid = null;
+    
 	private String TAG = "Register";
 
     // JSON parser class
@@ -40,8 +42,8 @@ public class Register extends AsyncTask<String, String, String> {
     private static final String LOGIN_URL = "http://gonzagakennelclub.com/textsecretary/register.php";
 
     //ids
-    private static final String TAG_SUCCESS = "success";
-   // private static final String TAG_PAID = "paid";
+    //private static final String TAG_SUCCESS = "success";
+    private static final String TAG_PAID = "paid";
     private static final String TAG_DATE = "trialEND";
 
 	boolean failure = false;
@@ -49,10 +51,8 @@ public class Register extends AsyncTask<String, String, String> {
 
 	@Override
 	protected String doInBackground(String... args) {
-        int success;
-        if(mPay)
+		if(mPay)
         	paid = "1";
-        
         else
         	paid = "0";
         
@@ -72,22 +72,12 @@ public class Register extends AsyncTask<String, String, String> {
 
 
             Log.d(TAG, "connected");
-
             Log.d(TAG, "JSON response" + json.toString());
-
-            success = json.getInt(TAG_SUCCESS);
-            if (success == 1) {
-            	//return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
-            	return(json.getString(TAG_DATE));
-           	}
-            else if(success == 2){
-            	//return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
-            	return(json.getString(TAG_DATE));
-           	}
-            else{
-            	//return (json.getString(TAG_SUCCESS) + " " + json.getString(TAG_PAID) + " " + json.getString(TAG_DATE));
-            	return(json.getString(TAG_DATE));
-            }
+            
+            //retrieve values
+        	paid = json.getString(TAG_PAID);
+        	return(json.getString(TAG_DATE));
+        
         } catch (JSONException e) {
         	Log.d(TAG, "CATCH");
             e.printStackTrace();
@@ -97,24 +87,21 @@ public class Register extends AsyncTask<String, String, String> {
         }
 
         return null;
-
 	}
 
     protected void onPostExecute(String file_url) {
-        boolean inTrial = true;
-        
-       //TODO: do paid check here if true, skip calendar check?
-        
-        if (file_url != null){
-        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        	String currentDateandTime = sdf.format(new Date());
-        	inTrial = isInTrialDate(file_url, currentDateandTime);
-        	Log.d(TAG, "onPostExecute: " + file_url + "  " + currentDateandTime);
-        }
-        
-        //TODO: include paid status in check or do earlier if possible
-        if(!inTrial)
-        	showTrialOver();
+    	if (!paid.equals("1")){
+    		boolean inTrial = true;
+		    if (file_url != null){
+		    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+		    	String currentDateandTime = sdf.format(new Date());
+		    	inTrial = isInTrialDate(file_url, currentDateandTime);
+		    	Log.d(TAG, "onPostExecute: " + file_url + "  " + currentDateandTime);
+		    }
+		    
+		    if(!inTrial)
+		    	showTrialOver();
+       }
     }
     
     private boolean isInTrialDate(String endTrial, String currentDate) {
