@@ -29,7 +29,6 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	
 	private IInAppBillingService mService;
 	private String PACKAGE_NAME;
-	private boolean unlockPurchased = false;
 	private Register task;
 
 	ServiceConnection mServiceConn = new ServiceConnection() {
@@ -42,7 +41,12 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	   public void onServiceConnected(ComponentName name, 
 	      IBinder service) {
 	       mService = IInAppBillingService.Stub.asInterface(service);
-	       unlockPurchased = alreadyPurchased();	//queries purchases
+	       
+			//set visibility of unlock
+	       if(isPurchased()){	//queries purchases
+	    	   PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("Activation");
+	    	   getPreferenceScreen().removePreference(preferenceCategory);
+	       }
 	   }
 	};
 	
@@ -62,13 +66,6 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 		getActivity().bindService(new 
 		        Intent("com.android.vending.billing.InAppBillingService.BIND"),
 		                mServiceConn, Context.BIND_AUTO_CREATE);
-		
-		//set visibility of unlock
-		if(!unlockPurchased){
-			PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("Activation");
-			getPreferenceScreen().removePreference(preferenceCategory);
-		}
-			
 	}
 	
 	@Override
@@ -106,7 +103,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	}
 	
 	//checks if unlock has already been purchased
-	private boolean alreadyPurchased(){
+	private boolean isPurchased(){
 		try {
 			Bundle ownedItems = mService.getPurchases(3, PACKAGE_NAME, "inapp", null);
 			

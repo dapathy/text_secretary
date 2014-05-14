@@ -90,6 +90,7 @@ public class Register extends AsyncTask<String, String, String> {
 	}
 
     protected void onPostExecute(String file_url) {
+    	Log.d("SDF", paid);
     	if (!paid.equals("1")){
     		boolean inTrial = true;
 		    if (file_url != null){
