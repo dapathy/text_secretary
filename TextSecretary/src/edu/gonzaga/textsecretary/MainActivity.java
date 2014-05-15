@@ -49,16 +49,14 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         
-        task = new Register(this, false);
+        checkActivation();
         
         SMS_Service_State = settings.getBoolean("smsState", true);
 
         if(SMS_Service_State && !settings.getBoolean("start_on_boot_preference", false)){
         	startService();
         }
-        
-        task.execute();
-        
+                
         //GUI stuff
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
@@ -100,8 +98,19 @@ public class MainActivity extends Activity {
 			showToggleDialogue();
 	}
 	
+	private void checkActivation(){
+		SharedPreferences secureSettings = new SecurePreferences(getApplicationContext());
+		String account = UserEmailFetcher.getEmail(getApplicationContext());
+		
+		//if application not paid
+		if(!secureSettings.getBoolean(account+"_paid", false)){
+	        task = new Register(this, false);
+	        task.execute();
+		}
+	}
+	
 	// Put the custom Message in the Edit Text
-	public void setMessage(){
+	private void setMessage(){
 		if (settings.getBoolean("calendar_preference", true))
 			customMessage = settings.getString("custom_calendar_message_preference", "You can change custom message in Settings");
 		else
@@ -192,17 +201,17 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	public void startService(){
+	private void startService(){
 		startService(new Intent(this, SMS_Service.class));
 		Log.d(TAG, "Started service");
 	}
 	
-	public void stopService (){
+	private void stopService (){
 		stopService (new Intent(this, SMS_Service.class));
 		Log.d(TAG, "Stoppped service");
 	}
 	
-	public void jiggleLayout(final RelativeLayout l){
+	private void jiggleLayout(final RelativeLayout l){
 		 l.clearAnimation(); 
 		 //load the "bounce" animation
 		 out = AnimationUtils.loadAnimation(this,R.anim.animationout);
@@ -222,7 +231,7 @@ public class MainActivity extends Activity {
 	}	
 	
 	//This dialogue is here to teach users how to toggle the service on and off
-	public void showToggleDialogue(){
+	private void showToggleDialogue(){
 		new AlertDialog.Builder(this)
 	    .setTitle("How to use Text Secretary")
 	    .setMessage("Press the typewriter to toggle the Text Secretary ON/OFF")

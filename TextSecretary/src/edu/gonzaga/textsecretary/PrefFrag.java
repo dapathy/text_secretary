@@ -2,9 +2,6 @@ package edu.gonzaga.textsecretary;
 
 import java.util.ArrayList;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.android.vending.billing.IInAppBillingService;
 
 import android.app.Activity;
@@ -124,10 +121,11 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 		return false;
 	}
 	
-	//TODO: add payload string to identify user
+	//TODO: encrypt payload??
 	private void purchaseUnlock(){
 		try {
-			Bundle buyIntentBundle = mService.getBuyIntent(3, PACKAGE_NAME, "text_secretary_unlock", "inapp", null);
+			String payload = UserEmailFetcher.getEmail(getActivity().getApplicationContext());
+			Bundle buyIntentBundle = mService.getBuyIntent(3, PACKAGE_NAME, "text_secretary_unlock", "inapp", payload);
 			PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
 			
 			getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(),
@@ -143,26 +141,34 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 		}
 	}
 	
+	//securely stores data locally, then stores on server
+	private void storeActivation(){
+		//securely store in shared preference
+		SharedPreferences secureSettings = new SecurePreferences(getActivity().getApplicationContext());
+		SharedPreferences.Editor secureEdit = secureSettings.edit();
+		String account = UserEmailFetcher.getEmail(getActivity().getApplicationContext());
+		
+		secureEdit.putBoolean(account+"_paid", true);
+		secureEdit.commit();
+		
+		//store on server
+		task = new Register(getActivity().getApplicationContext(), true);
+		task.execute();
+	}
+	
 	@Override
 	//I'm not sure why this is useful
-	public void onActivityResult(int requestCode, int resultCode, Intent data) { 
-	   if (requestCode == 1001) {           
-	      String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-	        
-	      if (resultCode == Activity.RESULT_OK) {
-	         try {
-	        	task = new Register(getActivity().getApplicationContext(), true);
-	            JSONObject jo = new JSONObject(purchaseData);
-	            String sku = jo.getString("productId");
-	            Log.d("PURCHASE", "You have bought the " + sku + ". Excellent choice, adventurer!");
-	            task.execute();
-	          }
-	          catch (JSONException e) {
-	        	 //task set false?
-	             Log.e("PURCHASE", "Failed to parse purchase data.");
-	             e.printStackTrace();
-	          }
-	      }
-	   }
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {          	        
+      if (resultCode == Activity.RESULT_OK) {
+         try {
+            Log.d("PURCHASE", "Purchase completed");
+            storeActivation();
+          }
+          catch (Exception e) {
+        	 //task set false?
+             Log.e("PURCHASE", "Failed to parse purchase data.");
+             e.printStackTrace();
+          }
+      }
 	}
 }
