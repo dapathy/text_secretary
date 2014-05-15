@@ -114,20 +114,34 @@ public class SMS_Service extends Service{
 		if(secureSettings.getBoolean(account+"_paid", false)){
 			registerReceiver();
 		}
+		//not in shared preferences, so check server
 		else{
 	        task = new Register(this, false);
 	        task.execute();
 	        try {
 				task.get(1000, TimeUnit.MILLISECONDS);	//wait for async to finish
 				//if paid or in trial, start service
-				if(!task.isFailure())
+				if(!task.isFailure()){
 					registerReceiver();
+					storeActivation();	//store local data since it didn't already exist
+				}
 			} catch (InterruptedException | ExecutionException
 					| TimeoutException e) {
 				Log.e("SMS", "task.get");
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	//securely stores data locally
+	private void storeActivation(){
+		//securely store in shared preference
+		SharedPreferences secureSettings = new SecurePreferences(getApplicationContext());
+		SharedPreferences.Editor secureEdit = secureSettings.edit();
+		String account = UserEmailFetcher.getEmail(getApplicationContext());
+		
+		secureEdit.putBoolean(account+"_paid", true);
+		secureEdit.commit();
 	}
 	
 	//register receiver
