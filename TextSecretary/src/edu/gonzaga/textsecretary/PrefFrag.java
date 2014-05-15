@@ -101,24 +101,32 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	
 	//checks if unlock has already been purchased
 	private boolean isPurchased(){
-		try {
-			Bundle ownedItems = mService.getPurchases(3, PACKAGE_NAME, "inapp", null);
-			
-			int response = ownedItems.getInt("RESPONSE_CODE");
-			if (response == 0) {
-			   ArrayList<String> ownedSkus =
-			      ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
-			   
-			   if(ownedSkus.isEmpty())
-				   return false;
-			   else
-				   return true;
+		SharedPreferences securePreferences = new SecurePreferences(getActivity().getApplicationContext());
+		String account = UserEmailFetcher.getEmail(getActivity().getApplicationContext());
+		//check shared preferences first
+		if(securePreferences.getBoolean(account+"_paid", false))
+			return true;
+		//else query google services
+		else{
+			try {
+				Bundle ownedItems = mService.getPurchases(3, PACKAGE_NAME, "inapp", null);
+				
+				int response = ownedItems.getInt("RESPONSE_CODE");
+				if (response == 0) {
+				   ArrayList<String> ownedSkus =
+				      ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+				   
+				   if(ownedSkus.isEmpty())
+					   return false;
+				   else
+					   return true;
+				}
+			} catch (RemoteException e) {
+				Log.e("PURCHASE", "query failed");
+				e.printStackTrace();
 			}
-		} catch (RemoteException e) {
-			Log.e("PURCHASE", "query failed");
-			e.printStackTrace();
+			return false;
 		}
-		return false;
 	}
 	
 	//TODO: encrypt payload??
