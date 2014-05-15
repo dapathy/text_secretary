@@ -98,6 +98,7 @@ public class Register extends AsyncTask<String, String, String> {
 		    	Log.d(TAG, "onPostExecute: " + file_url + "  " + currentDateandTime);
 		    }
 		    
+		    //if not in trial and not paid, then show dialog
 		    if(!inTrial){
 		    	failure = true;
 		    	showTrialOver();
