@@ -1,6 +1,7 @@
 package edu.gonzaga.textsecretary;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -23,7 +24,8 @@ public class Calendar_Service {
 				Instances.TITLE,
 				Instances.BEGIN,
 				Instances.END,
-				Instances.AVAILABILITY};
+				Instances.AVAILABILITY,
+				Instances.ALL_DAY};
 		
 		long start, end;
 		//establish search time frame
@@ -48,14 +50,20 @@ public class Calendar_Service {
 		
 		try{
 			Cursor calendarCursor = context.getContentResolver().query(builder.build(), projection, selection, selectionArgs, null);
-			//iterate over all events returned by query checking existance during current time
+			//iterate over all events returned by query checking existence during current time
 			while (calendarCursor.moveToNext()){
 				start = calendarCursor.getLong(1);
 				end = calendarCursor.getLong(2);
+				
+				//adjust start time for all day event
+				if (calendarCursor.getInt(4) == 1)
+					start = getAllDayStart(start);
+								
+				//checks if during current time
 				if (start <= currentMillis && end >= currentMillis){
-					Log.d("CALENDAR", "event present");
 					eventEnd = end;
 					eventName = calendarCursor.getString(0);
+					Log.d("CALENDAR", "event present");
 					calendarCursor.close();
 					return true;
 				}
@@ -68,6 +76,16 @@ public class Calendar_Service {
 		
 		Log.d("CALENDAR", "not event");
 		return false;
+	}
+	
+	//adjust start time for all day events
+	private long getAllDayStart(long origStart){
+		Calendar allStart = Calendar.getInstance();
+		allStart.setTime(new Date(origStart));
+		allStart.roll(Calendar.DATE, true);
+		allStart.set(Calendar.HOUR_OF_DAY, 0);
+		allStart.set(Calendar.MINUTE, 0);
+		return allStart.getTimeInMillis();
 	}
 
 	public long getEventEnd() {
