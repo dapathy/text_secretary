@@ -17,7 +17,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Register extends AsyncTask<String, String, String> {
 	
@@ -114,11 +113,11 @@ public class Register extends AsyncTask<String, String, String> {
 
             if(end.compareTo(current)>0){
                 Log.v(TAG,"end is after current");
-            	Toast.makeText(mContext, "WITHIN TRIAL DATE", Toast.LENGTH_LONG).show();
+            	//Toast.makeText(mContext, "WITHIN TRIAL DATE", Toast.LENGTH_LONG).show();
             	return true;
             }else if(end.compareTo(current)<=0){
                 Log.v(TAG,"end is before current");
-            	Toast.makeText(mContext, "TRIAL OVER" , Toast.LENGTH_LONG).show();
+            	//Toast.makeText(mContext, "TRIAL OVER" , Toast.LENGTH_LONG).show();
             	return false;
             }
         } catch(Exception e) {
