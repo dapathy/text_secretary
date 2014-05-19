@@ -26,12 +26,12 @@ import android.util.Log;
 
 public class SMS_Service extends Service{
 	
-	String TAG = "TAG";
-	Calendar_Service calendar;
-	String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
-	final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
-	HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
-	Register task;
+	private final String TAG = "Service";
+	private Calendar_Service calendar;
+	private String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
+	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
+	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
+	private Register task;
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -123,7 +123,6 @@ public class SMS_Service extends Service{
 				//if paid or in trial, start service
 				if(!task.isFailure()){
 					registerReceiver();
-					storeActivation();	//store local data since it didn't already exist
 				}
 			} catch (InterruptedException | ExecutionException
 					| TimeoutException e) {
@@ -131,17 +130,6 @@ public class SMS_Service extends Service{
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	//securely stores data locally
-	private void storeActivation(){
-		//securely store in shared preference
-		SharedPreferences secureSettings = new SecurePreferences(getApplicationContext());
-		SharedPreferences.Editor secureEdit = secureSettings.edit();
-		String account = UserEmailFetcher.getEmail(getApplicationContext());
-		
-		secureEdit.putBoolean(account+"_paid", true);
-		secureEdit.commit();
 	}
 	
 	//register receiver

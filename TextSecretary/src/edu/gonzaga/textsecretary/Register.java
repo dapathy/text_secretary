@@ -15,22 +15,19 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class Register extends AsyncTask<String, String, String> {
 	
 	private Context mContext;
-	private Boolean mPay;
-	private String userEmail = null;
-	private String paid = null;
+	private boolean mPay;
+	private String serverPay;
 	
-    public Register (Context context, Boolean pay){
-         mContext = context;
-         mPay = pay;
-    }
-    
-	private String TAG = "Register";
+	private boolean failure = false;
+	
+	private final String TAG = "Register";
 
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
@@ -42,12 +39,15 @@ public class Register extends AsyncTask<String, String, String> {
     //private static final String TAG_SUCCESS = "success";
     private static final String TAG_PAID = "paid";
     private static final String TAG_DATE = "trialEND";
-
-	private boolean failure = false;
-
+	
+    public Register (Context context, Boolean pay){
+         mContext = context;
+         mPay = pay;
+    }
 
 	@Override
 	protected String doInBackground(String... args) {
+		String paid, userEmail;
 		if(mPay)
         	paid = "1";
         else
@@ -72,7 +72,7 @@ public class Register extends AsyncTask<String, String, String> {
             Log.d(TAG, "JSON response" + json.toString());
             
             //retrieve values
-        	paid = json.getString(TAG_PAID);
+        	serverPay = json.getString(TAG_PAID);
         	return(json.getString(TAG_DATE));
         
         } catch (JSONException e) {
@@ -87,9 +87,10 @@ public class Register extends AsyncTask<String, String, String> {
 	}
 
     protected void onPostExecute(String file_url) {
-    	Log.d("SDF", paid);
-    	if (!paid.equals("1")){
-    		boolean inTrial = true;
+    	Log.d("SDF", serverPay);
+    	//if not paid
+    	if (!serverPay.equals("1")){
+    		boolean inTrial = false;
 		    if (file_url != null){
 		    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 		    	String currentDateandTime = sdf.format(new Date());
@@ -103,7 +104,24 @@ public class Register extends AsyncTask<String, String, String> {
 		    	showTrialOver();
 		    }
        }
+    	//must have paid, make a preference if one does not already exist
+    	else
+    		storeActivation();
     }
+    
+	//securely stores data locally
+	private void storeActivation(){
+		//securely store in shared preference
+		SharedPreferences secureSettings = new SecurePreferences(mContext);
+		String account = UserEmailFetcher.getEmail(mContext);
+		
+		//if preference is false, update it
+		if(!secureSettings.getBoolean(account+"_paid", false)){
+			SharedPreferences.Editor secureEdit = secureSettings.edit();
+			secureEdit.putBoolean(account+"_paid", true);
+			secureEdit.commit();
+		}
+	}
     
     private boolean isInTrialDate(String endTrial, String currentDate) {
         try {

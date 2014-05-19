@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
 	
 	private String TAG = "TAG";
 	private String customMessage;
-	private Boolean SMS_Service_State = true;
+	private Boolean SMS_Service_State;
 	private Boolean remindToggleDialogue;
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
 	private ImageButton imageState;
@@ -51,8 +51,8 @@ public class MainActivity extends Activity {
         
         checkActivation();
         
-        SMS_Service_State = settings.getBoolean("smsState", true);
-
+        SMS_Service_State = settings.getBoolean("smsState", false);
+        
         if(SMS_Service_State && !settings.getBoolean("start_on_boot_preference", false)){
         	startService();
         }
@@ -62,6 +62,9 @@ public class MainActivity extends Activity {
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
 		imageState = (ImageButton) findViewById(R.id.stateImage);
+		if (!SMS_Service_State)		//if setting is off, button should be off
+			imageState.setImageResource(R.drawable.button_off);
+		
 		imageState.setOnClickListener(imgButtonHandler);
 		
 		//WidgetStuff
@@ -161,7 +164,7 @@ public class MainActivity extends Activity {
     protected void onResume(){
     	super.onStop();
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	SMS_Service_State = settings.getBoolean("smsState", true);
+    	SMS_Service_State = settings.getBoolean("smsState", false);
     	
 		setMessage();
         

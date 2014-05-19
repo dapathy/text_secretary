@@ -9,21 +9,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 public class Widget extends AppWidgetProvider {
-	SharedPreferences settings;
-	Boolean state = true;
+	private SharedPreferences settings;
 	private boolean SMS_Service_State;
-	ImageView widgetIcon;
 	
     @Override
     public void onEnabled(Context context){
         RemoteViews remoteViews;
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.widgetlayout);
         settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SMS_Service_State = settings.getBoolean("smsState", true);
+        SMS_Service_State = settings.getBoolean("smsState", false);
         
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         ComponentName widget = new ComponentName(context, Widget.class);
@@ -51,7 +48,7 @@ public class Widget extends AppWidgetProvider {
         remoteViews.setOnClickPendingIntent(R.id.imageview_icon, getPendingSelfIntent(context, SYNC_CLICKED));
         
         settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SMS_Service_State = settings.getBoolean("smsState", true);
+        SMS_Service_State = settings.getBoolean("smsState", false);
 
         if(SMS_Service_State)
         	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
@@ -72,7 +69,7 @@ public class Widget extends AppWidgetProvider {
         settings = PreferenceManager.getDefaultSharedPreferences(context);
     	SharedPreferences.Editor editor = settings.edit();
 
-        SMS_Service_State = settings.getBoolean("smsState", true);
+        SMS_Service_State = settings.getBoolean("smsState", false);
         
         if (SYNC_CLICKED.equals(intent.getAction())) {
 
