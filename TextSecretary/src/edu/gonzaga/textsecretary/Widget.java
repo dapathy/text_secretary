@@ -1,5 +1,9 @@
 package edu.gonzaga.textsecretary;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -14,6 +18,7 @@ import android.widget.RemoteViews;
 public class Widget extends AppWidgetProvider {
 	private SharedPreferences settings;
 	private boolean SMS_Service_State;
+	private Register task;
 	
     @Override
     public void onEnabled(Context context){
@@ -52,7 +57,6 @@ public class Widget extends AppWidgetProvider {
 
         if(SMS_Service_State)
         	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
-        
         else
         	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
         
@@ -62,47 +66,41 @@ public class Widget extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO Auto-generated method stub
         super.onReceive(context, intent);
-        Intent serviceIntent = new Intent(context, SMS_Service.class);
         
         settings = PreferenceManager.getDefaultSharedPreferences(context);
-    	SharedPreferences.Editor editor = settings.edit();
 
         SMS_Service_State = settings.getBoolean("smsState", false);
         
         if (SYNC_CLICKED.equals(intent.getAction())) {
-
+        	Intent serviceIntent = new Intent(context, SMS_Service.class);
+        	SharedPreferences.Editor editor = settings.edit();
+        	
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-
-            RemoteViews remoteViews;
-            ComponentName textWidget;
-
-            remoteViews = new RemoteViews(context.getPackageName(), R.layout.widgetlayout);
-            textWidget = new ComponentName(context, Widget.class);
-
-            //remoteViews.setTextViewText(R.id.sync_button, "TESTING");
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widgetlayout);
+            ComponentName textWidget = new ComponentName(context, Widget.class);
+            
+            //stop service
             if(SMS_Service_State){
-            	Log.d("TAG", "service on");
+            	Log.d("TAG", "widget service on");
             	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
             	context.stopService(serviceIntent);
-            	Log.d("TAG", "STOPPED SERVICE");
 		        SMS_Service_State = false;
             	editor.putBoolean("smsState", SMS_Service_State);
             }
-            
+            //check activation, start service
             else{
-            	Log.d("TAG","service off");
-            	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
-            	context.startService(serviceIntent);
-            	Log.d("TAG", "STARTED SERVICE");
-		        SMS_Service_State = true;
-            	editor.putBoolean("smsState", SMS_Service_State);
+            	if (isActivated(context)){
+	            	Log.d("TAG","widget service off");
+	            	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
+	            	context.startService(serviceIntent);
+			        SMS_Service_State = true;
+	            	editor.putBoolean("smsState", SMS_Service_State);
+            	}
            	}
             
             appWidgetManager.updateAppWidget(textWidget, remoteViews);
         	editor.commit();
-
         }
     }
 
@@ -111,6 +109,33 @@ public class Widget extends AppWidgetProvider {
         intent.setAction(action);
         return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
+	
+	//checks unlock status then registers receiver
+	private boolean isActivated(Context context){
+		SharedPreferences secureSettings = new SecurePreferences(context);
+		String account = UserEmailFetcher.getEmail(context);
+		
+		//if application not paid in shared preferences
+		if(secureSettings.getBoolean(account+"_paid", false)){
+			return true;
+		}
+		//not in shared preferences, so check server
+		else{
+	        task = new Register(context, false);
+	        task.execute();
+	        try {
+				task.get(1000, TimeUnit.MILLISECONDS);	//wait for async to finish
+				//if paid or in trial, start service
+				if(task.isInTrial())
+					return true;
+			} catch (InterruptedException | ExecutionException
+					| TimeoutException e) {
+				Log.e("SMS", "task.get");
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
 
 
 }

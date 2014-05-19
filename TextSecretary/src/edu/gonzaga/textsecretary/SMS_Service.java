@@ -4,9 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -31,7 +28,6 @@ public class SMS_Service extends Service{
 	private String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
-	private Register task;
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -41,7 +37,10 @@ public class SMS_Service extends Service{
 	@Override
 	public void onCreate(){
 		super.onCreate();		
-		checkActivation();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+		calendar = new Calendar_Service(getApplicationContext());
+		registerReceiver (smsListener, filter);
 	}
 	
 	@Override
@@ -104,41 +103,6 @@ public class SMS_Service extends Service{
 			}
 		}
 	};
-	
-	//checks unlock status then registers receiver
-	private void checkActivation(){
-		SharedPreferences secureSettings = new SecurePreferences(getApplicationContext());
-		String account = UserEmailFetcher.getEmail(getApplicationContext());
-		
-		//if application not paid in shared preferences
-		if(secureSettings.getBoolean(account+"_paid", false)){
-			registerReceiver();
-		}
-		//not in shared preferences, so check server
-		else{
-	        task = new Register(this, false);
-	        task.execute();
-	        try {
-				task.get(1000, TimeUnit.MILLISECONDS);	//wait for async to finish
-				//if paid or in trial, start service
-				if(!task.isFailure()){
-					registerReceiver();
-				}
-			} catch (InterruptedException | ExecutionException
-					| TimeoutException e) {
-				Log.e("SMS", "task.get");
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	//register receiver
-	private void registerReceiver(){
-		IntentFilter filter = new IntentFilter();
-		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
-		calendar = new Calendar_Service(getApplicationContext());
-		registerReceiver (smsListener, filter);
-	}
 	
 	//checks if sender has sent a text recently (determined by settings)
 	//stores and updates information in hashmap

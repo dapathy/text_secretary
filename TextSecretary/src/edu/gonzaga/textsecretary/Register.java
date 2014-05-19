@@ -24,8 +24,7 @@ public class Register extends AsyncTask<String, String, String> {
 	private Context mContext;
 	private boolean mPay;
 	private String serverPay;
-	
-	private boolean failure = false;
+	private boolean inTrial;
 	
 	private final String TAG = "Register";
 
@@ -90,7 +89,6 @@ public class Register extends AsyncTask<String, String, String> {
     	Log.d("SDF", serverPay);
     	//if not paid
     	if (!serverPay.equals("1")){
-    		boolean inTrial = false;
 		    if (file_url != null){
 		    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 		    	String currentDateandTime = sdf.format(new Date());
@@ -99,10 +97,8 @@ public class Register extends AsyncTask<String, String, String> {
 		    }
 		    
 		    //if not in trial and not paid, then show dialog
-		    if(!inTrial){
-		    	failure = true;
+		    if(!inTrial)
 		    	showTrialOver();
-		    }
        }
     	//must have paid, make a preference if one does not already exist
     	else
@@ -168,8 +164,8 @@ public class Register extends AsyncTask<String, String, String> {
 	     .show();
 	}
 
-	public boolean isFailure() {
-		return failure;
+	public boolean isInTrial() {
+		return inTrial;
 	}
 
 }
