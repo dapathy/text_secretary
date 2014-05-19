@@ -58,7 +58,6 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	        messagePreference.setEnabled(false);
 		}
 		
-		//bind service?
 		PACKAGE_NAME = getActivity().getPackageName();
 		getActivity().bindService(new 
 		        Intent("com.android.vending.billing.InAppBillingService.BIND"),
@@ -91,8 +90,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 		return false;
 	}
 	
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
-	{
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
 	    if (key.equals("calendar_preference")){
 	        Preference preference = findPreference("custom_message_preference");
 	        preference.setEnabled(!sharedPreferences.getBoolean("calendar_preference", false));
@@ -116,7 +114,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 				   ArrayList<String> ownedSkus =
 				      ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
 				   
-				   if(ownedSkus.isEmpty())
+				   if(ownedSkus.isEmpty())	//nothing owned
 					   return false;
 				   else
 					   return true;
@@ -151,14 +149,6 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	
 	//securely stores data locally, then stores on server
 	private void storeActivation(){
-		//securely store in shared preference
-		SharedPreferences secureSettings = new SecurePreferences(getActivity().getApplicationContext());
-		SharedPreferences.Editor secureEdit = secureSettings.edit();
-		String account = UserEmailFetcher.getEmail(getActivity().getApplicationContext());
-		
-		secureEdit.putBoolean(account+"_paid", true);
-		secureEdit.commit();
-		
 		//store on server
 		task = new Register(getActivity().getApplicationContext(), true);
 		task.execute();
