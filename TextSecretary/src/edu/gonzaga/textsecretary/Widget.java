@@ -1,9 +1,5 @@
 package edu.gonzaga.textsecretary;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -18,7 +14,6 @@ import android.widget.RemoteViews;
 public class Widget extends AppWidgetProvider {
 	private SharedPreferences settings;
 	private boolean SMS_Service_State;
-	private Register task;
 	
     @Override
     public void onEnabled(Context context){
@@ -90,7 +85,7 @@ public class Widget extends AppWidgetProvider {
             }
             //check activation, start service
             else{
-            	if (isActivated(context)){
+            	if (RegCheck.isActivated(context)){
 	            	Log.d("TAG","widget service off");
 	            	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
 	            	context.startService(serviceIntent);
@@ -109,33 +104,5 @@ public class Widget extends AppWidgetProvider {
         intent.setAction(action);
         return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
-	
-	//checks unlock status then registers receiver
-	private boolean isActivated(Context context){
-		SharedPreferences secureSettings = new SecurePreferences(context);
-		String account = UserEmailFetcher.getEmail(context);
-		
-		//if application not paid in shared preferences
-		if(secureSettings.getBoolean(account+"_paid", false)){
-			return true;
-		}
-		//not in shared preferences, so check server
-		else{
-	        task = new Register(context, false);
-	        task.execute();
-	        try {
-				task.get(1000, TimeUnit.MILLISECONDS);	//wait for async to finish
-				//if paid or in trial, start service
-				if(task.isInTrial())
-					return true;
-			} catch (InterruptedException | ExecutionException
-					| TimeoutException e) {
-				Log.e("SMS", "task.get");
-				e.printStackTrace();
-			}
-		}
-		return false;
-	}
-
 
 }

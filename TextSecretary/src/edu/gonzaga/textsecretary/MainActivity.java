@@ -40,8 +40,8 @@ public class MainActivity extends Activity {
 	private FragmentManager fragmentManager;
 	private FragmentTransaction fragmentTransaction;
 	private ServiceListFragment myFragment;
-	private Register task;
-
+	private boolean enableButton = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -49,15 +49,33 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         
-        checkActivation();
+        //check unlock
+        enableButton = RegCheck.isActivated(this);
         
         SMS_Service_State = settings.getBoolean("smsState", false);
         
-        if(SMS_Service_State && !settings.getBoolean("start_on_boot_preference", false)){
-        	startService();
+        setUpGui();
+		setUpWidget();
+
+        // get an instance of FragmentTransaction from your Activity
+        fragmentManager = getFragmentManager();
+        fragmentTransaction = fragmentManager.beginTransaction();
+
+        //add a fragment
+        if(savedInstanceState == null){
+	        myFragment = new ServiceListFragment();
+	        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
+	        fragmentTransaction.commit();
         }
-                
-        //GUI stuff
+		
+        //Remind users how to use toggle
+		remindToggleDialogue = settings.getBoolean("remindToggleDialogue", true);
+		if(remindToggleDialogue)
+			showToggleDialogue();
+	}
+	
+	private void setUpGui(){
+		 //GUI stuff
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
@@ -67,6 +85,10 @@ public class MainActivity extends Activity {
 		
 		imageState.setOnClickListener(imgButtonHandler);
 		
+		setMessage();
+	}
+	
+	private void setUpWidget(){
 		//WidgetStuff
         remoteViews = new RemoteViews(getApplicationContext().getPackageName(), R.layout.widgetlayout);
         widget = new ComponentName(getApplicationContext(), Widget.class);
@@ -79,37 +101,7 @@ public class MainActivity extends Activity {
 	        public void onClick(View v) {
 				startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 	        }
-
 	    });
-
-		setMessage();
-        
-        // get an instance of FragmentTransaction from your Activity
-        fragmentManager = getFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
-
-        //add a fragment
-        if(savedInstanceState == null){
-	        myFragment = new ServiceListFragment();
-	        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
-	        fragmentTransaction.commit();
-        }
-
-        //Remind users how to use toggle
-		remindToggleDialogue = settings.getBoolean("remindToggleDialogue", true);
-		if(remindToggleDialogue)
-			showToggleDialogue();
-	}
-	
-	private void checkActivation(){
-		SharedPreferences secureSettings = new SecurePreferences(getApplicationContext());
-		String account = UserEmailFetcher.getEmail(getApplicationContext());
-		
-		//if application not paid
-		if(!secureSettings.getBoolean(account+"_paid", false)){
-	        task = new Register(this, false);
-	        task.execute();
-		}
 	}
 	
 	// Put the custom Message in the Edit Text
@@ -130,25 +122,29 @@ public class MainActivity extends Activity {
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
 	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
-		        jiggleLayout(lowerBar);
-		        jiggleLayout(lowerHalf);
-		        jiggleLayout(listFragment);
+		        jiggleGui();
 		        appWidgetManager.updateAppWidget(widget, remoteViews);
 			}
 			else{						//else service is off -> turn on
-				startService();
-		        SMS_Service_State = true;
-		        lowerBar.setBackgroundResource(R.drawable.lowbaron);
-		        imageState.setImageResource(R.drawable.button_on);
-	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
-		        jiggleLayout(lowerBar);
-		        jiggleLayout(lowerHalf);
-		        jiggleLayout(listFragment);
-		        appWidgetManager.updateAppWidget(widget, remoteViews);
+				if(enableButton){
+					startService();
+			        SMS_Service_State = true;
+			        lowerBar.setBackgroundResource(R.drawable.lowbaron);
+			        imageState.setImageResource(R.drawable.button_on);
+		        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
+			        jiggleGui();
+			        appWidgetManager.updateAppWidget(widget, remoteViews);
+				}
 			}
 
 	    }
 	};
+	
+	private void jiggleGui(){
+		jiggleLayout(lowerBar);
+        jiggleLayout(lowerHalf);
+        jiggleLayout(listFragment);
+	}
 
     @Override
     protected void onStop(){
@@ -156,7 +152,6 @@ public class MainActivity extends Activity {
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     	SharedPreferences.Editor editor = settings.edit();
     	editor.putBoolean("smsState", SMS_Service_State);
-
     	editor.commit();
     }
     
@@ -229,8 +224,6 @@ public class MainActivity extends Activity {
 		     }
 		 };
 		 r.run();
-
-
 	}	
 	
 	//This dialogue is here to teach users how to toggle the service on and off
