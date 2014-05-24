@@ -24,7 +24,7 @@ public class Register extends AsyncTask<String, String, String> {
 	private Context mContext;
 	private boolean mPay;
 	private String serverPay;
-	private boolean inTrial;
+	private boolean inTrial = false;
 	
 	private final String TAG = "Register";
 
