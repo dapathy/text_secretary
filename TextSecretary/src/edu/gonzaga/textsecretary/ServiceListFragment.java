@@ -47,30 +47,30 @@ public class ServiceListFragment extends ListFragment{
 
 	    	
 		    //Calendar
-		    if(prefs .getBoolean("calendar_preference", true))
+		    if(prefs.getBoolean("calendar_preference", true))
 		    	list.add(putData("Calendar", "ON"));
 		    else
 		    	list.add(putData("Calendar", "OFF"));
 		    
+		    //Start on Boot
+			if(prefs.getBoolean("start_on_boot_preference", true))
+				list.add(putData("Start on Boot", "ON"));
+			else
+				list.add(putData("Start on Boot", "OFF"));
+
+	    	//Notification
+			if(prefs.getBoolean("notification_preference", true))
+				list.add(putData("Notifications", "ON"));
+			else
+				list.add(putData("Notifications", "OFF"));
+			
 			//Sleep
-			if(prefs .getBoolean("sleep_timer_preference", true)){
+			if(prefs.getBoolean("sleep_timer_preference", true)){
 				list.add(putData("Sleep Timer", "ON"));
 				list.add(putData("Sleep Length", Long.valueOf(prefs.getString("list_preference", "1800000"))/60000 + " minutes"));
 			}
 			else
 				list.add(putData("Sleep", "OFF"));
-			
-	    	//Notification
-			if(prefs .getBoolean("notification_preference", true))
-				list.add(putData("Notifications", "ON"));
-			else
-				list.add(putData("Notifications", "OFF"));
-
-	    	//Start on Boot
-			if(prefs .getBoolean("start_on_boot_preference", true))
-				list.add(putData("Start on Boot", "ON"));
-			else
-				list.add(putData("Start on Boot", "OFF"));
 			
 		    return list;
 		  }
