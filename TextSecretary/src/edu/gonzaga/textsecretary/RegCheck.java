@@ -19,8 +19,8 @@ public class RegCheck {
 		}
 		//not in shared preferences, so check server
 		else{
-	        Register task = new Register(context, false);
-	        task.execute();
+	        Register task = new Register(context);
+	        task.execute(false);
 	        try {
 				return task.get();
 			} catch (InterruptedException | ExecutionException e) {

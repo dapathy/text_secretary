@@ -19,11 +19,10 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class Register extends AsyncTask<String, Void, Boolean> {
+public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	
 	private final String TAG = "REGISTER";
 	private Context mContext;
-	private boolean mPay;
 	
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
@@ -36,19 +35,18 @@ public class Register extends AsyncTask<String, Void, Boolean> {
     private static final String TAG_PAID = "paid";
     private static final String TAG_DATE = "trialEND";
 	
-    public Register (Context context, Boolean pay){
+    public Register (Context context){
          mContext = context;
-         mPay = pay;
     }
 
 	@Override
-	protected Boolean doInBackground(String... args) {
+	protected Boolean doInBackground(Boolean... pay) {
 		String paid;
 		String date = null;
 		String userEmail = UserEmailFetcher.getEmail(mContext);
 		String serverPay = "0";
 		
-		if(mPay)
+		if(pay[0])
         	paid = "1";
         else
         	paid = "0";
@@ -148,25 +146,30 @@ public class Register extends AsyncTask<String, Void, Boolean> {
 
 	//This dialogue informs user that they're period is over
 	private void showTrialOver(){
-        Intent serviceIntent = new Intent(mContext, SMS_Service.class);
-        mContext.stopService(serviceIntent);
-
-		new AlertDialog.Builder(mContext)
-	    .setTitle("End of Trial Period")
-	    .setMessage("You 30 day trial period of Text Secretary is over. Would you like to unlock for life?")
-	    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int which) {
-	        	//go to settings intent to purchase
-	        	Intent intent = new Intent(mContext, SettingsActivity.class);
-	        	mContext.startActivity(intent);
-	        }
-	     })
-	    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int which) {
-	        	System.exit(1);
-	        }
-	     })
-	     .show();
+		try{
+	        Intent serviceIntent = new Intent(mContext, SMS_Service.class);
+	        mContext.stopService(serviceIntent);
+	
+			new AlertDialog.Builder(mContext)
+		    .setTitle("End of Trial Period")
+		    .setMessage("You 30 day trial period of Text Secretary is over. Would you like to unlock for life?")
+		    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) {
+		        	//go to settings intent to purchase
+		        	Intent intent = new Intent(mContext, SettingsActivity.class);
+		        	mContext.startActivity(intent);
+		        }
+		     })
+		    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) {
+		        	System.exit(1);
+		        }
+		     })
+		     .show();
+		} catch(Exception e){
+			//probably not a big deal
+			Log.w(TAG, e.getMessage());
+		}
 	}
 
 }

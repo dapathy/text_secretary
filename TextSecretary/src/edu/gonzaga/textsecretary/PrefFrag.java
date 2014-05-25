@@ -1,7 +1,5 @@
 package edu.gonzaga.textsecretary;
 
-import java.util.ArrayList;
-
 import com.android.vending.billing.IInAppBillingService;
 
 import android.app.Activity;
@@ -24,6 +22,7 @@ import android.util.Log;
 
 public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceChangeListener{
 	
+	private final String TAG = "PURCHASE";
 	private IInAppBillingService mService;
 	private String PACKAGE_NAME;
 	private Register task;
@@ -40,7 +39,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	       mService = IInAppBillingService.Stub.asInterface(service);
 	       
 			//set visibility of unlock
-	       if(isPurchased()){	//queries purchases
+	       if(RegCheck.isActivated(getActivity().getApplicationContext())){	//queries purchases
 	    	   PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("Activation");
 	    	   getPreferenceScreen().removePreference(preferenceCategory);
 	       }
@@ -97,36 +96,6 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	    }
 	}
 	
-	//checks if unlock has already been purchased
-	private boolean isPurchased(){
-		SharedPreferences securePreferences = new SecurePreferences(getActivity().getApplicationContext());
-		String account = UserEmailFetcher.getEmail(getActivity().getApplicationContext());
-		//check shared preferences first
-		if(securePreferences.getBoolean(account+"_paid", false))
-			return true;
-		//else query google services
-		else{
-			try {
-				Bundle ownedItems = mService.getPurchases(3, PACKAGE_NAME, "inapp", null);
-				
-				int response = ownedItems.getInt("RESPONSE_CODE");
-				if (response == 0) {
-				   ArrayList<String> ownedSkus =
-				      ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
-				   
-				   if(ownedSkus.isEmpty())	//nothing owned
-					   return false;
-				   else
-					   return true;
-				}
-			} catch (RemoteException e) {
-				Log.e("PURCHASE", "query failed");
-				e.printStackTrace();
-			}
-			return false;
-		}
-	}
-	
 	//TODO: encrypt payload??
 	private void purchaseUnlock(){
 		try {
@@ -138,11 +107,11 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 					   1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
 					   Integer.valueOf(0));
 		}catch (SendIntentException e) {
-			Log.e("PURCHASE", "didn't start activity");
+			Log.e(TAG, "didn't start activity");
 			e.printStackTrace();
 		}
 		 catch (RemoteException e) {
-			Log.e("PURCHASE", "getting intent failed");
+			Log.e(TAG, "getting intent failed");
 			e.printStackTrace();
 		}
 	}
@@ -150,8 +119,8 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	//securely stores data locally, then stores on server
 	private void storeActivation(){
 		//store on server
-		task = new Register(getActivity().getApplicationContext(), true);
-		task.execute();
+		task = new Register(getActivity().getApplicationContext());
+		task.execute(true);
 	}
 	
 	@Override
@@ -159,12 +128,12 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {          	        
       if (resultCode == Activity.RESULT_OK) {
          try {
-            Log.d("PURCHASE", "Purchase completed");
+            Log.d(TAG, "Purchase completed");
             storeActivation();
           }
           catch (Exception e) {
         	 //task set false?
-             Log.e("PURCHASE", "Failed to parse purchase data.");
+             Log.e(TAG, "Failed to parse purchase data.");
              e.printStackTrace();
           }
       }
