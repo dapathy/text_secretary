@@ -93,9 +93,9 @@ public class Register extends AsyncTask<String, Void, Boolean> {
     private boolean checkActivation(String date, String serverPay){
     	Log.d(TAG, serverPay);
     	//if not paid
-    	if (!serverPay.equals("10")){	//1
+    	if (!serverPay.equals("1")){
     		boolean inTrial = false;
-		    if (date == null){	//!=
+		    if (date != null){
 		    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 		    	String currentDateandTime = sdf.format(new Date());
 		    	Log.d(TAG, date + "  " + currentDateandTime);
