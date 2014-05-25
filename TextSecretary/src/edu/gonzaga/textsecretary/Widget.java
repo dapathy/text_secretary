@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 public class Widget extends AppWidgetProvider {
+	private final String TAG = "WIDGET";
 	private SharedPreferences settings;
 	private boolean SMS_Service_State;
 	
@@ -77,7 +78,7 @@ public class Widget extends AppWidgetProvider {
             
             //stop service
             if(SMS_Service_State){
-            	Log.d("TAG", "widget service on");
+            	Log.d(TAG, "widget service on");
             	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
             	context.stopService(serviceIntent);
 		        SMS_Service_State = false;
@@ -86,19 +87,20 @@ public class Widget extends AppWidgetProvider {
             //check activation, start service
             else{
             	if (RegCheck.isActivated(context)){
-	            	Log.d("TAG","widget service off");
+	            	Log.d(TAG,"widget service off");
 	            	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
 	            	context.startService(serviceIntent);
 			        SMS_Service_State = true;
 	            	editor.putBoolean("smsState", SMS_Service_State);
             	}
+            	//TODO: else
            	}
             
             appWidgetManager.updateAppWidget(textWidget, remoteViews);
         	editor.commit();
         }
     }
-
+    
 	protected PendingIntent getPendingSelfIntent(Context context, String action) {
         Intent intent = new Intent(context, getClass());
         intent.setAction(action);
