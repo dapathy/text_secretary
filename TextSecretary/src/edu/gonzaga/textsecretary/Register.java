@@ -24,8 +24,6 @@ public class Register extends AsyncTask<String, Void, Boolean> {
 	private final String TAG = "REGISTER";
 	private Context mContext;
 	private boolean mPay;
-	private String serverPay;
-	private boolean inTrialOrPaid = false;
 	
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
@@ -48,6 +46,7 @@ public class Register extends AsyncTask<String, Void, Boolean> {
 		String paid;
 		String date = null;
 		String userEmail = UserEmailFetcher.getEmail(mContext);
+		String serverPay = "0";
 		
 		if(mPay)
         	paid = "1";
@@ -82,31 +81,32 @@ public class Register extends AsyncTask<String, Void, Boolean> {
         	Log.d(TAG, "CATCH httpRequest " + e.toString());
         }
         
-        return checkActivation(date);
+        return checkActivation(date, serverPay);
+	}
+	
+	protected void onPostExecute(Boolean result){
+		//if not in trial and not paid, then show dialog
+	    if(!result)
+	    	showTrialOver();
 	}
     
-    private boolean checkActivation(String date){
+    private boolean checkActivation(String date, String serverPay){
     	Log.d(TAG, serverPay);
     	//if not paid
-    	if (!serverPay.equals("1")){
+    	if (!serverPay.equals("10")){	//1
     		boolean inTrial = false;
-		    if (date != null){
+		    if (date == null){	//!=
 		    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 		    	String currentDateandTime = sdf.format(new Date());
 		    	Log.d(TAG, date + "  " + currentDateandTime);
 		    	inTrial =  isInTrialDate(date, currentDateandTime);
 		    }
 		    
-		    //if not in trial and not paid, then show dialog
-		    if(!inTrial)
-		    	showTrialOver();
-		    
 		    return inTrial;
        }
     	//must have paid, make a preference if one does not already exist
     	else{
     		Log.d(TAG, "paid");
-    		//inTrialOrPaid = true;
     		storeActivation();
     		return true;
     	}
@@ -134,11 +134,9 @@ public class Register extends AsyncTask<String, Void, Boolean> {
 
             if(end.compareTo(current)>0){
                 Log.v(TAG,"end is after current");
-            	//Toast.makeText(mContext, "WITHIN TRIAL DATE", Toast.LENGTH_LONG).show();
             	return true;
             }else if(end.compareTo(current)<=0){
                 Log.v(TAG,"end is before current");
-            	//Toast.makeText(mContext, "TRIAL OVER" , Toast.LENGTH_LONG).show();
             	return false;
             }
         } catch(Exception e) {
@@ -152,7 +150,7 @@ public class Register extends AsyncTask<String, Void, Boolean> {
 	private void showTrialOver(){
         Intent serviceIntent = new Intent(mContext, SMS_Service.class);
         mContext.stopService(serviceIntent);
-		
+
 		new AlertDialog.Builder(mContext)
 	    .setTitle("End of Trial Period")
 	    .setMessage("You 30 day trial period of Text Secretary is over. Would you like to unlock for life?")
@@ -169,10 +167,6 @@ public class Register extends AsyncTask<String, Void, Boolean> {
 	        }
 	     })
 	     .show();
-	}
-
-	public boolean isInTrialOrPaid() {
-		return inTrialOrPaid;
 	}
 
 }

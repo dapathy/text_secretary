@@ -48,10 +48,6 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         
-        //check unlock
-        enableButton = RegCheck.isActivated(this);
-        Log.d(TAG, String.valueOf(enableButton));
-        
         SMS_Service_State = settings.getBoolean("smsState", false);
         
         setUpGui();
@@ -68,6 +64,10 @@ public class MainActivity extends Activity {
 	        fragmentTransaction.commit();
         }
 		
+        //check unlock
+        enableButton = RegCheck.isActivated(this);
+        Log.d(TAG, String.valueOf(enableButton));
+        
         //Remind users how to use toggle
 		remindToggleDialogue = settings.getBoolean("remindToggleDialogue", true);
 		if(remindToggleDialogue)
