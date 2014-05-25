@@ -25,8 +25,7 @@ import android.widget.RemoteViews;
 
 public class MainActivity extends Activity {
 	
-	private String TAG = "TAG";
-	private String customMessage;
+	private final String TAG = "MAIN";
 	private Boolean SMS_Service_State;
 	private Boolean remindToggleDialogue;
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
@@ -51,6 +50,7 @@ public class MainActivity extends Activity {
         
         //check unlock
         enableButton = RegCheck.isActivated(this);
+        Log.d(TAG, String.valueOf(enableButton));
         
         SMS_Service_State = settings.getBoolean("smsState", false);
         
@@ -82,10 +82,18 @@ public class MainActivity extends Activity {
 		imageState = (ImageButton) findViewById(R.id.stateImage);
 		if (!SMS_Service_State)		//if setting is off, button should be off
 			imageState.setImageResource(R.drawable.button_off);
-		
 		imageState.setOnClickListener(imgButtonHandler);
 		
+		//Set the on click listener for the custom message
+		custom = (EditText) findViewById(R.id.customMessage);
+		custom.setOnClickListener(new View.OnClickListener() {
+		        @Override
+		        public void onClick(View v) {
+					startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+		        }
+		    });
 		setMessage();
+		Log.d(TAG, "gui");
 	}
 	
 	private void setUpWidget(){
@@ -93,24 +101,18 @@ public class MainActivity extends Activity {
         remoteViews = new RemoteViews(getApplicationContext().getPackageName(), R.layout.widgetlayout);
         widget = new ComponentName(getApplicationContext(), Widget.class);
         appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-
-        //Set the on click listener for the custom message
-		custom = (EditText) findViewById(R.id.customMessage);
-		custom.setOnClickListener(new View.OnClickListener() {
-	        @Override
-	        public void onClick(View v) {
-				startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-	        }
-	    });
+		Log.d(TAG, "widget setup");
 	}
 	
 	// Put the custom Message in the Edit Text
 	private void setMessage(){
+		String customMessage = "You can change custom message in Settings";
 		if (settings.getBoolean("calendar_preference", true))
-			customMessage = settings.getString("custom_calendar_message_preference", "You can change custom message in Settings");
+			customMessage = settings.getString("custom_calendar_message_preference", customMessage);
 		else
-			customMessage = settings.getString("custom_message_preference", "You can change custom message in Settings");
-        custom.setText(customMessage.toString());
+			customMessage = settings.getString("custom_message_preference", customMessage);
+        
+		custom.setText(customMessage);
 	}
 	
 	View.OnClickListener imgButtonHandler = new View.OnClickListener() {

@@ -19,15 +19,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class Register extends AsyncTask<String, String, String> {
+public class Register extends AsyncTask<String, Void, Boolean> {
 	
+	private final String TAG = "REGISTER";
 	private Context mContext;
 	private boolean mPay;
 	private String serverPay;
-	private boolean inTrial = false;
+	private boolean inTrialOrPaid = false;
 	
-	private final String TAG = "Register";
-
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
 
@@ -45,14 +44,16 @@ public class Register extends AsyncTask<String, String, String> {
     }
 
 	@Override
-	protected String doInBackground(String... args) {
-		String paid, userEmail;
+	protected Boolean doInBackground(String... args) {
+		String paid;
+		String date = null;
+		String userEmail = UserEmailFetcher.getEmail(mContext);
+		
 		if(mPay)
         	paid = "1";
         else
         	paid = "0";
         
-        userEmail = UserEmailFetcher.getEmail(mContext);
         try {
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -66,13 +67,12 @@ public class Register extends AsyncTask<String, String, String> {
 			json = jsonParser.makeHttpRequest(
 				       LOGIN_URL, "POST", params);
 
-
             Log.d(TAG, "connected");
             Log.d(TAG, "JSON response" + json.toString());
             
             //retrieve values
         	serverPay = json.getString(TAG_PAID);
-        	return(json.getString(TAG_DATE));
+        	date = json.getString(TAG_DATE);
         
         } catch (JSONException e) {
         	Log.d(TAG, "CATCH");
@@ -81,28 +81,35 @@ public class Register extends AsyncTask<String, String, String> {
         catch (Exception e){
         	Log.d(TAG, "CATCH httpRequest " + e.toString());
         }
-
-        return null;
+        
+        return checkActivation(date);
 	}
-
-    protected void onPostExecute(String file_url) {
-    	Log.d("SDF", serverPay);
+    
+    private boolean checkActivation(String date){
+    	Log.d(TAG, serverPay);
     	//if not paid
     	if (!serverPay.equals("1")){
-		    if (file_url != null){
+    		boolean inTrial = false;
+		    if (date != null){
 		    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 		    	String currentDateandTime = sdf.format(new Date());
-		    	inTrial = isInTrialDate(file_url, currentDateandTime);
-		    	Log.d(TAG, "onPostExecute: " + file_url + "  " + currentDateandTime);
+		    	Log.d(TAG, date + "  " + currentDateandTime);
+		    	inTrial =  isInTrialDate(date, currentDateandTime);
 		    }
 		    
 		    //if not in trial and not paid, then show dialog
 		    if(!inTrial)
 		    	showTrialOver();
+		    
+		    return inTrial;
        }
     	//must have paid, make a preference if one does not already exist
-    	else
+    	else{
+    		Log.d(TAG, "paid");
+    		//inTrialOrPaid = true;
     		storeActivation();
+    		return true;
+    	}
     }
     
 	//securely stores data locally
@@ -164,8 +171,8 @@ public class Register extends AsyncTask<String, String, String> {
 	     .show();
 	}
 
-	public boolean isInTrial() {
-		return inTrial;
+	public boolean isInTrialOrPaid() {
+		return inTrialOrPaid;
 	}
 
 }
