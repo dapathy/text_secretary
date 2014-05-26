@@ -152,15 +152,15 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	
 			new AlertDialog.Builder(mContext)
 		    .setTitle("End of Trial Period")
-		    .setMessage("You 30 day trial period of Text Secretary is over. Would you like to unlock for life?")
-		    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		    .setMessage("You 30 day trial period of Text Secretary is over. Please go to the bottom of the settings page to purchase the unlock.")
+		    .setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) {
 		        	//go to settings intent to purchase
 		        	Intent intent = new Intent(mContext, SettingsActivity.class);
 		        	mContext.startActivity(intent);
 		        }
 		     })
-		    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+		    .setNegativeButton("Exit application", new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) {
 		        	System.exit(1);
 		        }

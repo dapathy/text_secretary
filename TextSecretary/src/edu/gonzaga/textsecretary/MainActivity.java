@@ -159,7 +159,7 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onResume(){
-    	super.onStop();
+    	super.onResume();
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     	SMS_Service_State = settings.getBoolean("smsState", false);
     	
@@ -174,7 +174,6 @@ public class MainActivity extends Activity {
 	        imageState.setImageResource(R.drawable.button_off);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
     	}
-    	
     }
         
 	@Override
