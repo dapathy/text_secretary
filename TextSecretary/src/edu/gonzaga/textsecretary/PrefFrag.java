@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.android.vending.billing.IInAppBillingService;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -138,7 +137,10 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 			getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(),
 					   1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
 					   Integer.valueOf(0));
+			
 			Log.d(TAG, "purchase intent started");
+			storeActivation();
+			Log.d(TAG, "Purchase completed");
 		}catch (SendIntentException e) {
 			Log.e(TAG, "didn't start activity");
 			e.printStackTrace();
@@ -154,20 +156,5 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 		//store on server
 		task = new Register(getActivity().getApplicationContext());
 		task.execute(true);
-	}
-	
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {          	        
-      if (resultCode == Activity.RESULT_OK) {
-         try {
-            storeActivation();
-            Log.d(TAG, "Purchase completed");
-          }
-          catch (Exception e) {
-        	 //task set false?
-             Log.e(TAG, "Failed to parse purchase data.");
-             e.printStackTrace();
-          }
-      }
 	}
 }
