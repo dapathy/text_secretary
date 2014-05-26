@@ -15,7 +15,7 @@
         <EditTextPreference
                 android:key="custom_message_preference"
                 android:title="Response with Calendar Off"
-                android:summary="This is the message that your recipient will receive when TextSecretary replies for you."
+                android:summary="This is the message that your recipient will receive when Text Secretary replies for you."
                 android:dialogTitle="Enter your custom message:"
                 android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you as soon as possible."/>
 

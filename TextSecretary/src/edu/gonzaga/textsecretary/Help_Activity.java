@@ -47,7 +47,6 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 		//show the launcher icon in the action bar and change the title
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setTitle("Help and Information");
-		actionBar.setDisplayUseLogoEnabled(false);
 					
 		createTabs();
 		addTabs();

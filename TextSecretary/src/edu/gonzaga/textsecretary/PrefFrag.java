@@ -1,5 +1,7 @@
 package edu.gonzaga.textsecretary;
 
+import java.util.ArrayList;
+
 import com.android.vending.billing.IInAppBillingService;
 
 import android.app.Activity;
@@ -39,7 +41,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	       mService = IInAppBillingService.Stub.asInterface(service);
 	       
 			//set visibility of unlock
-	       if(RegCheck.isActivated(getActivity().getApplicationContext())){	//queries purchases
+	       if(isPurchased()){	//queries purchases
 	    	   PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("Activation");
 	    	   getPreferenceScreen().removePreference(preferenceCategory);
 	       }
@@ -96,6 +98,36 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	    }
 	}
 	
+	//checks if unlock has already been purchased
+	private boolean isPurchased(){
+		SharedPreferences securePreferences = new SecurePreferences(getActivity().getApplicationContext());
+		String account = UserEmailFetcher.getEmail(getActivity().getApplicationContext());
+		//check shared preferences first
+		if(securePreferences.getBoolean(account+"_paid", false))
+			return true;
+		
+		//else query google services
+		else{
+			try {
+				Bundle ownedItems = mService.getPurchases(3, PACKAGE_NAME, "inapp", null);
+
+				int response = ownedItems.getInt("RESPONSE_CODE");
+				if (response == 0) {
+				   ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
+
+				   if(ownedSkus.isEmpty())	//nothing owned
+					   return false;
+				   else
+					   return true;			//something owned
+				}
+			} catch (RemoteException e) {
+				Log.e(TAG, "query failed");
+				e.printStackTrace();
+			}
+			return false;
+		}
+	}
+	
 	//TODO: encrypt payload??
 	private void purchaseUnlock(){
 		try {
@@ -106,6 +138,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 			getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(),
 					   1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
 					   Integer.valueOf(0));
+			Log.d(TAG, "purchase intent started");
 		}catch (SendIntentException e) {
 			Log.e(TAG, "didn't start activity");
 			e.printStackTrace();
@@ -124,12 +157,11 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	}
 	
 	@Override
-	//I'm not sure why this is useful
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {          	        
       if (resultCode == Activity.RESULT_OK) {
          try {
-            Log.d(TAG, "Purchase completed");
             storeActivation();
+            Log.d(TAG, "Purchase completed");
           }
           catch (Exception e) {
         	 //task set false?
