@@ -1,5 +1,6 @@
 package edu.gonzaga.textsecretary;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,6 +99,8 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		    	String currentDateandTime = sdf.format(new Date());
 		    	Log.d(TAG, date + "  " + currentDateandTime);
 		    	inTrial =  isInTrialDate(date, currentDateandTime);
+		    	if(inTrial)
+		    		storeTrialInfo(date);
 		    }
 		    
 		    return inTrial;
@@ -107,6 +110,28 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
     		Log.d(TAG, "paid");
     		storeActivation();
     		return true;
+    	}
+    }
+    
+    //securely stores trial information
+    private void storeTrialInfo(String endTrial){
+    	SharedPreferences secureSettings = new SecurePreferences(mContext);
+    	String account = UserEmailFetcher.getEmail(mContext);
+    	
+    	//if date preference doesn't exist, create one
+    	if(secureSettings.getLong(account+"_trial", 0) == 0){
+    		try{
+	    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+	            Date endDate = sdf.parse(endTrial);
+	    		
+	    		SharedPreferences.Editor secureEdit = secureSettings.edit();
+				secureEdit.putLong(account+"_trial", endDate.getTime());
+				secureEdit.commit();
+    		}
+    		catch(ParseException e){
+    			Log.e(TAG, "parse exception");
+    			Log.e(TAG, e.getMessage());
+    		}
     	}
     }
     

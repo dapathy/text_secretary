@@ -41,7 +41,8 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	}
 	
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
-		if(key.toString().equals("Unlock Text Secretary")){
+		//this is ridiculous
+		if(key.toString().equals("Unlock For Life This product has an 30 day trial and will become non-functioning afterwards without the unlock.")){
 			((SettingsActivity) getActivity()).purchaseUnlock();
 		}
 		return false;

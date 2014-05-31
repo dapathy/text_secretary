@@ -1,5 +1,6 @@
 package edu.gonzaga.textsecretary;
 
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import android.content.Context;
@@ -13,8 +14,12 @@ public class RegCheck {
 		SharedPreferences secureSettings = new SecurePreferences(context);
 		String account = UserEmailFetcher.getEmail(context);
 		
-		//if application not paid in shared preferences
+		//if application paid in shared preferences
 		if(secureSettings.getBoolean(account+"_paid", false)){
+			return true;
+		}
+		//if current date is less than date stored
+		else if(secureSettings.getLong(account+"_trial", 0) > new Date().getTime()){
 			return true;
 		}
 		//not in shared preferences, so check server

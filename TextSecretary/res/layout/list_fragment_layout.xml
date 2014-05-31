@@ -4,8 +4,7 @@
     android:minHeight="30dp"
     android:mode="oneLine"
     android:paddingBottom="10dp"
-    
->
+   >
     
 	<TextView android:id="@android:id/text1"
 		android:layout_width="match_parent"
