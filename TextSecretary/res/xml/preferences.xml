@@ -67,7 +67,7 @@
 			android:key="Activation">
         	<Preference
             	android:title="Unlock For Life"
-            	android:summary="This product has an 30 day trial and will become non-functioning afterwards without the unlock."/>
+            	android:summary="This product has a 30 day trial.  Purchase the Unlock here."/>
     </PreferenceCategory>
     
 </PreferenceScreen>

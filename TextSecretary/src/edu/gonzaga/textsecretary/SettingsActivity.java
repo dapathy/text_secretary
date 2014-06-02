@@ -49,6 +49,7 @@ public class SettingsActivity extends PreferenceActivity {
 		bindService(new 
 		        Intent("com.android.vending.billing.InAppBillingService.BIND"),
 		                mServiceConn, Context.BIND_AUTO_CREATE);
+		Log.d(TAG, "bind");
 	}
 	
 	@Override
@@ -61,6 +62,7 @@ public class SettingsActivity extends PreferenceActivity {
 	    super.onDestroy();
 	    if (mService != null) {
 	    	unbindService(mServiceConn);
+	    	Log.d(TAG, "unbind");
 	    }   
 	}
 	
@@ -76,6 +78,7 @@ public class SettingsActivity extends PreferenceActivity {
 		else{
 			try {
 				Bundle ownedItems = mService.getPurchases(3, PACKAGE_NAME, "inapp", null);
+				Log.d(TAG, "getPurchases");
 				int response = ownedItems.getInt("RESPONSE_CODE");
 				if (response == 0) {
 				   ArrayList<String> ownedSkus = ownedItems.getStringArrayList("INAPP_PURCHASE_ITEM_LIST");
@@ -87,7 +90,7 @@ public class SettingsActivity extends PreferenceActivity {
 				}
 			} catch (RemoteException e) {
 				Log.e(TAG, "query failed");
-				e.printStackTrace();
+				Log.e(TAG, e.getMessage());
 			}
 			return false;
 		}
