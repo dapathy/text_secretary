@@ -2,18 +2,18 @@ package edu.gonzaga.textsecretary;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract.PhoneLookup;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 public class Notification_Service{
 	   private NotificationManager mNotificationManager;
-	   Context mContext;
+	   private Context mContext;
 	   
 	public Notification_Service (Context context){
 		mContext = context;

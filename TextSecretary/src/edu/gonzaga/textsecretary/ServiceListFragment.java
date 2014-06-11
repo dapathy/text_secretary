@@ -15,30 +15,23 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 public class ServiceListFragment extends ListFragment{
-	  SimpleAdapter adapter;
-      ArrayList<String> settingValues;
-      ArrayList<Map<String, Object>> data1;
-      ArrayList<Map<String, String>> list;
+	  private SimpleAdapter adapter;
+      private ArrayList<Map<String, String>> list;
 
       
 	  @Override
 	  public void onActivityCreated(Bundle savedInstanceState) {
-	    super.onActivityCreated(savedInstanceState);
-	    buildData();
-
-	    settingValues = new ArrayList<String>();
-	    String[] from = { "name", "purpose" };
-	    int[] to = { android.R.id.text1, android.R.id.text2 };
-
-	    //adapter = new ArrayAdapter<String>(getActivity(),
-	    //    android.R.layout.simple_list_item_1, settingValues);
-
-	    adapter = new SimpleAdapter(getActivity(), list,
-	            //android.R.layout.simple_list_item_2, from, to);
-	    		R.layout.list_fragment_layout, from, to);
-	    setListAdapter(adapter);
-	    Log.d("TAG" , "set adapter");
-
+		super.onActivityCreated(savedInstanceState);
+		buildData();
+		
+		String[] from = { "name", "purpose" };
+		int[] to = { android.R.id.text1, android.R.id.text2 };
+		
+		adapter = new SimpleAdapter(getActivity(), list,
+		        //android.R.layout.simple_list_item_2, from, to);
+				R.layout.list_fragment_layout, from, to);
+		setListAdapter(adapter);
+		Log.d("TAG" , "set adapter");
 	  }
 	  
 	  private ArrayList<Map<String, String>> buildData() {
@@ -53,7 +46,7 @@ public class ServiceListFragment extends ListFragment{
 		    	list.add(putData("Calendar", "OFF"));
 		    
 		    //Start on Boot
-			if(prefs.getBoolean("start_on_boot_preference", true))
+			if(prefs.getBoolean("start_on_boot_preference", false))
 				list.add(putData("Start on Boot", "ON"));
 			else
 				list.add(putData("Start on Boot", "OFF"));
