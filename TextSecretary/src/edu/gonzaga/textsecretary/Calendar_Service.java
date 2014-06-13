@@ -11,6 +11,7 @@ import android.provider.CalendarContract.Instances;
 import android.util.Log;
 
 public class Calendar_Service {
+	private final String TAG = "CALENDAR";
 	private Context context;
 	private long eventEnd = Long.MAX_VALUE;
 	private String eventName = "";
@@ -63,7 +64,7 @@ public class Calendar_Service {
 				if (start <= currentMillis && end >= currentMillis){
 					eventEnd = end;
 					eventName = calendarCursor.getString(0);
-					Log.d("CALENDAR", "event present");
+					Log.d(TAG, "event present");
 					calendarCursor.close();
 					return true;
 				}
@@ -71,10 +72,10 @@ public class Calendar_Service {
 			calendarCursor.close();
 		}
 		catch(Exception e){
-			Log.d("CALENDAR", e.getMessage());
+			Log.d(TAG, e.getMessage());
 		}
 		
-		Log.d("CALENDAR", "not event");
+		Log.d(TAG, "not event");
 		return false;
 	}
 	
@@ -82,9 +83,21 @@ public class Calendar_Service {
 	private long getAllDayStart(long origStart){
 		Calendar allStart = Calendar.getInstance();
 		allStart.setTime(new Date(origStart));
-		allStart.roll(Calendar.DATE, true);
-		allStart.set(Calendar.HOUR_OF_DAY, 0);
-		allStart.set(Calendar.MINUTE, 0);
+		
+		//if already start of day, probably fine
+		if (allStart.get(Calendar.HOUR_OF_DAY) != 0){
+			//if PM then roll up to beginning of next day
+			if (allStart.get(Calendar.AM_PM) == Calendar.PM){
+				allStart.roll(Calendar.DATE, true);
+				allStart.set(Calendar.HOUR_OF_DAY, 0);
+				allStart.set(Calendar.MINUTE, 0);
+			}
+			//else, AM so roll back to beginning of current day
+			else{
+				allStart.set(Calendar.HOUR_OF_DAY, 0);
+				allStart.set(Calendar.MINUTE, 0);
+			}
+		}
 		return allStart.getTimeInMillis();
 	}
 
