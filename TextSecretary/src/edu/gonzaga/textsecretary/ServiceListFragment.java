@@ -37,7 +37,21 @@ public class ServiceListFragment extends ListFragment{
 	  private ArrayList<Map<String, String>> buildData() {
 	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());	  
 	        list = new ArrayList<Map<String, String>>();
-
+        	
+	        //respond to
+	        String respondTo = prefs.getString("respond_to_preference", "2");
+	        switch(respondTo){
+	        case "0":
+	        	list.add(putData("Reply to", "Texts"));
+	        	break;
+        	case "1":
+        		list.add(putData("Reply to", "Calls"));
+        		break;
+        	case "2":
+        		list.add(putData("Reply to", "Texts & Calls"));
+        		break;
+	        }
+	        
 	    	
 		    //Calendar
 		    if(prefs.getBoolean("calendar_preference", true))

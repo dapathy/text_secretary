@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     
+   	<ListPreference 
+	    android:title="Reply to:"
+	    android:summary="Select whether an auto reply is sent for missed calls, text messages, or both."
+	    android:key="respond_to_preference"
+	    android:entries="@array/entries_respond_to"
+		android:entryValues="@array/entryvalues_respond_to"
+	    android:dialogTitle="Reply to..."
+		android:defaultValue="2"/>
+    
 	<PreferenceCategory
             android:title="Customizable Response">
             
@@ -52,7 +61,6 @@
         <ListPreference
                 android:key="list_preference"
                 android:dependency="sleep_timer_preference"
-                android:layout="?android:attr/preferenceLayoutChild"
                 android:title="Sleep Length"
                 android:summary="Customize the minimum length of time between responses."
                 android:entries="@array/entries_list_preference"

@@ -25,7 +25,7 @@ import android.util.Log;
 
 public class SMS_Service extends Service{
 	
-	private final String TAG = "Service";
+	private final String TAG = "SMS_SERVICE";
 	private Calendar_Service calendar;
 	private String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	private SharedPreferences prefs;
@@ -42,7 +42,7 @@ public class SMS_Service extends Service{
 		super.onCreate();		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
-		filter.addAction("android.telephony.TelephonyManager.ACTION_PHONE_STATE_CHANGED");
+		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 		calendar = new Calendar_Service(getApplicationContext());
 		registerReceiver (receiver, filter);
 	}
@@ -60,15 +60,17 @@ public class SMS_Service extends Service{
 			//calendar integration is disabled or is in event
 			if(!prefs.getBoolean("calendar_preference", true) || calendar.inEvent()){
 				
+				int respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "2"));
+				
 				//if call
-				if(intent.getAction().equals("android.telephony.TelephonyManager.ACTION_PHONE_STATE_CHANGED")) {
+				if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo == 1 || respondTo == 2)) {
 					PhoneStateChangeListener pscl = new PhoneStateChangeListener();
 					TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
 					tm.listen(pscl, PhoneStateListener.LISTEN_CALL_STATE);
 				}
 				
 				//if received SMS
-				if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
+				else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (respondTo == 0 || respondTo == 2)){
 					Bundle bundle = intent.getExtras();
 					SmsMessage[] msgs = null;
 					String msg_from = "empty";
@@ -95,6 +97,7 @@ public class SMS_Service extends Service{
 	
 	private class PhoneStateChangeListener extends PhoneStateListener {
 	    private boolean wasRinging = false;
+	    private String number;
 	    //may need to save number when ringing?
 	    
 	    @Override
@@ -103,6 +106,7 @@ public class SMS_Service extends Service{
 	            case TelephonyManager.CALL_STATE_RINGING:
 	                 Log.d(TAG, "RINGING");
 	                 wasRinging = true;
+	                 number = incomingNumber;
 	                 break;
 	            case TelephonyManager.CALL_STATE_OFFHOOK:
 	                 Log.d(TAG, "OFFHOOK");
@@ -111,7 +115,7 @@ public class SMS_Service extends Service{
 	            case TelephonyManager.CALL_STATE_IDLE:
 	                 Log.d(TAG, "IDLE");
 	                 if (wasRinging){
-	                	 handleSMSReply(incomingNumber);
+	                	 handleSMSReply(number);
 	                 }
 	                 wasRinging = false;
 	                 break;
