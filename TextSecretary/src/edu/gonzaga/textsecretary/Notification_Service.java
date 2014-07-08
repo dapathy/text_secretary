@@ -12,8 +12,9 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 public class Notification_Service{
-	   private NotificationManager mNotificationManager;
-	   private Context mContext;
+	private static final String TAG = "NOTIFICATION";
+	private NotificationManager mNotificationManager;
+	private Context mContext;
 	   
 	public Notification_Service (Context context){
 		mContext = context;
@@ -23,11 +24,10 @@ public class Notification_Service{
 		String id = "";
 		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
 		String[] projection = new String[]{
-				PhoneLookup.DISPLAY_NAME,
-				PhoneLookup.PHOTO_THUMBNAIL_URI
+				PhoneLookup.DISPLAY_NAME
 		};
 		Cursor contactCursor = mContext.getContentResolver().query(uri, projection, null, null, null);
-		Log.d("CONTACT", "query completed");
+		Log.d(TAG, "query completed");
 		if (contactCursor.moveToFirst()){
 			id = contactCursor.getString(0);
 		}
@@ -39,7 +39,7 @@ public class Notification_Service{
 	}
 
 	public void displayNotification(String number) {
-		Log.d("TAG", "notification");
+		Log.d(TAG, "notification");
 		
 		String id = getId(number);
 		
@@ -51,8 +51,6 @@ public class Notification_Service{
 		mBuilder.setTicker("Text Secretary Auto Reply");
 		mBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
 		mBuilder.setAutoCancel(true);
-		mBuilder.setNumber(3);
-
 	      
 		/* Creates an explicit intent for an Activity in your app */
 		Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null));

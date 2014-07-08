@@ -12,11 +12,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.PhoneStateListener;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -29,7 +32,10 @@ public class SMS_Service extends Service{
 	private Calendar_Service calendar;
 	private String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	private SharedPreferences prefs;
+	private int respondTo;
 	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
+	private static PhoneStateChangeListener pscl;
+	private static TelephonyManager tm;
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	
 	@Override
@@ -60,17 +66,17 @@ public class SMS_Service extends Service{
 			//calendar integration is disabled or is in event
 			if(!prefs.getBoolean("calendar_preference", true) || calendar.inEvent()){
 				
-				int respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "2"));
+				respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "3"));
 				
 				//if call
-				if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo == 1 || respondTo == 2)) {
-					PhoneStateChangeListener pscl = new PhoneStateChangeListener();
-					TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+				if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo != 0)) {
+					pscl = new PhoneStateChangeListener(context);
+					tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
 					tm.listen(pscl, PhoneStateListener.LISTEN_CALL_STATE);
 				}
 				
 				//if received SMS
-				else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (respondTo == 0 || respondTo == 2)){
+				else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (respondTo != 1 && respondTo != 2)){
 					Bundle bundle = intent.getExtras();
 					SmsMessage[] msgs = null;
 					String msg_from = "empty";
@@ -96,9 +102,14 @@ public class SMS_Service extends Service{
 	};
 	
 	private class PhoneStateChangeListener extends PhoneStateListener {
-	    private boolean wasRinging = false;
+	    private Context mContext;
+		private boolean wasRinging = false;
 	    private String number;
-	    //may need to save number when ringing?
+
+	    public PhoneStateChangeListener (Context context) {
+	    	super();
+	    	mContext = context;
+	    }
 	    
 	    @Override
 	    public void onCallStateChanged(int state, String incomingNumber) {
@@ -114,13 +125,38 @@ public class SMS_Service extends Service{
 	                 break;
 	            case TelephonyManager.CALL_STATE_IDLE:
 	                 Log.d(TAG, "IDLE");
-	                 if (wasRinging){
+	                 if (wasRinging && (isMobileContact(number, mContext) || (respondTo == 2 || respondTo == 4))){
 	                	 handleSMSReply(number);
 	                 }
 	                 wasRinging = false;
+	                 number = "";
+	                 tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
 	                 break;
 	        }
 	    }
+	}
+	
+	private boolean isMobileContact(String number, Context context) {
+		if (number.isEmpty())
+			return false;
+		else{
+			Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+			String[] projection = new String[]{
+					PhoneLookup.TYPE
+			};
+			Cursor contactCursor = context.getContentResolver().query(uri, projection, null, null, null);
+			Log.d(TAG, "query completed");
+			if (contactCursor.moveToFirst()
+				&& (contactCursor.getInt(0) == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)){
+					
+				Log.d(TAG, "mobile found");
+				contactCursor.close();
+				return true;
+			}
+			Log.d(TAG, "no mobile found");
+			contactCursor.close();
+			return false;
+		}
 	}
 	
 	private void handleSMSReply(String msg_from) {
@@ -209,6 +245,6 @@ public class SMS_Service extends Service{
     	values.put("address", mobNo); 
     	values.put("body", msg); 
     	getContentResolver().insert(Uri.parse("content://sms/sent"), values); 
-  } 
+    } 
 	
 }

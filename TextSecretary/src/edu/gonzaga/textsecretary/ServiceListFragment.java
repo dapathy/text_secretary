@@ -42,13 +42,19 @@ public class ServiceListFragment extends ListFragment{
 	        String respondTo = prefs.getString("respond_to_preference", "2");
 	        switch(respondTo){
 	        case "0":
-	        	list.add(putData("Reply to", "Texts"));
+	        	list.add(putData("Replying to", "Texts"));
 	        	break;
         	case "1":
-        		list.add(putData("Reply to", "Calls"));
+        		list.add(putData("Replying to", "Calls"));
         		break;
         	case "2":
-        		list.add(putData("Reply to", "Texts & Calls"));
+        		list.add(putData("Replying to", "Calls"));
+        		break;
+        	case "3":
+        		list.add(putData("Replying to", "Texts & Calls"));
+        		break;
+        	case "4":
+        		list.add(putData("Replying to", "Texts & Calls"));
         		break;
 	        }
 	        
