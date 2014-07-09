@@ -37,6 +37,7 @@ public class SMS_Service extends Service{
 	private static PhoneStateChangeListener pscl;
 	private static TelephonyManager tm;
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
+	private static boolean listenerLock = false;
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -56,6 +57,9 @@ public class SMS_Service extends Service{
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
+		tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
+		pscl = null;
+		tm = null;
 		unregisterReceiver(receiver);
 	}
 	
@@ -69,10 +73,12 @@ public class SMS_Service extends Service{
 				respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "3"));
 				
 				//if call
-				if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo != 0)) {
+				if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo != 0) && !listenerLock) {
 					pscl = new PhoneStateChangeListener(context);
 					tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
 					tm.listen(pscl, PhoneStateListener.LISTEN_CALL_STATE);
+					Log.d(TAG, "register listener");
+					listenerLock = true;
 				}
 				
 				//if received SMS
@@ -131,6 +137,8 @@ public class SMS_Service extends Service{
 	                 wasRinging = false;
 	                 number = "";
 	                 tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
+	                 listenerLock = false;
+	                 Log.d(TAG, "unregistering listener");
 	                 break;
 	        }
 	    }
