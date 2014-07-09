@@ -57,7 +57,7 @@ public class SMS_Service extends Service{
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
+		//tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
 		pscl = null;
 		tm = null;
 		unregisterReceiver(receiver);
