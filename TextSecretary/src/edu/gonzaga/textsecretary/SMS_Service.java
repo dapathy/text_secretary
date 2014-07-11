@@ -7,11 +7,13 @@ import java.util.Locale;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,6 +52,12 @@ public class SMS_Service extends Service{
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		
+		ContentResolver contentResolver = getApplicationContext().getContentResolver();
+		YourObserver yourObserver = new YourObserver(new Handler());
+		contentResolver.registerContentObserver(Uri.parse("content://sms"),true, yourObserver);
+		
+		
 		calendar = new Calendar_Service(getApplicationContext());
 		registerReceiver (receiver, filter);
 	}
@@ -255,4 +263,48 @@ public class SMS_Service extends Service{
     	getContentResolver().insert(Uri.parse("content://sms/sent"), values); 
     } 
 	
-}
+    class YourObserver extends ContentObserver {
+    	Cursor cursor = getApplicationContext().getContentResolver().query(
+				Uri.parse("content://sms"), null, null, null, null);
+    	
+        public YourObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            long currentTime = Calendar.getInstance().getTimeInMillis();
+    		if (cursor.moveToNext()) {
+    			String protocol = cursor.getString(cursor.getColumnIndex("protocol"));
+    			int type = cursor.getInt(cursor.getColumnIndex("type"));
+    			// Only processing outgoing sms event & only when it
+    			// is sent successfully (available in SENT box).
+    			if (protocol != null || type != 2) {
+    				return;
+    			}
+    			Log.d("TAG", "SENT MESSAGE!");
+    			
+    			//int dateColumn = cursor.getColumnIndex("date");
+    			//int bodyColumn = cursor.getColumnIndex("body");
+    			int addressColumn = cursor.getColumnIndex("address");
+    			//String from = "0";
+    			String to = cursor.getString(addressColumn);
+    			//String message = cursor.getString(bodyColumn);
+    			prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+    			if(prefs.getBoolean("smart_sent_message", true)){
+	    			if(isRecent(to,currentTime)){
+	    				Log.d("TAG", "sent to recent");
+	    			}
+	    			else
+	    				Log.d("TAG", "sent to someone not recent");
+    			}
+    		}
+    			
+    		}
+    		           
+            
+        }
+        
+    }
+

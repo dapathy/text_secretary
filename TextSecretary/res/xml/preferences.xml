@@ -67,6 +67,13 @@
                 android:entryValues="@array/entryvalues_list_preference"
                 android:dialogTitle="Sleep timer delay:"
                 android:defaultValue="1800000"/>
+        
+ 		<CheckBoxPreference
+                android:key="smart_sent_message"
+                android:title="Smart Sent Message"
+                android:dependency="sleep_timer_preference"
+                android:summary="If the user sends a text, that recipient is added to the sleep timer. In other words, if the user sends a text and the recipient responds, Text Secretary will not auto-respond to avoid confusing the recipient."
+                android:defaultValue="true"/>
             
     </PreferenceCategory>
     
