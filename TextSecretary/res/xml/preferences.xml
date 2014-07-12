@@ -55,7 +55,7 @@
         <CheckBoxPreference
                 android:key="sleep_timer_preference"
                 android:title="Sleep Timer"
-                android:summary="Enables a minimum time between responses to a single contact to avoid spamming the recipient. View the help page for more information and an example."
+                android:summary="Enables a minimum time between auto responses to a single contact to avoid spamming the recipient. View the help page for more information and an example."
                 android:defaultValue="true"/>
         
         <ListPreference
@@ -70,9 +70,9 @@
         
  		<CheckBoxPreference
                 android:key="smart_sent_message"
-                android:title="Smart Sent Message"
+                android:title="Smart Sent Messages"
                 android:dependency="sleep_timer_preference"
-                android:summary="If the user sends a text, that recipient is added to the sleep timer. In other words, if the user sends a text and the recipient responds, Text Secretary will not auto-respond to avoid confusing the recipient."
+                android:summary="The sleep timer will also be reset when you send a regular text message that is not an auto reply."
                 android:defaultValue="true"/>
             
     </PreferenceCategory>

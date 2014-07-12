@@ -81,6 +81,11 @@ public class ServiceListFragment extends ListFragment{
 			if(prefs.getBoolean("sleep_timer_preference", true)){
 				list.add(putData("Sleep Timer", "ON"));
 				list.add(putData("Sleep Length", Long.valueOf(prefs.getString("list_preference", "1800000"))/60000 + " minutes"));
+				
+				if(prefs.getBoolean("smart_sent_message", true))
+					list.add(putData("Smart Sent Message", "ON"));
+				else
+					list.add(putData("Smart Sent Message", "OFF"));
 			}
 			else
 				list.add(putData("Sleep", "OFF"));

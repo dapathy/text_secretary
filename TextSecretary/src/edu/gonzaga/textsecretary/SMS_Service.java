@@ -22,6 +22,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
+import android.provider.Telephony;
 import android.telephony.PhoneStateListener;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -38,6 +39,7 @@ public class SMS_Service extends Service{
 	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
 	private static PhoneStateChangeListener pscl;
 	private static TelephonyManager tm;
+	private OutgoingListener outgoingListener;
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	private static boolean listenerLock = false;
 	
@@ -48,27 +50,27 @@ public class SMS_Service extends Service{
 
 	@Override
 	public void onCreate(){
-		super.onCreate();		
+		super.onCreate();
+		calendar = new Calendar_Service(getApplicationContext());
+
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 		
 		ContentResolver contentResolver = getApplicationContext().getContentResolver();
-		YourObserver yourObserver = new YourObserver(new Handler());
-		contentResolver.registerContentObserver(Uri.parse("content://sms"),true, yourObserver);
+		outgoingListener = new OutgoingListener(new Handler());
+		contentResolver.registerContentObserver(Uri.parse("content://sms"),true, outgoingListener);
 		
-		
-		calendar = new Calendar_Service(getApplicationContext());
 		registerReceiver (receiver, filter);
 	}
 	
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		//tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
 		pscl = null;
 		tm = null;
 		unregisterReceiver(receiver);
+		getContentResolver().unregisterContentObserver(outgoingListener);
 	}
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
@@ -263,48 +265,40 @@ public class SMS_Service extends Service{
     	getContentResolver().insert(Uri.parse("content://sms/sent"), values); 
     } 
 	
-    class YourObserver extends ContentObserver {
-    	Cursor cursor = getApplicationContext().getContentResolver().query(
-				Uri.parse("content://sms"), null, null, null, null);
+    private class OutgoingListener extends ContentObserver {
     	
-        public YourObserver(Handler handler) {
+        public OutgoingListener(Handler handler) {
             super(handler);
         }
 
         @Override
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
-            long currentTime = Calendar.getInstance().getTimeInMillis();
-    		if (cursor.moveToNext()) {
-    			String protocol = cursor.getString(cursor.getColumnIndex("protocol"));
-    			int type = cursor.getInt(cursor.getColumnIndex("type"));
-    			// Only processing outgoing sms event & only when it
-    			// is sent successfully (available in SENT box).
-    			if (protocol != null || type != 2) {
-    				return;
-    			}
-    			Log.d("TAG", "SENT MESSAGE!");
-    			
-    			//int dateColumn = cursor.getColumnIndex("date");
-    			//int bodyColumn = cursor.getColumnIndex("body");
-    			int addressColumn = cursor.getColumnIndex("address");
-    			//String from = "0";
-    			String to = cursor.getString(addressColumn);
-    			//String message = cursor.getString(bodyColumn);
-    			prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-    			if(prefs.getBoolean("smart_sent_message", true)){
-	    			if(isRecent(to,currentTime)){
-	    				Log.d("TAG", "sent to recent");
-	    			}
-	    			else
-	    				Log.d("TAG", "sent to someone not recent");
-    			}
-    		}
-    			
-    		}
-    		           
             
-        }
-        
+            prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			//calendar integration is disabled or is in event
+			if(prefs.getBoolean("smart_sent_message", true) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+				Cursor cursor = getApplicationContext().getContentResolver().query(
+						Uri.parse("content://sms"), null, null, null, null);
+				
+				//last outgoing message
+				if (cursor.moveToNext()) {
+	    			String protocol = cursor.getString(cursor.getColumnIndex("protocol"));
+	    			int type = cursor.getInt(cursor.getColumnIndex("type"));
+	    			// Only processing outgoing sms event & only when it
+	    			// is sent successfully (available in SENT box).
+	    			if (protocol == null && type == Telephony.TextBasedSmsColumns.MESSAGE_TYPE_SENT) {
+		    			Log.d(TAG, "SENT MESSAGE!");
+		    			
+		    			int addressColumn = cursor.getColumnIndex("address");
+		    			String number = cursor.getString(addressColumn);
+	    	            long currentTime = Calendar.getInstance().getTimeInMillis();
+	    				recentNumbers.put(number, currentTime);
+	    			}
+	    		}
+				cursor.close();
+			}		
+		}	                 
     }
 
+}
