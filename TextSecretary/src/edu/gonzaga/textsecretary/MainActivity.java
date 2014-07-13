@@ -49,8 +49,6 @@ public class MainActivity extends Activity {
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         
         SMS_Service_State = settings.getBoolean("smsState", false);
-        if(SMS_Service_State)
-        	startService();
         
         setUpGui();
 		setUpWidget();

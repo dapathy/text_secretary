@@ -72,7 +72,7 @@
                 android:key="smart_sent_message"
                 android:title="Smart Sent Messages"
                 android:dependency="sleep_timer_preference"
-                android:summary="The sleep timer will also be reset when you send a regular text message that is not an auto reply."
+                android:summary="If you send a text, the recipient is added to the sleep timer. If the recipient were to respond, Text Secretary would not auto-respond if within the Sleep Length."
                 android:defaultValue="true"/>
             
     </PreferenceCategory>
