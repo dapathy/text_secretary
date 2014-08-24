@@ -165,8 +165,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         } catch(Exception e) {
         	Log.d(TAG, "CATCH compare " + e.toString());
         }
-        return true;
-        
+        return false;
     }
 
 	//This dialogue informs user that they're period is over
