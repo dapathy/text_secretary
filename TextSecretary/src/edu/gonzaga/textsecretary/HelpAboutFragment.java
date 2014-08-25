@@ -34,14 +34,4 @@ public class HelpAboutFragment extends Fragment {
 	    t.setText("Version: "+ versionName);
 		return myInflatedView;
 	}
-	
-    public void setText(String text){
-        TextView textView = (TextView) getView().findViewById(R.id.aboutVersion);
-        textView.setText(text);
-    }
-
-    public void onActivityCreated(){
-    	super.onActivityCreated(getArguments());
-    	setText("TEST");
-    }
 }
