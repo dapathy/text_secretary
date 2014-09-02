@@ -88,7 +88,7 @@ public class ServiceListFragment extends ListFragment{
 					list.add(putData("Smart Sent Message", "OFF"));
 			}
 			else
-				list.add(putData("Sleep", "OFF"));
+				list.add(putData("Sleep Timer", "OFF"));
 			
 		    return list;
 		  }

@@ -73,7 +73,7 @@
                 android:title="Smart Sent Messages"
                 android:dependency="sleep_timer_preference"
                 android:summary="If you send a text, the recipient is added to the sleep timer. If the recipient were to respond, Text Secretary would not auto-respond if within the Sleep Length."
-                android:defaultValue="true"/>
+                android:defaultValue="false"/>
             
     </PreferenceCategory>
     

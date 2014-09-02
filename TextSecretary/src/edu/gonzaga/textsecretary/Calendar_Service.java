@@ -33,8 +33,8 @@ public class Calendar_Service {
 		Calendar current = Calendar.getInstance();
 		Calendar cStart = Calendar.getInstance();
 		Calendar cEnd = Calendar.getInstance();
-		cStart.roll(Calendar.DATE, false);
-		cEnd.roll(Calendar.DATE, true);
+		cStart.add(Calendar.DATE, -1);
+		cEnd.add(Calendar.DATE, 1);
 		
 		long cStartMillis = cStart.getTimeInMillis();
 		long cEndMillis = cEnd.getTimeInMillis();
@@ -86,13 +86,13 @@ public class Calendar_Service {
 		
 		//if already start of day, probably fine
 		if (allStart.get(Calendar.HOUR_OF_DAY) != 0){
-			//if PM then roll up to beginning of next day
+			//if PM then increment up to beginning of next day
 			if (allStart.get(Calendar.AM_PM) == Calendar.PM){
-				allStart.roll(Calendar.DATE, true);
+				allStart.add(Calendar.DATE, 1);
 				allStart.set(Calendar.HOUR_OF_DAY, 0);
 				allStart.set(Calendar.MINUTE, 0);
 			}
-			//else, AM so roll back to beginning of current day
+			//else, AM so increment back to beginning of current day
 			else{
 				allStart.set(Calendar.HOUR_OF_DAY, 0);
 				allStart.set(Calendar.MINUTE, 0);
