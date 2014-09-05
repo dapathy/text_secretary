@@ -150,6 +150,7 @@ public class SettingsActivity extends PreferenceActivity {
 			while (!task.get() && count < 5) {
 				task = new Register(getApplicationContext());
 				task.execute(true);
+				count++;
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
