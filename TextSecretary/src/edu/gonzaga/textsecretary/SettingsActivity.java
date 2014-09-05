@@ -1,6 +1,7 @@
 package edu.gonzaga.textsecretary;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import com.android.vending.billing.IInAppBillingService;
 
@@ -141,5 +142,17 @@ public class SettingsActivity extends PreferenceActivity {
 		//store on server
 		task = new Register(getApplicationContext());
 		task.execute(true);
+		
+		//retry task until true or 5 times tried
+		try {
+			int count = 0;
+			
+			while (!task.get() && count < 5) {
+				task = new Register(getApplicationContext());
+				task.execute(true);
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 }
