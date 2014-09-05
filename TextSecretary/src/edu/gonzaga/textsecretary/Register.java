@@ -71,6 +71,8 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
             //retrieve values
         	serverPay = json.getString(TAG_PAID);
         	date = json.getString(TAG_DATE);
+        	
+        	return checkActivation(date, serverPay);
         
         } catch (JSONException e) {
         	Log.d(TAG, "CATCH");
@@ -80,7 +82,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         	Log.d(TAG, "CATCH httpRequest " + e.toString());
         }
         
-        return checkActivation(date, serverPay);
+        return false;
 	}
 	
 	protected void onPostExecute(Boolean result){
@@ -141,12 +143,10 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		SharedPreferences secureSettings = new SecurePreferences(mContext);
 		String account = UserEmailFetcher.getEmail(mContext);
 		
-		//if preference is false, update it
-		if(!secureSettings.getBoolean(account+"_paid", false)){
-			SharedPreferences.Editor secureEdit = secureSettings.edit();
-			secureEdit.putBoolean(account+"_paid", true);
-			secureEdit.commit();
-		}
+		//update preference
+		SharedPreferences.Editor secureEdit = secureSettings.edit();
+		secureEdit.putBoolean(account+"_paid", true);
+		secureEdit.commit();
 	}
     
     private boolean isInTrialDate(String endTrial, String currentDate) {
