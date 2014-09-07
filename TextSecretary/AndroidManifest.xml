@@ -58,8 +58,11 @@
         <activity
             android:name="edu.gonzaga.textsecretary.SettingsActivity"
             android:label="@string/action_settings"
-            android:parentActivityName="edu.gonzaga.textsecretary.MainActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:parentActivityName="edu.gonzaga.textsecretary.MainActivity" >
+           <meta-data
+		        android:name="android.support.PARENT_ACTIVITY"
+		        android:value="edu.gonzaga.textsecretary.MainActivity" />
         </activity>
         <activity
             android:name="edu.gonzaga.textsecretary.PrefFrag"
@@ -68,8 +71,11 @@
         <activity
             android:name="edu.gonzaga.textsecretary.Help_Activity"
             android:label="@string/title_activity_help_" 
-            android:parentActivityName="edu.gonzaga.textsecretary.MainActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:parentActivityName="edu.gonzaga.textsecretary.MainActivity" >
+           <meta-data
+		        android:name="android.support.PARENT_ACTIVITY"
+		        android:value="edu.gonzaga.textsecretary.MainActivity" />
         </activity>
     </application>
 
