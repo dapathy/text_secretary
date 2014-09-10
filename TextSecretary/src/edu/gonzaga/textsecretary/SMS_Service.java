@@ -278,7 +278,7 @@ public class SMS_Service extends Service{
             
             prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 			//calendar integration is disabled or is in event
-			if(prefs.getBoolean("smart_sent_message", true) && prefs.getBoolean("sleep_timer_preference", true) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+			if(prefs.getBoolean("smart_sent_message", false) && prefs.getBoolean("sleep_timer_preference", true) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
 				Cursor cursor = getApplicationContext().getContentResolver().query(
 						Uri.parse("content://sms"), null, null, null, null);
 				
