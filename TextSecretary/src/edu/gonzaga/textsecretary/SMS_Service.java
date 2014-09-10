@@ -40,7 +40,7 @@ public class SMS_Service extends Service{
 	private static PhoneStateChangeListener pscl;
 	private static TelephonyManager tm;
 	private OutgoingListener outgoingListener;
-	private static HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
+	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	private static boolean listenerLock = false;
 	
 	@Override
@@ -59,7 +59,7 @@ public class SMS_Service extends Service{
 		
 		ContentResolver contentResolver = getApplicationContext().getContentResolver();
 		outgoingListener = new OutgoingListener(new Handler());
-		contentResolver.registerContentObserver(Uri.parse("content://sms"),true, outgoingListener);
+		contentResolver.registerContentObserver(Uri.parse("content://sms"), true, outgoingListener);
 		
 		registerReceiver (receiver, filter);
 	}
@@ -69,7 +69,6 @@ public class SMS_Service extends Service{
 		super.onDestroy();
 		pscl = null;
 		tm = null;
-		recentNumbers.clear();
 		unregisterReceiver(receiver);
 		getContentResolver().unregisterContentObserver(outgoingListener);
 	}
@@ -215,18 +214,20 @@ public class SMS_Service extends Service{
 		//if number is new
 		long currentTime = Calendar.getInstance().getTimeInMillis();
 		if (!recentNumbers.containsKey(phoneNumber)){
-			recentNumbers.put(phoneNumber, currentTime);
+			recentNumbers.put(formatNumber(phoneNumber), currentTime);
+			Log.d(TAG, "new number: " + phoneNumber);
 			return false;
 		}
 		//if number is already in map
 		else{
 			long time = recentNumbers.get(phoneNumber);
-			recentNumbers.put(phoneNumber, currentTime);
+			recentNumbers.put(formatNumber(phoneNumber), currentTime);
 			if ((currentTime - time) > repeatTime){
+				Log.d(TAG, "update time" + phoneNumber);
 				return false;
 			}
 			else{
-				Log.d("SDF", "recent");
+				Log.d("SDF", "recent: " + phoneNumber);
 				return true;
 			}
 		}
@@ -288,18 +289,31 @@ public class SMS_Service extends Service{
 	    			int type = cursor.getInt(cursor.getColumnIndex("type"));
 	    			// Only processing outgoing sms event & only when it
 	    			// is sent successfully (available in SENT box).
-	    			if (protocol == null && type == Telephony.TextBasedSmsColumns.MESSAGE_TYPE_SENT) {
-		    			Log.d(TAG, "SENT MESSAGE!");
-		    			
+	    			if (protocol == null && type == Telephony.TextBasedSmsColumns.MESSAGE_TYPE_SENT) {		    			
 		    			int addressColumn = cursor.getColumnIndex("address");
 		    			String number = cursor.getString(addressColumn);
-	    	            long currentTime = Calendar.getInstance().getTimeInMillis();
-	    				recentNumbers.put(number, currentTime);
+		    			long currentTime = Calendar.getInstance().getTimeInMillis();
+		    			recentNumbers.put(formatNumber(number), currentTime);
+	    				Log.d(TAG, "Sent message to: " + number);
 	    			}
 	    		}
 				cursor.close();
 			}		
 		}	                 
     }
-
+    
+    private String formatNumber(String number) {
+    	String newNumber = number;
+    	
+    	//replace non-numbers
+    	newNumber = newNumber.replaceAll("\\W", "");
+    	
+    	//replace starting '1' if exists
+    	if (newNumber.charAt(0) == '1') 
+    		newNumber = newNumber.substring(1);
+    	
+    	Log.d(TAG, "new number is:" + newNumber);
+    	
+    	return newNumber;
+    }
 }
