@@ -212,22 +212,23 @@ public class SMS_Service extends Service{
 	//stores and updates information in hashmap
 	private boolean isRecent(String phoneNumber, long repeatTime){
 		//if number is new
+		String newNumber = formatNumber(phoneNumber);
 		long currentTime = Calendar.getInstance().getTimeInMillis();
-		if (!recentNumbers.containsKey(phoneNumber)){
-			recentNumbers.put(formatNumber(phoneNumber), currentTime);
-			Log.d(TAG, "new number: " + phoneNumber);
+		if (!recentNumbers.containsKey(newNumber)){
+			recentNumbers.put(newNumber, currentTime);
+			Log.d(TAG, "new number: " + newNumber);
 			return false;
 		}
 		//if number is already in map
 		else{
-			long time = recentNumbers.get(phoneNumber);
-			recentNumbers.put(formatNumber(phoneNumber), currentTime);
+			long time = recentNumbers.get(newNumber);
+			recentNumbers.put(newNumber, currentTime);
 			if ((currentTime - time) > repeatTime){
-				Log.d(TAG, "update time" + phoneNumber);
+				Log.d(TAG, "update time" + newNumber);
 				return false;
 			}
 			else{
-				Log.d("SDF", "recent: " + phoneNumber);
+				Log.d("SDF", "recent: " + newNumber);
 				return true;
 			}
 		}
@@ -293,8 +294,9 @@ public class SMS_Service extends Service{
 		    			int addressColumn = cursor.getColumnIndex("address");
 		    			String number = cursor.getString(addressColumn);
 		    			long currentTime = Calendar.getInstance().getTimeInMillis();
-		    			recentNumbers.put(formatNumber(number), currentTime);
-	    				Log.d(TAG, "Sent message to: " + number);
+		    			String newNumber = formatNumber(number);
+		    			recentNumbers.put(newNumber, currentTime);
+	    				Log.d(TAG, "Sent message to: " + newNumber);
 	    			}
 	    		}
 				cursor.close();
