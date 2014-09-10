@@ -40,7 +40,7 @@ public class SMS_Service extends Service{
 	private static PhoneStateChangeListener pscl;
 	private static TelephonyManager tm;
 	private OutgoingListener outgoingListener;
-	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
+	private static HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	private static boolean listenerLock = false;
 	
 	@Override
@@ -69,6 +69,7 @@ public class SMS_Service extends Service{
 		super.onDestroy();
 		pscl = null;
 		tm = null;
+		recentNumbers.clear();
 		unregisterReceiver(receiver);
 		getContentResolver().unregisterContentObserver(outgoingListener);
 	}
@@ -178,7 +179,7 @@ public class SMS_Service extends Service{
 	}
 	
 	private void handleSMSReply(String msg_from) {
-		//if timer is disabled or is recent
+		//if timer is disabled or is not recent
 		if (!prefs.getBoolean("sleep_timer_preference", true) || !isRecent(msg_from, Long.valueOf(prefs.getString("list_preference", "1800000")))){
 	        String message;
 	        
@@ -277,7 +278,7 @@ public class SMS_Service extends Service{
             
             prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 			//calendar integration is disabled or is in event
-			if(prefs.getBoolean("smart_sent_message", true) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+			if(prefs.getBoolean("smart_sent_message", true) && prefs.getBoolean("sleep_timer_preference", true) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
 				Cursor cursor = getApplicationContext().getContentResolver().query(
 						Uri.parse("content://sms"), null, null, null, null);
 				
