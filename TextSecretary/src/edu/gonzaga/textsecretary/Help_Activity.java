@@ -10,11 +10,11 @@ import android.support.v4.view.ViewPager;
 
 public class Help_Activity extends FragmentActivity implements TabListener {
 
-	ActionBar actionBar;
-	ViewPager view;
-	ActionBar.Tab calendarTab;
-	ActionBar.Tab sleepTab;
-	ActionBar.Tab aboutTab;
+	private ActionBar actionBar;
+	private ViewPager view;
+	private ActionBar.Tab calendarTab;
+	private ActionBar.Tab sleepTab;
+	private ActionBar.Tab aboutTab;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

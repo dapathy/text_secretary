@@ -21,7 +21,7 @@ import android.util.Log;
 
 public class SettingsActivity extends PreferenceActivity {
 	
-	private final String TAG = "PURCHASE";
+	private static final String TAG = "PURCHASE";
 	private IInAppBillingService mService;
 	private String PACKAGE_NAME;
 	private Register task;

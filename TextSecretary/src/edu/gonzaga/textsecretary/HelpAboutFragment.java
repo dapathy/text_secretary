@@ -28,7 +28,6 @@ public class HelpAboutFragment extends Fragment {
 		try {
 			versionName = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	    t.setText("Version: "+ versionName);

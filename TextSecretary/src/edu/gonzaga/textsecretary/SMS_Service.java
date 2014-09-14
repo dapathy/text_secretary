@@ -31,7 +31,7 @@ import android.util.Log;
 
 public class SMS_Service extends Service{
 	
-	private final String TAG = "SMS_SERVICE";
+	private static final String TAG = "SMS_SERVICE";
 	private Calendar_Service calendar;
 	private String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	private SharedPreferences prefs;
@@ -154,7 +154,7 @@ public class SMS_Service extends Service{
 	    }
 	}
 	
-	private boolean isMobileContact(String number, Context context) {
+	private static boolean isMobileContact(String number, Context context) {
 		if (number.isEmpty())
 			return false;
 		else{
@@ -212,7 +212,7 @@ public class SMS_Service extends Service{
 	//stores and updates information in hashmap
 	private boolean isRecent(String phoneNumber, long repeatTime){
 		//if number is new
-		String newNumber = formatNumber(phoneNumber);
+		String newNumber = formatPhoneNumber(phoneNumber);
 		long currentTime = Calendar.getInstance().getTimeInMillis();
 		if (!recentNumbers.containsKey(newNumber)){
 			recentNumbers.put(newNumber, currentTime);
@@ -240,14 +240,14 @@ public class SMS_Service extends Service{
 		CharSequence end = "[end]";
 		CharSequence name = "[name]";
 		
-		newMessage = oldMessage.replace(end, getDate(calendar.getEventEnd()));
+		newMessage = oldMessage.replace(end, convertDateToString(calendar.getEventEnd()));
 		newMessage = newMessage.replace(name, calendar.getEventName());
 			
 		return newMessage;
 	}
 	
 	//converts milliseconds to date
-	private String getDate (long date){
+	private static String convertDateToString (long date){
 		SimpleDateFormat dateFormat = new SimpleDateFormat ("hh:mm a", Locale.US);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(date);
@@ -255,7 +255,7 @@ public class SMS_Service extends Service{
 	}
 	
 	//sends auto reply
-	private void sendSMS(String phoneNumber, String message){
+	private static void sendSMS(String phoneNumber, String message){
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
 	}
@@ -294,7 +294,7 @@ public class SMS_Service extends Service{
 		    			int addressColumn = cursor.getColumnIndex("address");
 		    			String number = cursor.getString(addressColumn);
 		    			long currentTime = Calendar.getInstance().getTimeInMillis();
-		    			String newNumber = formatNumber(number);
+		    			String newNumber = formatPhoneNumber(number);
 		    			recentNumbers.put(newNumber, currentTime);
 	    				Log.d(TAG, "Sent message to: " + newNumber);
 	    			}
@@ -304,7 +304,7 @@ public class SMS_Service extends Service{
 		}	                 
     }
     
-    private String formatNumber(String number) {
+    private static String formatPhoneNumber(String number) {
     	String newNumber = number;
     	
     	//replace non-numbers

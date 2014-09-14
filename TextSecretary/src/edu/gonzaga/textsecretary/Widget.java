@@ -12,7 +12,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 public class Widget extends AppWidgetProvider {
-	private final String TAG = "WIDGET";
+	private static final String TAG = "WIDGET";
 	private SharedPreferences settings;
 	private boolean SMS_Service_State;
 	

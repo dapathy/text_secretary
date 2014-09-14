@@ -6,7 +6,7 @@ import android.content.Context;
 
 public class UserEmailFetcher {
     
-    static public String getEmail(Context context) {
+    public static String getEmail(Context context) {
       AccountManager accountManager = AccountManager.get(context); 
       Account account = getAccount(accountManager);
 

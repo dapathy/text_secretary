@@ -22,7 +22,7 @@ import android.util.Log;
 
 public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	
-	private final String TAG = "REGISTER";
+	private static final String TAG = "REGISTER";
 	private Context mContext;
 	
     // JSON parser class
@@ -32,7 +32,6 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
     private static final String LOGIN_URL = "http://gonzagakennelclub.com/textsecretary/register.php";
 
     //ids
-    //private static final String TAG_SUCCESS = "success";
     private static final String TAG_PAID = "paid";
     private static final String TAG_DATE = "trialEND";
 	
@@ -110,7 +109,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
     	//must have paid, make a preference if one does not already exist
     	else{
     		Log.d(TAG, "paid");
-    		storeActivation();
+    		storeActivation(mContext);
     		return true;
     	}
     }
@@ -138,10 +137,10 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
     }
     
 	//securely stores data locally
-	private void storeActivation(){
+	private static void storeActivation(Context context){
 		//securely store in shared preference
-		SharedPreferences secureSettings = new SecurePreferences(mContext);
-		String account = UserEmailFetcher.getEmail(mContext);
+		SharedPreferences secureSettings = new SecurePreferences(context);
+		String account = UserEmailFetcher.getEmail(context);
 		
 		//update preference
 		SharedPreferences.Editor secureEdit = secureSettings.edit();
@@ -149,7 +148,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		secureEdit.commit();
 	}
     
-    private boolean isInTrialDate(String endTrial, String currentDate) {
+    private static boolean isInTrialDate(String endTrial, String currentDate) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
             Date end = sdf.parse(endTrial);

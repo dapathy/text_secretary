@@ -11,7 +11,7 @@ import android.provider.CalendarContract.Instances;
 import android.util.Log;
 
 public class Calendar_Service {
-	private final String TAG = "CALENDAR";
+	private static final String TAG = "CALENDAR";
 	private Context context;
 	private long eventEnd = Long.MAX_VALUE;
 	private String eventName = "";
@@ -80,7 +80,7 @@ public class Calendar_Service {
 	}
 	
 	//adjust start time for all day events
-	private long getAllDayStart(long origStart){
+	private static long getAllDayStart(long origStart){
 		Calendar allStart = Calendar.getInstance();
 		allStart.setTime(new Date(origStart));
 		

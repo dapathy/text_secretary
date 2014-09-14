@@ -12,7 +12,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 public class Notification_Service{
-	private final String TAG = "NOTIFICATION";
+	private static final String TAG = "NOTIFICATION";
 	private NotificationManager mNotificationManager;
 	private Context mContext;
 	   

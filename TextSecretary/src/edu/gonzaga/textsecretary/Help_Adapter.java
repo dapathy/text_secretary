@@ -8,12 +8,10 @@ public class Help_Adapter extends FragmentPagerAdapter{
 
 	public Help_Adapter(FragmentManager fm) {
 		super(fm);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public Fragment getItem(int tab) {
-		// TODO Auto-generated method stub
 		Fragment fragment = null;
 		if(tab == 0){
 			fragment = new HelpCalendarFragment();
@@ -29,7 +27,6 @@ public class Help_Adapter extends FragmentPagerAdapter{
 
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return 3;
 	}
 
