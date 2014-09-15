@@ -9,6 +9,8 @@ import android.util.Log;
 
 public class RegCheck {
 	
+	private final static String TAG = "REGCHECK";
+	
 	//checks unlock status
 	public static boolean isActivated(Context context){
 		SharedPreferences secureSettings = new SecurePreferences(context);
@@ -29,7 +31,7 @@ public class RegCheck {
 	        try {
 				return task.get();
 			} catch (InterruptedException | ExecutionException e) {
-				Log.e("SMS", "task.get");
+				Log.e(TAG, "task.get failed");
 				e.printStackTrace();
 			}
 		}

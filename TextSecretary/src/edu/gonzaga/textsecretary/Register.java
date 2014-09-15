@@ -24,6 +24,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	
 	private static final String TAG = "REGISTER";
 	private Context mContext;
+	private boolean problemHappenned = false;
 	
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
@@ -81,13 +82,18 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         	Log.d(TAG, "CATCH httpRequest " + e.toString());
         }
         
+        problemHappenned = true;
         return false;
 	}
 	
 	protected void onPostExecute(Boolean result){
 		//if not in trial and not paid, then show dialog
-	    if(!result)
-	    	showTrialOver();
+	    if(!result) {
+	    	if (problemHappenned)
+	    		showErrorDialogue();
+	    	else
+	    		showTrialOver();
+	    }
 	}
     
     private boolean checkActivation(String date, String serverPay){
@@ -165,6 +171,18 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         	Log.d(TAG, "CATCH compare " + e.toString());
         }
         return false;
+    }
+    
+    private void showErrorDialogue() {
+    	new AlertDialog.Builder(mContext)
+	    .setTitle("Something unfortunate happenned...")
+	    .setMessage("Your device was not able to launch the app correctly.  Please check your internet connection and restart the app.")
+	    .setNeutralButton("Exit application", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) {
+	        	System.exit(1);
+	        }
+	     })
+	     .show();
     }
 
 	//This dialogue informs user that they're period is over
