@@ -173,16 +173,22 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         return false;
     }
     
+    //shows error if server is not responding correctly
     private void showErrorDialogue() {
-    	new AlertDialog.Builder(mContext)
-	    .setTitle("Something unfortunate happenned...")
-	    .setMessage("Your device was not able to launch the app correctly.  Please check your internet connection and restart the app.")
-	    .setNeutralButton("Exit application", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int which) {
-	        	System.exit(1);
-	        }
-	     })
-	     .show();
+    	try {
+	    	new AlertDialog.Builder(mContext)
+		    .setTitle("Something unfortunate happenned...")
+		    .setMessage("Your device was not able to launch the app correctly.  Please check your internet connection and restart the app.")
+		    .setNeutralButton("Exit application", new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int which) {
+		        	System.exit(1);
+		        }
+		     })
+		     .show();
+    	} catch (Exception e) {
+    		//not in main activity, not a problem
+			Log.w(TAG, e.getMessage());
+    	}
     }
 
 	//This dialogue informs user that they're period is over
@@ -208,7 +214,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		     })
 		     .show();
 		} catch(Exception e){
-			//probably not a big deal
+			//not in main activity, not a problem
 			Log.w(TAG, e.getMessage());
 		}
 	}
