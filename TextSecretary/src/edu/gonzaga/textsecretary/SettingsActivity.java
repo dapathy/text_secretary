@@ -51,21 +51,6 @@ public class SettingsActivity extends PreferenceActivity {
 	    mHelper = null;
 	}
 	
-	IabHelper.QueryInventoryFinishedListener mGotInventoryListener 
-	   = new IabHelper.QueryInventoryFinishedListener() {
-	   public void onQueryInventoryFinished(IabResult result,
-	      Inventory inventory) {
-
-	      if (result.isFailure()) {
-	    	  Log.e(TAG, "error while checking purchase");
-	      }
-	      else {
-	        // does the user have the premium upgrade?
-	    	  isUnlocked = inventory.hasPurchase(UNLOCK_SKU);
-	      }
-	   }
-	};
-	
 	//checks if unlock has already been purchased
 	protected boolean isPurchased(){
 		SharedPreferences securePreferences = new SecurePreferences(getApplicationContext());
@@ -77,15 +62,19 @@ public class SettingsActivity extends PreferenceActivity {
 		//else query google services
 		else{
 			mHelper.queryInventoryAsync(
-					mGotInventoryListener);
+				new IabHelper.QueryInventoryFinishedListener() {
+				   public void onQueryInventoryFinished(IabResult result, Inventory inventory)   
+				   {
+				      if (result.isFailure()) {
+				         // handle error
+				    	 Log.e(TAG, "error while checking purchase");
+				         return;
+				       }
+
+				       isUnlocked = inventory.hasPurchase(UNLOCK_SKU);
+				   }});
 			
-			//wait until result received
-			try {
-				mGotInventoryListener.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
+			//TODO: need to wait for result!!
 			return isUnlocked;
 		}
 	}
