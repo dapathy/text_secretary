@@ -9,7 +9,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
 public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceChangeListener{
-	
+		
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -23,8 +23,8 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 
 		//set visibility of unlock
 		if(((SettingsActivity) getActivity()).isPurchased()){	//queries purchases
-    	   PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("Activation");
-    	   getPreferenceScreen().removePreference(preferenceCategory);
+			PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("Activation");
+			getPreferenceScreen().removePreference(preferenceCategory);
 		}
 	}
 	

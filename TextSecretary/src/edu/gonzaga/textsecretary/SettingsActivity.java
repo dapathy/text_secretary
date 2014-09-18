@@ -34,8 +34,10 @@ public class SettingsActivity extends PreferenceActivity {
 			         Log.d(TAG, "Problem setting up In-app Billing: " + result);
 			      }
 			      //create fragment if no problems
-			      else
+			      else {
+			    	  Log.d(TAG, "creating fragment");
 			    	  getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefFrag()).commit();
+			      }
 			   }
 			});
 	}
@@ -49,6 +51,21 @@ public class SettingsActivity extends PreferenceActivity {
 	    mHelper = null;
 	}
 	
+	IabHelper.QueryInventoryFinishedListener mGotInventoryListener 
+	   = new IabHelper.QueryInventoryFinishedListener() {
+	   public void onQueryInventoryFinished(IabResult result,
+	      Inventory inventory) {
+
+	      if (result.isFailure()) {
+	    	  Log.e(TAG, "error while checking purchase");
+	      }
+	      else {
+	        // does the user have the premium upgrade?
+	    	  isUnlocked = inventory.hasPurchase(UNLOCK_SKU);
+	      }
+	   }
+	};
+	
 	//checks if unlock has already been purchased
 	protected boolean isPurchased(){
 		SharedPreferences securePreferences = new SecurePreferences(getApplicationContext());
@@ -60,20 +77,14 @@ public class SettingsActivity extends PreferenceActivity {
 		//else query google services
 		else{
 			mHelper.queryInventoryAsync(
-				new IabHelper.QueryInventoryFinishedListener() {
-				   public void onQueryInventoryFinished(IabResult result, Inventory inventory)   
-				   {
-				      if (result.isFailure()) {
-				         // handle error
-				    	  Log.e(TAG, "error while checking purchase");
-				         return;
-				       }
-
-				       if(inventory.hasPurchase(UNLOCK_SKU)) {
-				    	   isUnlocked = true;
-				    	   return;
-				       }
-				   }});
+					mGotInventoryListener);
+			
+			//wait until result received
+			try {
+				mGotInventoryListener.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			
 			return isUnlocked;
 		}
@@ -91,7 +102,8 @@ public class SettingsActivity extends PreferenceActivity {
 			      }
 			      //purchase successful!
 			      else if (purchase.getSku().equals(UNLOCK_SKU)) {
-			         storeActivation();
+			    	  Log.d(TAG, "google play purchase successful");
+			    	  storeActivation();
 			      }
 			   }}, UserEmailFetcher.getEmail(getApplicationContext()));
 	}
