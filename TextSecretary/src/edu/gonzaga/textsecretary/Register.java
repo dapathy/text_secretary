@@ -74,7 +74,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         	serverPay = json.getString(TAG_PAID);
         	date = json.getString(TAG_DATE);
         	
-        	return checkActivation(date, serverPay);
+        	return checkActivation(date, serverPay, pay[0]);
         
         } catch (JSONException e) {
         	Log.d(TAG, "CATCH");
@@ -98,7 +98,9 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	    }
 	}
     
-    private boolean checkActivation(String date, String serverPay){
+	//ensures current date is within server trial dates
+	//firstActivation determines if this is first time being activated and will therefore skip the storing process this time
+    private boolean checkActivation(String date, String serverPay, boolean firstActivation){
     	Log.d(TAG, serverPay);
     	//if not paid
     	if (!serverPay.equals("1")){
@@ -117,6 +119,9 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
     	//must have paid
     	else{
     		Log.d(TAG, "paid");
+    		//skips the storing procedure, as it would have already been stored
+    		if (!firstActivation)
+    			storeActivation(mContext);
     		return true;
     	}
     }

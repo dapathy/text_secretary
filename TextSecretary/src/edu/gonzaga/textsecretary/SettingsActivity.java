@@ -35,9 +35,11 @@ public class SettingsActivity extends PreferenceActivity {
 			   public void onIabSetupFinished(IabResult result) {
 			      if (!result.isSuccess()) {
 			    	  Log.d(TAG, "Problem setting up In-app Billing: " + result);
+			    	  removeUnlockItem();	//remove this because this wouldn't work if in app billing is screwed
 			      }
 			      
-			      isPurchased();	//checks unlock status and removes unlock item if necessary
+			      else
+			    	  isPurchased();	//checks unlock status and removes unlock item if necessary
 			   }
 			});
 	}
