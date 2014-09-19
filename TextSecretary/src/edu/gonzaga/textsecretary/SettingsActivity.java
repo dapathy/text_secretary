@@ -7,6 +7,7 @@ import edu.gonzaga.textsecretary.inapp.IabResult;
 import edu.gonzaga.textsecretary.inapp.Inventory;
 import edu.gonzaga.textsecretary.inapp.Purchase;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
@@ -38,8 +39,8 @@ public class SettingsActivity extends PreferenceActivity {
 			    	  removeUnlockItem();	//remove this because this wouldn't work if in app billing is screwed
 			      }
 			      
-			      else
-			    	  isPurchased();	//checks unlock status and removes unlock item if necessary
+			      //else
+			    	  //isPurchased();	//checks unlock status and removes unlock item if necessary
 			   }
 			});
 	}
@@ -89,7 +90,7 @@ public class SettingsActivity extends PreferenceActivity {
 	//purchases unlock
 	protected void purchaseUnlock(){
 		mHelper.launchPurchaseFlow(this, UNLOCK_SKU, 10001,   
-				new IabHelper.OnIabPurchaseFinishedListener() {
+			new IabHelper.OnIabPurchaseFinishedListener() {
 			   public void onIabPurchaseFinished(IabResult result, Purchase purchase) 
 			   {
 			      if (result.isFailure()) {
@@ -104,6 +105,21 @@ public class SettingsActivity extends PreferenceActivity {
 			      }
 			   }}, UserEmailFetcher.getEmail(getApplicationContext()));
 	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + "," + data);
+        if (mHelper == null) return;
+
+        // Pass on the activity result to the helper for handling
+        if (!mHelper.handleActivityResult(requestCode, resultCode, data)) {
+            // handling of non in app billing stuff
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+        else {
+            Log.d(TAG, "onActivityResult handled by IABUtil.");
+        }
+    }
 	
 	//securely stores data locally, then stores on server
 	private void storeActivation(){
