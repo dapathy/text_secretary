@@ -10,6 +10,8 @@ import edu.gonzaga.textsecretary.inapp.Purchase;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceFragment;
 import android.util.Log;
 
 public class SettingsActivity extends PreferenceActivity {
@@ -18,26 +20,24 @@ public class SettingsActivity extends PreferenceActivity {
 	private IabHelper mHelper;
 	private Register task;
 	private static final String UNLOCK_SKU = "text_secretary_unlock";
-	private boolean isUnlocked = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApNk2gDi9RLPvIqu/7bHAHglCv31OY+3JoBYNam6ROslAAT2ZC8TVd3obZKaXkZuU8aa+EP3Br1G210vfQsNvb+nb37z10f5sL3HrKLfxUuqZB9p26El36yAN5AuxAyqNJHH5S5AYcaqelYU3xk6Kj5Z6d701xvoF2V1SbWFGCA9cT5FqWiCcTZ8FSUn/BTHa/zVdJ+coWm6d/VuAzlCmvsMt1oUIzyHk/KBo1x/88BQ7yJw7cYBHd1Ge4EGBI3dTlYR0nM3WJyQj/yTO9pOXmxzp6bPEZCGG5tt/ieFhjlbSN9+nXZSiA9NZuwLmkcVvDflzMzjIRpOgka/9R5xidQIDAQAB";
+		//create fragment
+		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefFrag()).commit();
 		
+		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApNk2gDi9RLPvIqu/7bHAHglCv31OY+3JoBYNam6ROslAAT2ZC8TVd3obZKaXkZuU8aa+EP3Br1G210vfQsNvb+nb37z10f5sL3HrKLfxUuqZB9p26El36yAN5AuxAyqNJHH5S5AYcaqelYU3xk6Kj5Z6d701xvoF2V1SbWFGCA9cT5FqWiCcTZ8FSUn/BTHa/zVdJ+coWm6d/VuAzlCmvsMt1oUIzyHk/KBo1x/88BQ7yJw7cYBHd1Ge4EGBI3dTlYR0nM3WJyQj/yTO9pOXmxzp6bPEZCGG5tt/ieFhjlbSN9+nXZSiA9NZuwLmkcVvDflzMzjIRpOgka/9R5xidQIDAQAB";
 		mHelper = new IabHelper(this, base64EncodedPublicKey);
 		
 		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
 			   public void onIabSetupFinished(IabResult result) {
 			      if (!result.isSuccess()) {
-			         Log.d(TAG, "Problem setting up In-app Billing: " + result);
+			    	  Log.d(TAG, "Problem setting up In-app Billing: " + result);
 			      }
-			      //create fragment if no problems
-			      else {
-			    	  Log.d(TAG, "creating fragment");
-			    	  getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefFrag()).commit();
-			      }
+			      
+			      isPurchased();	//checks unlock status and removes unlock item if necessary
 			   }
 			});
 	}
@@ -51,13 +51,13 @@ public class SettingsActivity extends PreferenceActivity {
 	    mHelper = null;
 	}
 	
-	//checks if unlock has already been purchased
-	protected boolean isPurchased(){
+	//checks if unlock has already been purchased and remove unlock item if so
+	protected void isPurchased(){
 		SharedPreferences securePreferences = new SecurePreferences(getApplicationContext());
 		String account = UserEmailFetcher.getEmail(getApplicationContext());
 		//check shared preferences first
 		if(securePreferences.getBoolean(account+"_paid", false))
-			return true;
+			removeUnlockItem();
 		
 		//else query google services
 		else{
@@ -66,17 +66,22 @@ public class SettingsActivity extends PreferenceActivity {
 				   public void onQueryInventoryFinished(IabResult result, Inventory inventory)   
 				   {
 				      if (result.isFailure()) {
-				         // handle error
 				    	 Log.e(TAG, "error while checking purchase");
-				         return;
 				       }
 
-				       isUnlocked = inventory.hasPurchase(UNLOCK_SKU);
+				      else if (inventory.hasPurchase(UNLOCK_SKU)){
+				    	  Log.d(TAG, "purchased on google play");
+				    	  removeUnlockItem();
+				       }
 				   }});
-			
-			//TODO: need to wait for result!!
-			return isUnlocked;
 		}
+	}
+	
+	//remove purchase option from preference fragment
+	private void removeUnlockItem() {
+		PreferenceFragment preferenceFragment = (PreferenceFragment) getFragmentManager().findFragmentById(android.R.id.content);
+		PreferenceCategory activationCategory = (PreferenceCategory) preferenceFragment.findPreference("Activation");
+		preferenceFragment.getPreferenceScreen().removePreference(activationCategory);
 	}
 	
 	//purchases unlock
@@ -93,6 +98,7 @@ public class SettingsActivity extends PreferenceActivity {
 			      else if (purchase.getSku().equals(UNLOCK_SKU)) {
 			    	  Log.d(TAG, "google play purchase successful");
 			    	  storeActivation();
+			    	  removeUnlockItem();
 			      }
 			   }}, UserEmailFetcher.getEmail(getApplicationContext()));
 	}

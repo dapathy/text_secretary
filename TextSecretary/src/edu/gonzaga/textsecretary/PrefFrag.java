@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
@@ -19,12 +18,6 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 		if(getPreferenceManager().getSharedPreferences().getBoolean("calendar_preference", true)){
 			Preference messagePreference = findPreference("custom_message_preference");
 	        messagePreference.setEnabled(false);
-		}
-
-		//set visibility of unlock
-		if(((SettingsActivity) getActivity()).isPurchased()){	//queries purchases
-			PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("Activation");
-			getPreferenceScreen().removePreference(preferenceCategory);
 		}
 	}
 	

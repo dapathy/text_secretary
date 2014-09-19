@@ -47,8 +47,10 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		String userEmail = UserEmailFetcher.getEmail(mContext);
 		String serverPay = "0";
 		
-		if(pay[0])
+		if(pay[0]) {
+			storeActivation(mContext);	//storing here is probably a little safer
         	paid = "1";
+		}
         else
         	paid = "0";
         
@@ -112,10 +114,9 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		    
 		    return inTrial;
        }
-    	//must have paid, make a preference if one does not already exist
+    	//must have paid
     	else{
     		Log.d(TAG, "paid");
-    		storeActivation(mContext);
     		return true;
     	}
     }
