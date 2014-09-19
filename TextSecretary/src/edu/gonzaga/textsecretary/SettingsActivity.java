@@ -39,8 +39,8 @@ public class SettingsActivity extends PreferenceActivity {
 			    	  removeUnlockItem();	//remove this because this wouldn't work if in app billing is screwed
 			      }
 			      
-			      //else
-			    	  //isPurchased();	//checks unlock status and removes unlock item if necessary
+			      else
+			    	  isPurchased();	//checks unlock status and removes unlock item if necessary
 			   }
 			});
 	}
