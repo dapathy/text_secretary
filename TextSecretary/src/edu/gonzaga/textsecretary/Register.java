@@ -9,7 +9,6 @@ import java.util.Locale;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
@@ -29,7 +28,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
 
-    //testing from a real server:
+    //server URL:
     private static final String LOGIN_URL = "http://gonzagakennelclub.com/textsecretary/register.php";
 
     //ids
@@ -46,6 +45,8 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		String date = null;
 		String userEmail = UserEmailFetcher.getEmail(mContext);
 		String serverPay = "0";
+		JSONObject json = null;
+		int count = 0;
 		
 		if(pay[0]) {
 			storeActivation(mContext);	//storing here is probably a little safer
@@ -54,36 +55,38 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         else
         	paid = "0";
         
-        try {
-            // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("userIDD", userEmail));
-            params.add(new BasicNameValuePair("just_paid", paid));
-            
-            Log.d(TAG, "starting");
-
-            //Posting user data to script
-            JSONObject json = null;
-			json = jsonParser.makeHttpRequest(
-				       LOGIN_URL, "POST", params);
-
-            Log.d(TAG, "connected");
-            Log.d(TAG, "JSON response" + json.toString());
-            
-            //retrieve values
-        	serverPay = json.getString(TAG_PAID);
-        	date = json.getString(TAG_DATE);
-        	
-        	return checkActivation(date, serverPay, pay[0]);
+        // Building Parameters
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("userIDD", userEmail));
+        params.add(new BasicNameValuePair("just_paid", paid));
         
-        } catch (JSONException e) {
-        	Log.d(TAG, "CATCH");
-            e.printStackTrace();
-        }
-        catch (Exception e){
-        	Log.d(TAG, "CATCH httpRequest " + e.toString());
+        //try up to 5 times
+        while (count < 5) {
+	        try {
+	            Log.d(TAG, "starting attempt " + count);
+	
+	            //Posting user data to script
+				json = jsonParser.makeHttpRequest(
+					       LOGIN_URL, "POST", params);
+	
+	            Log.d(TAG, "connected");
+	            Log.d(TAG, "JSON response" + json.toString());
+	            
+	            //retrieve values
+	        	serverPay = json.getString(TAG_PAID);
+	        	date = json.getString(TAG_DATE);
+	        	
+	        	//if we get this far, then everything should have worked and checks can be performed
+	        	return checkActivation(date, serverPay, pay[0]);
+	        } 
+	        catch (Exception e){
+	        	//bad so increment count and try again
+	        	Log.e(TAG, "CATCH httpRequest " + e.getMessage());
+	        	count++;
+	        }
         }
         
+        //user is screwed so set boolean to show message
         problemHappenned = true;
         return false;
 	}
