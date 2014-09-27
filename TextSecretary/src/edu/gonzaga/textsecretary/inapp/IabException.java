@@ -22,7 +22,8 @@ package edu.gonzaga.textsecretary.inapp;
  * call {@link #getResult()}.
  */
 public class IabException extends Exception {
-    IabResult mResult;
+	private static final long serialVersionUID = 2703414798373250138L;
+	IabResult mResult;
 
     public IabException(IabResult r) {
         this(r, null);
