@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,12 +21,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 
 public class MainActivity extends Activity {
 	
 	private final String TAG = "MAIN";
+	private Context mContext = this;
 	private Boolean SMS_Service_State;
 	private Boolean remindToggleDialogue;
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
@@ -40,6 +43,7 @@ public class MainActivity extends Activity {
 	private FragmentTransaction fragmentTransaction;
 	private ServiceListFragment myFragment;
 	private boolean enableButton = false;
+	private ProgressBar spinner;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +67,9 @@ public class MainActivity extends Activity {
 	        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
 	        fragmentTransaction.commit();
         }
-		
-        //check unlock
-        enableButton = RegCheck.isActivated(this);
-        Log.d(TAG, String.valueOf(enableButton));
+        
+        spinner.setVisibility(View.VISIBLE);
+        new Thread(checkActivation).start();
         
         //Remind users how to use toggle
 		remindToggleDialogue = settings.getBoolean("remindToggleDialogue", true);
@@ -76,6 +79,7 @@ public class MainActivity extends Activity {
 	
 	private void setUpGui(){
 		 //GUI stuff
+		spinner = (ProgressBar) findViewById(R.id.progressBar1);
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
@@ -246,4 +250,22 @@ public class MainActivity extends Activity {
 	     })
 	     .show();
 	}
+	
+	//thread to check activation
+	Runnable checkActivation = new Runnable() {
+	    @Override
+	    public void run() {
+	    	//check unlock
+	        enableButton = RegCheck.isActivated(mContext);
+	        Log.d(TAG, String.valueOf(enableButton));
+	        
+	        //remove spinner
+	        runOnUiThread(new Runnable() {
+	            @Override
+	            public void run() {
+	            	 spinner.setVisibility(View.GONE);
+	           }
+	       });
+	    }
+	};
 }
