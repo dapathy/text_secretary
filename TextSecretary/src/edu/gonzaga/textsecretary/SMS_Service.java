@@ -69,6 +69,8 @@ public class SMS_Service extends Service{
 		super.onDestroy();
 		unregisterReceiver(receiver);
 		getContentResolver().unregisterContentObserver(outgoingListener);
+		
+		//if listener has been created, unregister it
 		if (listenerLock) {
 	        tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
 	        pscl = null;
@@ -84,7 +86,7 @@ public class SMS_Service extends Service{
 				
 			respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "3"));
 			
-			//if call
+			//if call (this will only run once, we only want one listener active)
 			if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo != 0) && !listenerLock) {
 				pscl = new PhoneStateChangeListener(context);
 				tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -133,13 +135,15 @@ public class SMS_Service extends Service{
 	    
 	    @Override
 	    public void onCallStateChanged(int state, String incomingNumber) {
-	    	if (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent()) {
+	    	if ((respondTo != 0) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())) {
 		        switch(state){
 		            case TelephonyManager.CALL_STATE_RINGING:
 		                 Log.d(TAG, "RINGING"); 
-		                 wasRinging = true;
-		                 number = incomingNumber;
-	                	 //silenceRinger();
+		                 if ((respondTo == 2 || respondTo == 4) || isMobileContact(incomingNumber, mContext)) {
+			                 wasRinging = true;
+			                 number = incomingNumber;
+		                 }
+		                 //silenceRinger();
 		                 break;
 		            case TelephonyManager.CALL_STATE_OFFHOOK:
 		                 Log.d(TAG, "OFFHOOK");
@@ -148,7 +152,7 @@ public class SMS_Service extends Service{
 		                 break;
 		            case TelephonyManager.CALL_STATE_IDLE:
 		                 Log.d(TAG, "IDLE");
-		                 if (wasRinging && (respondTo == 2 || respondTo == 4) || isMobileContact(number, mContext))
+		                 if (wasRinging)
 		                	 handleSMSReply(number);
 		                 
 		                 wasRinging = false;
