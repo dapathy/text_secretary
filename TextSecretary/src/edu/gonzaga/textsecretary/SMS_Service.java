@@ -37,11 +37,11 @@ public class SMS_Service extends Service{
 	private SharedPreferences prefs;
 	private int respondTo;
 	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
-	private static PhoneStateChangeListener pscl;
-	private static TelephonyManager tm;
+	private PhoneStateChangeListener pscl;
+	private TelephonyManager tm;
 	private OutgoingListener outgoingListener;
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
-	private static boolean listenerLock = false;
+	private boolean listenerLock = false;
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -67,50 +67,51 @@ public class SMS_Service extends Service{
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		pscl = null;
-		tm = null;
 		unregisterReceiver(receiver);
 		getContentResolver().unregisterContentObserver(outgoingListener);
+		if (listenerLock) {
+	        tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
+	        pscl = null;
+			tm = null;
+			listenerLock = false;
+		}
 	}
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			prefs = PreferenceManager.getDefaultSharedPreferences(context);
-			//calendar integration is disabled or is in event
-			if(!prefs.getBoolean("calendar_preference", true) || calendar.inEvent()){
 				
-				respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "3"));
-				
-				//if call
-				if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo != 0) && !listenerLock) {
-					pscl = new PhoneStateChangeListener(context);
-					tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-					tm.listen(pscl, PhoneStateListener.LISTEN_CALL_STATE);
-					Log.d(TAG, "register listener");
-					listenerLock = true;
-				}
-				
-				//if received SMS
-				else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (respondTo != 1 && respondTo != 2)){
-					Bundle bundle = intent.getExtras();
-					SmsMessage[] msgs = null;
-					String msg_from = "empty";
-					if (bundle != null){
-						try{
-							Object[] pdus = (Object[]) bundle.get("pdus");
-		                    msgs = new SmsMessage[pdus.length];
-		    				Log.d(TAG, "created msgs");
-							for(int i = 0; i < msgs.length; i++){
-		                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
-		                        msg_from = msgs[i].getOriginatingAddress(); 
-		                    }
-							
-							handleSMSReply(msg_from);
-							
-						} catch(Exception e){
-							Log.d(TAG, "cought");
-						}
+			respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "3"));
+			
+			//if call
+			if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo != 0) && !listenerLock) {
+				pscl = new PhoneStateChangeListener(context);
+				tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+				tm.listen(pscl, PhoneStateListener.LISTEN_CALL_STATE);
+				Log.d(TAG, "register listener");
+				listenerLock = true;
+			}
+			
+			//if received SMS
+			else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (respondTo != 1 && respondTo != 2) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+				Bundle bundle = intent.getExtras();
+				SmsMessage[] msgs = null;
+				String msg_from = "empty";
+				if (bundle != null){
+					try{
+						Object[] pdus = (Object[]) bundle.get("pdus");
+	                    msgs = new SmsMessage[pdus.length];
+	    				Log.d(TAG, "created msgs");
+						for(int i = 0; i < msgs.length; i++){
+	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+	                        msg_from = msgs[i].getOriginatingAddress(); 
+	                    }
+						
+						handleSMSReply(msg_from);
+						
+					} catch(Exception e){
+						Log.d(TAG, "cought");
 					}
 				}
 			}
@@ -121,37 +122,53 @@ public class SMS_Service extends Service{
 	    private Context mContext;
 		private boolean wasRinging = false;
 	    private String number;
+	    //private AudioManager ringerManager;
+	    //private int currentRingerMode;
 
 	    public PhoneStateChangeListener (Context context) {
 	    	super();
 	    	mContext = context;
+	    	//ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
 	    }
 	    
 	    @Override
 	    public void onCallStateChanged(int state, String incomingNumber) {
-	        switch(state){
-	            case TelephonyManager.CALL_STATE_RINGING:
-	                 Log.d(TAG, "RINGING");
-	                 wasRinging = true;
-	                 number = incomingNumber;
-	                 break;
-	            case TelephonyManager.CALL_STATE_OFFHOOK:
-	                 Log.d(TAG, "OFFHOOK");
-	                 wasRinging = false;
-	                 break;
-	            case TelephonyManager.CALL_STATE_IDLE:
-	                 Log.d(TAG, "IDLE");
-	                 if (wasRinging && (isMobileContact(number, mContext) || (respondTo == 2 || respondTo == 4))){
-	                	 handleSMSReply(number);
-	                 }
-	                 wasRinging = false;
-	                 number = "";
-	                 tm.listen(pscl, PhoneStateListener.LISTEN_NONE);
-	                 listenerLock = false;
-	                 Log.d(TAG, "unregistering listener");
-	                 break;
-	        }
+	    	if (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent()) {
+		        switch(state){
+		            case TelephonyManager.CALL_STATE_RINGING:
+		                 Log.d(TAG, "RINGING"); 
+		                 wasRinging = true;
+		                 number = incomingNumber;
+	                	 //silenceRinger();
+		                 break;
+		            case TelephonyManager.CALL_STATE_OFFHOOK:
+		                 Log.d(TAG, "OFFHOOK");
+		                 wasRinging = false;
+		                 //restoreRingerMode();
+		                 break;
+		            case TelephonyManager.CALL_STATE_IDLE:
+		                 Log.d(TAG, "IDLE");
+		                 if (wasRinging && (respondTo == 2 || respondTo == 4) || isMobileContact(number, mContext))
+		                	 handleSMSReply(number);
+		                 
+		                 wasRinging = false;
+		                 number = "";
+		                 //restoreRingerMode();
+		                 break;
+		        }
+	    	}
 	    }
+	    /*
+	    private void silenceRinger() {
+	    	currentRingerMode = ringerManager.getRingerMode();	//save current mode
+	    	Log.d(TAG, currentRingerMode + " silence");
+	    	ringerManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+	    }
+	    
+	    private void restoreRingerMode() {
+	    	Log.d(TAG, currentRingerMode + " restore");
+	    	ringerManager.setRingerMode(currentRingerMode);
+	    }*/
 	}
 	
 	private static boolean isMobileContact(String number, Context context) {
@@ -314,7 +331,7 @@ public class SMS_Service extends Service{
     	if (newNumber.charAt(0) == '1') 
     		newNumber = newNumber.substring(1);
     	
-    	Log.d(TAG, "new number is:" + newNumber);
+    	Log.d(TAG, "formatted number is: " + newNumber);
     	
     	return newNumber;
     }

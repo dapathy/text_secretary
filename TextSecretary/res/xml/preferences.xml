@@ -52,6 +52,11 @@
             android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
             android:defaultValue="true"/>
         
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:title="Sleep Timer">
+        
         <CheckBoxPreference
                 android:key="sleep_timer_preference"
                 android:title="Sleep Timer"

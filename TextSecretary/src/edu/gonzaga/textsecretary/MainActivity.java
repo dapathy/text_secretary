@@ -7,7 +7,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,7 +27,6 @@ import android.widget.RemoteViews;
 public class MainActivity extends Activity {
 	
 	private final String TAG = "MAIN";
-	private Context mContext = this;
 	private Boolean SMS_Service_State;
 	private Boolean remindToggleDialogue;
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
@@ -256,11 +254,11 @@ public class MainActivity extends Activity {
 	    @Override
 	    public void run() {
 	    	//check unlock
-	        enableButton = RegCheck.isActivated(mContext);
+	        enableButton = RegCheck.isActivated(MainActivity.this);
 	        Log.d(TAG, String.valueOf(enableButton));
 	        
 	        //remove spinner
-	        runOnUiThread(new Runnable() {
+	        MainActivity.this.runOnUiThread(new Runnable() {
 	            @Override
 	            public void run() {
 	            	 spinner.setVisibility(View.GONE);

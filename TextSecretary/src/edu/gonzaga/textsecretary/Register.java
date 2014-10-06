@@ -11,6 +11,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -91,14 +92,23 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         return false;
 	}
 	
-	protected void onPostExecute(Boolean result){
+	protected void onPostExecute(final Boolean result){
 		//if not in trial and not paid, then show dialog
-	    if(!result) {
-	    	if (problemHappenned)
-	    		showErrorDialogue();
-	    	else
-	    		showTrialOver();
-	    }
+		if (mContext instanceof Activity) {
+			((Activity) mContext).runOnUiThread(new Runnable() {
+	
+				@Override
+				public void run() {
+					if(!result) {
+				    	if (problemHappenned)
+				    		showErrorDialogue();
+				    	else
+				    		showTrialOver();
+				    }
+				}
+				
+			});
+		}
 	}
     
 	//ensures current date is within server trial dates
