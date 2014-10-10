@@ -43,6 +43,8 @@ public class SMS_Service extends Service{
 	private OutgoingListener outgoingListener;
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	private boolean listenerLock = false;
+	private AudioManager ringerManager;
+    private int currentRingerMode = AudioManager.RINGER_MODE_SILENT;
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -53,7 +55,8 @@ public class SMS_Service extends Service{
 	public void onCreate(){
 		super.onCreate();
 		calendar = new Calendar_Service(getApplicationContext());
-
+		ringerManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
@@ -98,6 +101,10 @@ public class SMS_Service extends Service{
 			
 			//if received SMS
 			else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (respondTo != 1 && respondTo != 2) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+				final boolean silenceNotification = prefs.getBoolean("silence_notification", false);
+				if (silenceNotification)
+					silenceRinger();
+				
 				Bundle bundle = intent.getExtras();
 				SmsMessage[] msgs = null;
 				String msg_from = "empty";
@@ -117,6 +124,15 @@ public class SMS_Service extends Service{
 						Log.d(TAG, "cought");
 					}
 				}
+				
+				//need delay for turning off sms sound
+				new Handler().postDelayed(new Runnable() {
+			        @Override
+			        public void run() {
+			        	if (silenceNotification)
+							restoreRingerMode();
+			        }
+			    }, 5000);
 			}
 		}
 	};
@@ -125,13 +141,10 @@ public class SMS_Service extends Service{
 	    private Context mContext;
 		private boolean wasRinging = false;
 	    private String number;
-	    private AudioManager ringerManager;
-	    private int currentRingerMode;
 
 	    public PhoneStateChangeListener (Context context) {
 	    	super();
 	    	mContext = context;
-	    	ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
 	    }
 	    
 	    @Override
@@ -169,17 +182,6 @@ public class SMS_Service extends Service{
 		                 break;
 		        }
 	    	}
-	    }
-	    
-	    private void silenceRinger() {
-	    	currentRingerMode = ringerManager.getRingerMode();	//save current mode
-	    	Log.d(TAG, currentRingerMode + " silence");
-	    	ringerManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-	    }
-	    
-	    private void restoreRingerMode() {
-	    	Log.d(TAG, currentRingerMode + " restore");
-	    	ringerManager.setRingerMode(currentRingerMode);
 	    }
 	}
 	
@@ -231,7 +233,7 @@ public class SMS_Service extends Service{
 		    new Handler().postDelayed(new Runnable() {
 			        @Override
 			        public void run() {
-					storeMessage(savefrom , savemessage);
+			        	storeMessage(savefrom , savemessage);
 			        }
 			    }, 2000);
 		}
@@ -346,5 +348,20 @@ public class SMS_Service extends Service{
     	Log.d(TAG, "formatted number is: " + newNumber);
     	
     	return newNumber;
+    }
+    
+    private void silenceRinger() {
+    	int tempRingerMode = ringerManager.getRingerMode();
+    	//prevents possible conflicts between listeners
+    	if (tempRingerMode != AudioManager.RINGER_MODE_SILENT) {
+    		Log.d(TAG, currentRingerMode + " silence");
+        	ringerManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+        	currentRingerMode = tempRingerMode;	//save current mode
+    	}
+    }
+    
+    private void restoreRingerMode() {
+    	Log.d(TAG, currentRingerMode + " restore");
+    	ringerManager.setRingerMode(currentRingerMode);
     }
 }
