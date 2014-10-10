@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -124,31 +125,36 @@ public class SMS_Service extends Service{
 	    private Context mContext;
 		private boolean wasRinging = false;
 	    private String number;
-	    //private AudioManager ringerManager;
-	    //private int currentRingerMode;
+	    private AudioManager ringerManager;
+	    private int currentRingerMode;
 
 	    public PhoneStateChangeListener (Context context) {
 	    	super();
 	    	mContext = context;
-	    	//ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+	    	ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
 	    }
 	    
 	    @Override
 	    public void onCallStateChanged(int state, String incomingNumber) {
 	    	if ((respondTo != 0) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())) {
-		        switch(state){
+		        boolean silenceRinger = prefs.getBoolean("silence_ringer", false);
+	    		switch(state){
 		            case TelephonyManager.CALL_STATE_RINGING:
 		                 Log.d(TAG, "RINGING"); 
 		                 if ((respondTo == 2 || respondTo == 4) || isMobileContact(incomingNumber, mContext)) {
 			                 wasRinging = true;
 			                 number = incomingNumber;
 		                 }
-		                 //silenceRinger();
+		                 
+		                 if (silenceRinger)
+		                	 silenceRinger();
 		                 break;
 		            case TelephonyManager.CALL_STATE_OFFHOOK:
 		                 Log.d(TAG, "OFFHOOK");
 		                 wasRinging = false;
-		                 //restoreRingerMode();
+		                 
+		                 if (silenceRinger)
+		                 	restoreRingerMode();
 		                 break;
 		            case TelephonyManager.CALL_STATE_IDLE:
 		                 Log.d(TAG, "IDLE");
@@ -157,12 +163,14 @@ public class SMS_Service extends Service{
 		                 
 		                 wasRinging = false;
 		                 number = "";
-		                 //restoreRingerMode();
+		                 
+		                 if (silenceRinger)
+		                	 restoreRingerMode();
 		                 break;
 		        }
 	    	}
 	    }
-	    /*
+	    
 	    private void silenceRinger() {
 	    	currentRingerMode = ringerManager.getRingerMode();	//save current mode
 	    	Log.d(TAG, currentRingerMode + " silence");
@@ -172,7 +180,7 @@ public class SMS_Service extends Service{
 	    private void restoreRingerMode() {
 	    	Log.d(TAG, currentRingerMode + " restore");
 	    	ringerManager.setRingerMode(currentRingerMode);
-	    }*/
+	    }
 	}
 	
 	private static boolean isMobileContact(String number, Context context) {
