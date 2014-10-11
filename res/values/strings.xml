@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Text Secretary</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_pref_frag">PrefFrag</string>
+    <string name="image_state">Image state</string>
+    <string name="current_message">Current custom message:</string>
+    <string name="current_services">Current services:</string>
+    <string name="title_activity_help_">Help_Activity</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="action_help">Help</string>
+    <string name="calendar_body">When enabled, Text Secretary will only auto respond if the user is in a calendar event. Text Secretary will check all of the available calendars in the user’s device. Text Secretary will also enter the name and end time of the event if the user puts [name] and/or [end] into their Custom Message with Calendar On. For example:</string>
+    <string name="sleep_body">Text Secretary’s Sleep capability is used to prevent auto responding too quickly to the same contact. In other words, when Text Secretary auto responds to a contact, Text Secretary will not auto respond to that same contact for a certain amount of time. For example:</string>
+    <string name="about_body">Outbreak Mobile 2014</string>
+    <string name="smartsent_body">By enabling Smart Sent, user sent messages are added to the Sleep and Sleep Timer (which must be enabled). In other words, if the user sends a message and someone were to respond to that message, Text Secretary will not auto-respond. For example:</string>
+    <string name="widget_body">The Text Secretary widget allows users to quickly turn on and off all Text Secretary features without ever opening up the app.</string>
+    
+</resources>
