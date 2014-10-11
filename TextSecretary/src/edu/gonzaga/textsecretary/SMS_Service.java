@@ -91,7 +91,7 @@ public class SMS_Service extends Service{
 			respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "3"));
 			
 			//if call (this will only run once, we only want one listener active)
-			if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && (respondTo != 0) && !listenerLock) {
+			if(intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED) && !listenerLock) {
 				pscl = new PhoneStateChangeListener(context);
 				tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
 				tm.listen(pscl, PhoneStateListener.LISTEN_CALL_STATE);
@@ -100,28 +100,32 @@ public class SMS_Service extends Service{
 			}
 			
 			//if received SMS
-			else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (respondTo != 1 && respondTo != 2) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+			else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+				//silence ringer regardless of auto reply settings
 				final boolean silenceNotification = prefs.getBoolean("silence_notification", false);
 				if (silenceNotification)
 					silenceRinger();
 				
-				Bundle bundle = intent.getExtras();
-				SmsMessage[] msgs = null;
-				String msg_from = "empty";
-				if (bundle != null){
-					try{
-						Object[] pdus = (Object[]) bundle.get("pdus");
-	                    msgs = new SmsMessage[pdus.length];
-	    				Log.d(TAG, "created msgs");
-						for(int i = 0; i < msgs.length; i++){
-	                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
-	                        msg_from = msgs[i].getOriginatingAddress(); 
-	                    }
-						
-						handleSMSReply(msg_from);
-						
-					} catch(Exception e){
-						Log.d(TAG, "cought");
+				//now check auto reply settings
+				if (respondTo != 1 && respondTo != 2) {
+					Bundle bundle = intent.getExtras();
+					SmsMessage[] msgs = null;
+					String msg_from = "empty";
+					if (bundle != null){
+						try{
+							Object[] pdus = (Object[]) bundle.get("pdus");
+		                    msgs = new SmsMessage[pdus.length];
+		    				Log.d(TAG, "created msgs");
+							for(int i = 0; i < msgs.length; i++){
+		                        msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+		                        msg_from = msgs[i].getOriginatingAddress(); 
+		                    }
+							
+							handleSMSReply(msg_from);
+							
+						} catch(Exception e){
+							Log.d(TAG, "cought");
+						}
 					}
 				}
 				
@@ -149,12 +153,12 @@ public class SMS_Service extends Service{
 	    
 	    @Override
 	    public void onCallStateChanged(int state, String incomingNumber) {
-	    	if ((respondTo != 0) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())) {
+	    	if (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent()) {
 		        boolean silenceRinger = prefs.getBoolean("silence_ringer", false);
 	    		switch(state){
 		            case TelephonyManager.CALL_STATE_RINGING:
 		                 Log.d(TAG, "RINGING"); 
-		                 if ((respondTo == 2 || respondTo == 4) || isMobileContact(incomingNumber, mContext)) {
+		                 if ((respondTo != 0) && ((respondTo == 2 || respondTo == 4) || isMobileContact(incomingNumber, mContext))) {
 			                 wasRinging = true;
 			                 number = incomingNumber;
 		                 }
