@@ -17,7 +17,7 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 	private ActionBar.Tab aboutTab;
 	private ActionBar.Tab smartsentTab;
 	private ActionBar.Tab widgetTab;
-
+	private ActionBar.Tab silencerTab;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +85,10 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 		widgetTab = actionBar.newTab();
 		widgetTab.setText("Widget");
 		widgetTab.setTabListener(this);
+
+		silencerTab = actionBar.newTab();
+		silencerTab.setText("Silencer");
+		silencerTab.setTabListener(this);
 		
 		aboutTab = actionBar.newTab();
 		aboutTab.setText("About");
@@ -96,6 +100,7 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 		actionBar.addTab(sleepTab);
 		actionBar.addTab(smartsentTab);
 		actionBar.addTab(widgetTab);
+		actionBar.addTab(silencerTab);
 		actionBar.addTab(aboutTab);
 	}
 	

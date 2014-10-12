@@ -26,6 +26,9 @@ public class Help_Adapter extends FragmentPagerAdapter{
 			fragment = new HelpWidgetFragment();
 		}
 		else if(tab == 4){
+			fragment = new HelpSilencerFragment();
+		}
+		else if(tab == 5){
 			fragment = new HelpAboutFragment();
 		}
 		return fragment;
@@ -33,7 +36,7 @@ public class Help_Adapter extends FragmentPagerAdapter{
 
 	@Override
 	public int getCount() {
-		return 5;
+		return 6;
 	}
 
 }

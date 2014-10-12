@@ -17,5 +17,6 @@
     <string name="about_body">Outbreak Mobile 2014</string>
     <string name="smartsent_body">By enabling Smart Sent, user sent messages are added to the Sleep and Sleep Timer (which must be enabled). In other words, if the user sends a message and someone were to respond to that message, Text Secretary will not auto-respond. For example:</string>
     <string name="widget_body">The Text Secretary widget allows users to quickly turn on and off all Text Secretary features without ever opening up the app.</string>
+    <string name="silencer_body">If enabled, phone calls and/or text message tones will be silenced. If Calendar Integration is on, silencing will only happen when in an event. After the ringtone is finished, the previous sound profile will be restored. For example, if a user receives a phone call and/or text message, that ringtone will be silenced during the tone but then restored to the volume previously set after the tone is finished.</string>
     
 </resources>
