@@ -69,7 +69,8 @@ public class ActivityRecognitionIntentService extends IntentService {
                        // The confidence level for the current activity is > 50%
                        && (confidence >= 50)) {
 
-                //TODO: broadcast or something.....
+                //broadcast?
+            	broadcastActivityState();
             }
         }
     }
@@ -108,5 +109,11 @@ public class ActivityRecognitionIntentService extends IntentService {
             default:
                 return true;
         }
+    }
+    
+    private void broadcastActivityState() {
+    	Intent state = new Intent();
+    	state.setAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_INTENT");
+    	sendBroadcast(state);
     }
 }

@@ -26,6 +26,12 @@ public class ActivityRecognizer extends Service {
         
         startUpdates();
 	}
+	
+	@Override
+	public void onDestroy() {
+		stopUpdates();
+		super.onDestroy();
+	}
     
     private boolean servicesConnected() {
         // Check that Google Play services is available

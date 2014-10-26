@@ -70,7 +70,6 @@ public class SMS_Service extends Service{
 	
 	@Override
 	public void onDestroy(){
-		super.onDestroy();
 		unregisterReceiver(receiver);
 		getContentResolver().unregisterContentObserver(outgoingListener);
 		
@@ -81,6 +80,7 @@ public class SMS_Service extends Service{
 			tm = null;
 			listenerLock = false;
 		}
+		super.onDestroy();
 	}
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
