@@ -52,26 +52,16 @@
             android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
             android:defaultValue="true"/>
         
-    </PreferenceCategory>
-    
-    <PreferenceCategory
-        android:title="Do Not Disturb">
-    
-    <CheckBoxPreference
-            android:key="silencer_enable"
-            android:title="Silence Ringer"
-            android:summary="The ringer will be silenced when Text Secretary is enabled or if you are in an event with Calendar Integration enabled."
-            android:defaultValue="false"/>       
+    </PreferenceCategory>     
             
     <ListPreference 
-	    android:title="Silence:"
-	    android:summary="Select whether silence calls, text messages, or both."
+	    android:title="Do Not Disturb"
+	    android:summary="The ringer will be silenced when Text Secretary is enabled or if you are in an event with Calendar Integration enabled."
 	    android:key="silencer_preference"
 	    android:entries="@array/entries_silencer"
 		android:entryValues="@array/entryvalues_silencer"
 	    android:dialogTitle="Silence..."
-		android:defaultValue="2"/>
-    </PreferenceCategory>
+		android:defaultValue="0"/>
     
     <PreferenceCategory
         android:title="Sleep Timer">

@@ -77,24 +77,21 @@ public class ServiceListFragment extends ListFragment{
 			else
 				list.add(putData("Notifications", "OFF"));
 
-	    	//Silence
-			if(prefs.getBoolean("silencer_enable", true)){
-				list.add(putData("Silencer", "ON"));
-		        String silencertype = prefs.getString("silencer_preference", "2");
-		        switch(silencertype){
-		        case "0":
-		        	list.add(putData("Silencing", "Texts"));
-		        	break;
-	        	case "1":
-	        		list.add(putData("Silencing", "Calls"));
-	        		break;
-	        	case "2":
-	        		list.add(putData("Silencing", "Texts & Calls"));
-	        		break;
-		        }
-			}
-			else
-				list.add(putData("Silencer", "OFF"));
+	    	//Do Not Disturb
+	        String silencerType = prefs.getString("silencer_preference", "0");
+	        switch(silencerType){
+	        case "0":
+	        	list.add(putData("Do Not Disturb", "Off"));
+	        case "1":
+	        	list.add(putData("Do Not Disturb", "Texts"));
+	        	break;
+        	case "2":
+        		list.add(putData("Do Not Disturb", "Calls"));
+        		break;
+        	case "3":
+        		list.add(putData("Do Not Disturb", "Texts & Calls"));
+        		break;
+	        }
 			
 			//Sleep
 			if(prefs.getBoolean("sleep_timer_preference", true)){

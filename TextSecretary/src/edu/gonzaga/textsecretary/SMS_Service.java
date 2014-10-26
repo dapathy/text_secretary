@@ -102,11 +102,9 @@ public class SMS_Service extends Service{
 			//if received SMS
 			else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
 				//silence ringer regardless of auto reply settings
-	    		final boolean silencerEnable = prefs.getBoolean("silencer_enable", true);
-	    		final int silencerType = Integer.parseInt(prefs.getString("silencer_preference", "2"));
+	    		final int silencerType = Integer.parseInt(prefs.getString("silencer_preference", "0"));
 	    		
-	    		Log.d(TAG, "silencerenable: " + silencerEnable);
-				if (silencerEnable && (silencerType == 0 || silencerType == 2))
+				if (silencerType == 1 || silencerType == 3)
 					silenceRinger();
 				
 				//now check auto reply settings
@@ -136,7 +134,7 @@ public class SMS_Service extends Service{
 				new Handler().postDelayed(new Runnable() {
 			        @Override
 			        public void run() {
-			        	if (silencerEnable && (silencerType == 0 || silencerType == 2))
+			        	if (silencerType == 1 || silencerType == 3)
 							restoreRingerMode();
 			        }
 			    }, 5000);
@@ -157,8 +155,7 @@ public class SMS_Service extends Service{
 	    @Override
 	    public void onCallStateChanged(int state, String incomingNumber) {    	
 	    	if (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent()) {
-	    		boolean silencerEnable = prefs.getBoolean("silencer_enable", true);
-	    		int silencerType = Integer.parseInt(prefs.getString("silencer_preference", "2"));
+	    		int silencerType = Integer.parseInt(prefs.getString("silencer_preference", "0"));
 	    		switch(state){
 		            case TelephonyManager.CALL_STATE_RINGING:
 		                 Log.d(TAG, "RINGING"); 
@@ -167,14 +164,14 @@ public class SMS_Service extends Service{
 			                 number = incomingNumber;
 		                 }
 		                 
-		                 if (silencerEnable && (silencerType == 2 || silencerType == 1))
+		                 if (silencerType == 2 || silencerType == 3)
 		                	 silenceRinger();
 		                 break;
 		            case TelephonyManager.CALL_STATE_OFFHOOK:
 		                 Log.d(TAG, "OFFHOOK");
 		                 wasRinging = false;
 		                 
-		                 if (silencerEnable && (silencerType == 2 || silencerType == 1))
+		                 if (silencerType == 2 || silencerType == 3)
 		                 	restoreRingerMode();
 		                 break;
 		            case TelephonyManager.CALL_STATE_IDLE:
@@ -185,7 +182,7 @@ public class SMS_Service extends Service{
 		                 wasRinging = false;
 		                 number = "";
 		                 
-		                 if (silencerEnable && (silencerType == 2 || silencerType == 1))
+		                 if (silencerType == 2 || silencerType == 3)
 		                	 restoreRingerMode();
 		                 break;
 		        }
