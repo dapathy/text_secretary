@@ -81,6 +81,7 @@ public class ActivityRecognitionIntentService extends IntentService {
     private boolean activityChanged(int currentType) {
         // If the previous type isn't the same as the current type, the activity has changed
         if (previousActivityType != currentType) {
+        	previousActivityType = currentType;
             return true;
 
         // Otherwise, it hasn't.

@@ -47,7 +47,7 @@ public class SMS_Service extends Service{
 	private boolean listenerLock = false;
 	private AudioManager ringerManager;
     private int currentRingerMode = AudioManager.RINGER_MODE_SILENT;
-    private int lastActivityState = DetectedActivity.STILL;
+    private int lastActivityState = DetectedActivity.UNKNOWN;
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
