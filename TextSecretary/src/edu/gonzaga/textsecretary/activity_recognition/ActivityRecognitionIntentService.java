@@ -58,11 +58,6 @@ public class ActivityRecognitionIntentService extends IntentService {
 
             // If the repository contains a type
             if (
-                       // If the current type is "moving"
-                       isMoving(activityType)
-
-                       &&
-
                        // The activity has changed from the previous activity
                        activityChanged(activityType)
 
@@ -70,7 +65,7 @@ public class ActivityRecognitionIntentService extends IntentService {
                        && (confidence >= 50)) {
 
                 //broadcast?
-            	broadcastActivityState();
+            	broadcastActivityState(activityType);
             }
         }
     }
@@ -99,7 +94,7 @@ public class ActivityRecognitionIntentService extends IntentService {
      * @param type The type of activity the user is doing (see DetectedActivity constants)
      * @return true if the user seems to be moving from one location to another, otherwise false
      */
-    private static boolean isMoving(int type) {
+    public static boolean isMoving(int type) {
         switch (type) {
             // These types mean that the user is probably not moving
             case DetectedActivity.STILL :
@@ -111,9 +106,10 @@ public class ActivityRecognitionIntentService extends IntentService {
         }
     }
     
-    private void broadcastActivityState() {
+    private void broadcastActivityState(int activityType) {
     	Intent state = new Intent();
-    	state.setAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_INTENT");
+    	state.setAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE");
+    	state.putExtra("type", activityType);
     	sendBroadcast(state);
     }
 }

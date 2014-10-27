@@ -20,7 +20,6 @@ public class ActivityRecognizer extends Service {
 	@Override
 	public void onCreate () {
         super.onCreate();
-        
         mDetectionRequester = new DetectionRequester(getApplicationContext());
         mDetectionRemover = new DetectionRemover(getApplicationContext());
         

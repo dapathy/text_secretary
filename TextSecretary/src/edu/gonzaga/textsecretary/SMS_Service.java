@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 
+import com.google.android.gms.location.DetectedActivity;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -45,6 +47,7 @@ public class SMS_Service extends Service{
 	private boolean listenerLock = false;
 	private AudioManager ringerManager;
     private int currentRingerMode = AudioManager.RINGER_MODE_SILENT;
+    private int lastActivityState = DetectedActivity.STILL;
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -60,6 +63,7 @@ public class SMS_Service extends Service{
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
 		filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		filter.addAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE");
 		
 		ContentResolver contentResolver = getApplicationContext().getContentResolver();
 		outgoingListener = new OutgoingListener(new Handler());
@@ -138,6 +142,11 @@ public class SMS_Service extends Service{
 							restoreRingerMode();
 			        }
 			    }, 5000);
+			}
+			
+			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
+				lastActivityState = intent.getIntExtra("type", DetectedActivity.STILL);
+				Log.d(TAG, "received activity state: " + lastActivityState);
 			}
 		}
 	};

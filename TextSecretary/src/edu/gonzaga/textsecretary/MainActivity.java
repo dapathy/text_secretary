@@ -1,5 +1,6 @@
 package edu.gonzaga.textsecretary;
 
+import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -205,11 +206,21 @@ public class MainActivity extends Activity {
 	private void startService(){
 		startService(new Intent(this, SMS_Service.class));
 		Log.d(TAG, "Started service");
+		
+		//if driving enabled, start that service
+		if (settings.getBoolean("driving_preference", false)) {
+			startService(new Intent(this, ActivityRecognizer.class));
+			Log.d(TAG, "driving service started");
+		}
 	}
 	
 	private void stopService (){
 		stopService (new Intent(this, SMS_Service.class));
 		Log.d(TAG, "Stoppped service");
+		
+		//if driving enabled, turn it off too
+		if (settings.getBoolean("driving_preference", false))
+			stopService(new Intent(this, ActivityRecognizer.class));
 	}
 	
 	private void jiggleLayout(final RelativeLayout l){
