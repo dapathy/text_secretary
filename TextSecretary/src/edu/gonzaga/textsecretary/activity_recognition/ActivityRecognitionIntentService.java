@@ -21,6 +21,7 @@ import com.google.android.gms.location.DetectedActivity;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * Service that receives ActivityRecognition updates. It receives updates
@@ -43,7 +44,7 @@ public class ActivityRecognitionIntentService extends IntentService {
 
         // If the intent contains an update
         if (ActivityRecognitionResult.hasResult(intent)) {
-
+        	Log.d(ActivityUtils.APPTAG, "new activity update available");
             // Get the update
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 
@@ -97,12 +98,11 @@ public class ActivityRecognitionIntentService extends IntentService {
     public static boolean isMoving(int type) {
         switch (type) {
             // These types mean that the user is probably not moving
-            case DetectedActivity.STILL :
-            case DetectedActivity.TILTING :
-            case DetectedActivity.UNKNOWN :
-                return false;
-            default:
+            case DetectedActivity.IN_VEHICLE :
+            case DetectedActivity.ON_BICYCLE:
                 return true;
+            default:
+                return false;
         }
     }
     
@@ -111,5 +111,6 @@ public class ActivityRecognitionIntentService extends IntentService {
     	state.setAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE");
     	state.putExtra("type", activityType);
     	sendBroadcast(state);
+    	Log.d(ActivityUtils.APPTAG, "activity broadcast sent");
     }
 }
