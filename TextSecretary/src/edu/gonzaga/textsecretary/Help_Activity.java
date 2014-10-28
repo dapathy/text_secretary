@@ -87,7 +87,7 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 		widgetTab.setTabListener(this);
 
 		silencerTab = actionBar.newTab();
-		silencerTab.setText("Silencer");
+		silencerTab.setText("Do Not Disturb");
 		silencerTab.setTabListener(this);
 		
 		aboutTab = actionBar.newTab();
