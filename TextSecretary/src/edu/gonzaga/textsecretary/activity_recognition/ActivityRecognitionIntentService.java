@@ -91,14 +91,14 @@ public class ActivityRecognitionIntentService extends IntentService {
     }
 
     /**
-     * Determine if an activity means that the user is moving.
+     * Determine if an activity means that the user is in a vehicle.
      *
      * @param type The type of activity the user is doing (see DetectedActivity constants)
      * @return true if the user seems to be moving from one location to another, otherwise false
      */
     public static boolean isMoving(int type) {
         switch (type) {
-            // These types mean that the user is probably not moving
+            // These types mean that the user is probably in a vehicle
             case DetectedActivity.IN_VEHICLE :
             case DetectedActivity.ON_BICYCLE:
                 return true;
