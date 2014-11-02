@@ -82,6 +82,7 @@ public class ServiceListFragment extends ListFragment{
 	        switch(silencerType){
 	        case "0":
 	        	list.add(putData("Do Not Disturb", "Off"));
+	        	break;
 	        case "1":
 	        	list.add(putData("Do Not Disturb", "Texts"));
 	        	break;
@@ -90,6 +91,8 @@ public class ServiceListFragment extends ListFragment{
         		break;
         	case "3":
         		list.add(putData("Do Not Disturb", "Texts & Calls"));
+        		break;
+        	default:
         		break;
 	        }
 			

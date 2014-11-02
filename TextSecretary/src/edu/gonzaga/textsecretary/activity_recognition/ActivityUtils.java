@@ -37,24 +37,4 @@ public final class ActivityUtils {
 
     public static final int DETECTION_INTERVAL_MILLISECONDS =
             MILLISECONDS_PER_SECOND * DETECTION_INTERVAL_SECONDS;
-
-    // Shared Preferences repository name
-    public static final String SHARED_PREFERENCES =
-            "com.example.android.activityrecognition.SHARED_PREFERENCES";
-
-    // Key in the repository for the previous activity
-    public static final String KEY_PREVIOUS_ACTIVITY_TYPE =
-            "com.example.android.activityrecognition.KEY_PREVIOUS_ACTIVITY_TYPE";
-
-    // Constants for constructing the log file name
-    public static final String LOG_FILE_NAME_PREFIX = "activityrecognition";
-    public static final String LOG_FILE_NAME_SUFFIX = ".log";
-
-    // Keys in the repository for storing the log file info
-    public static final String KEY_LOG_FILE_NUMBER =
-            "com.example.android.activityrecognition.KEY_LOG_FILE_NUMBER";
-    public static final String KEY_LOG_FILE_NAME =
-            "com.example.android.activityrecognition.KEY_LOG_FILE_NAME";
-
-
 }

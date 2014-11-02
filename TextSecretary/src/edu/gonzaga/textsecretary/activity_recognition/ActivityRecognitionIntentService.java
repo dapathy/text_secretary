@@ -65,7 +65,7 @@ public class ActivityRecognitionIntentService extends IntentService {
                        // The confidence level for the current activity is > 50%
                        && (confidence >= 50)) {
 
-                //broadcast?
+                //broadcast current type
             	broadcastActivityState(activityType);
             }
         }

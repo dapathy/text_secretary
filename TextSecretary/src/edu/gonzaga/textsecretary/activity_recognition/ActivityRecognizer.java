@@ -131,13 +131,13 @@ public class ActivityRecognizer extends Service {
                     default:
 
                         // Report that Google Play services was unable to resolve the problem.
-                        Log.d(ActivityUtils.APPTAG, "google play couldn't do anything useful");
+                        Log.e(ActivityUtils.APPTAG, "google play couldn't do anything useful");
                 }
 
             // If any other request code was received
             default:
                // Report that this Activity received an unknown requestCode
-               Log.d(ActivityUtils.APPTAG, "I'm not sure what happened but it wasn't good");
+               Log.e(ActivityUtils.APPTAG, "I'm not sure what happened but it wasn't good");
 
                break;
         }
