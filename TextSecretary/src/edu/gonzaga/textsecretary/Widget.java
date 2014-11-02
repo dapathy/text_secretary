@@ -1,5 +1,6 @@
 package edu.gonzaga.textsecretary;
 
+import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 import android.app.PendingIntent;
 import android.app.PendingIntent.CanceledException;
 import android.appwidget.AppWidgetManager;
@@ -54,6 +55,9 @@ public class Widget extends AppWidgetProvider {
             	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
             	context.stopService(serviceIntent);
             	editor.putBoolean("smsState", false);
+            	
+            	if (settings.getBoolean("driving_preference", false))
+        			context.stopService(new Intent(context, ActivityRecognizer.class));
             }
             //check activation, start service
             else{
@@ -62,6 +66,9 @@ public class Widget extends AppWidgetProvider {
 	            	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
 	            	context.startService(serviceIntent);
 	            	editor.putBoolean("smsState", true);
+	            	
+	            	if (settings.getBoolean("driving_preference", false))
+	        			context.startService(new Intent(context, ActivityRecognizer.class));
             	}
             	//not activated, open app to get money
             	else {

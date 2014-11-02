@@ -1,5 +1,6 @@
 package edu.gonzaga.textsecretary;
 
+import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +27,9 @@ public class StartOnBoot extends BroadcastReceiver{
 		    		Intent smsService = new Intent(context, SMS_Service.class);
 					context.startService(smsService);				
 			    	editor.putBoolean("smsState", true);
+			    	
+			    	if (settings.getBoolean("driving_preference", false))
+	        			context.stopService(new Intent(context, ActivityRecognizer.class));
 	    		}
 	    		//otherwise open app to display trial over dialogue
 	    		else {
