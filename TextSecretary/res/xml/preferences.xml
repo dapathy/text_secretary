@@ -50,11 +50,11 @@
             android:key="notification_preference"
             android:title="Notifications"
             android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
-            android:defaultValue="true"/>     
+            android:defaultValue="true"/>
             
 	    <ListPreference 
 		    android:title="Do Not Disturb"
-		    android:summary="The ringer will be silenced when Text Secretary is enabled or if you are in an event with Calendar Integration enabled."
+		    android:summary="The ringer will be silenced when Text Secretary is enabled or if you are in an event with Calendar Integration enabled. *Experimental*"
 		    android:key="silencer_preference"
 		    android:entries="@array/entries_silencer"
 			android:entryValues="@array/entryvalues_silencer"
