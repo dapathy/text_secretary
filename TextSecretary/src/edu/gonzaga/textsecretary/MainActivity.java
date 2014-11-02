@@ -27,8 +27,7 @@ import android.widget.RemoteViews;
 
 public class MainActivity extends Activity {
 	
-	private final String TAG = "MAIN";
-	private Boolean SMS_Service_State;
+	private final static String TAG = "MAIN";
 	private Boolean remindToggleDialogue;
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
 	private ImageButton imageState;
@@ -50,8 +49,6 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        
-        SMS_Service_State = settings.getBoolean("smsState", false);
         
         setUpGui();
 		setUpWidget();
@@ -83,7 +80,7 @@ public class MainActivity extends Activity {
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
 		imageState = (ImageButton) findViewById(R.id.stateImage);
-		if (!SMS_Service_State)		//if setting is off, button should be off
+		if (!settings.getBoolean("smsState", false))		//if setting is off, button should be off
 			imageState.setImageResource(R.drawable.button_off);
 		imageState.setOnClickListener(imgButtonHandler);
 		
@@ -121,9 +118,10 @@ public class MainActivity extends Activity {
 	View.OnClickListener imgButtonHandler = new View.OnClickListener() {
 	    @SuppressLint("ResourceAsColor")
 		public void onClick(View v) {
-			if(SMS_Service_State == true){			//if service is on -> turn off
+	    	SharedPreferences.Editor editor = settings.edit();
+			if(settings.getBoolean("smsState", false) == true){			//if service is on -> turn off
 				stopService();
-		        SMS_Service_State = false;
+		        editor.putBoolean("smsState", false).commit();
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
 	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
@@ -133,7 +131,7 @@ public class MainActivity extends Activity {
 			else{						//else service is off -> turn on
 				if(enableButton){
 					startService();
-			        SMS_Service_State = true;
+					editor.putBoolean("smsState", true).commit();
 			        lowerBar.setBackgroundResource(R.drawable.lowbaron);
 			        imageState.setImageResource(R.drawable.button_on);
 		        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
@@ -152,23 +150,12 @@ public class MainActivity extends Activity {
 	}
 
     @Override
-    protected void onStop(){
-    	super.onStop();
-        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	SharedPreferences.Editor editor = settings.edit();
-    	editor.putBoolean("smsState", SMS_Service_State);
-    	editor.commit();
-    }
-    
-    @Override
     protected void onResume(){
     	super.onResume();
-        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	SMS_Service_State = settings.getBoolean("smsState", false);
     	
 		setMessage();
         
-    	if(SMS_Service_State){
+    	if(settings.getBoolean("smsState", false)){
 	        imageState.setImageResource(R.drawable.button_on);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaron);
     	}
