@@ -29,7 +29,7 @@ public class StartOnBoot extends BroadcastReceiver{
 			    	editor.putBoolean("smsState", true);
 			    	
 			    	if (settings.getBoolean("driving_preference", false))
-	        			context.stopService(new Intent(context, ActivityRecognizer.class));
+	        			context.startService(new Intent(context, ActivityRecognizer.class));
 	    		}
 	    		//otherwise open app to display trial over dialogue
 	    		else {
