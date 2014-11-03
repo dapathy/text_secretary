@@ -7,6 +7,8 @@ import java.util.Locale;
 
 import com.google.android.gms.location.DetectedActivity;
 
+import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognitionIntentService;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -35,8 +37,10 @@ import android.util.Log;
 public class SMS_Service extends Service{
 	
 	private static final String TAG = "SMS_SERVICE";
+	private static final String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
+	private static final String defDrivingMsg = "Sorry, I'm on the road. I'll get back to you as soon as possible.";
+	
 	private Calendar_Service calendar;
-	private String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	private SharedPreferences prefs;
 	private int respondTo;
 	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
@@ -104,7 +108,7 @@ public class SMS_Service extends Service{
 			}
 			
 			//if received SMS
-			else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+			else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && shouldReply()){
 				//silence ringer regardless of auto reply settings
 	    		final int silencerType = Integer.parseInt(prefs.getString("silencer_preference", "0"));
 	    		
@@ -163,7 +167,7 @@ public class SMS_Service extends Service{
 	    
 	    @Override
 	    public void onCallStateChanged(int state, String incomingNumber) {    	
-	    	if (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent()) {
+	    	if (shouldReply()) {
 	    		int silencerType = Integer.parseInt(prefs.getString("silencer_preference", "0"));
 	    		switch(state){
 		            case TelephonyManager.CALL_STATE_RINGING:
@@ -225,16 +229,8 @@ public class SMS_Service extends Service{
 	private void handleSMSReply(String msg_from) {
 		//if timer is disabled or is not recent
 		if (!prefs.getBoolean("sleep_timer_preference", true) || !isRecent(msg_from, Long.valueOf(prefs.getString("list_preference", "1800000")))){
-	        String message;
+	        String message = getCorrectMessage();
 	        
-	        //retrieves correct message
-	        if(prefs.getBoolean("calendar_preference", true)){
-	        	message = prefs.getString("custom_calendar_message_preference", defMessage);
-	        	message = getNewMessage(message);	//replaces insertables
-	        }
-	        else{
-	        	message = prefs.getString("custom_message_preference", defMessage);
-	        }
 			sendSMS(msg_from, message);
 			
 			//create notification
@@ -377,5 +373,26 @@ public class SMS_Service extends Service{
     private void restoreRingerMode() {
     	Log.d(TAG, currentRingerMode + " restore");
     	ringerManager.setRingerMode(currentRingerMode);
+    }
+    
+    private String getCorrectMessage() {
+    	//retrieves correct message
+    	String message;
+        if(prefs.getBoolean("calendar_preference", true)){
+        	message = prefs.getString("custom_calendar_message_preference", defMessage);
+        	message = getNewMessage(message);	//replaces insertables
+        }
+        else if (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)){
+        	message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
+        }
+        else{
+        	message = prefs.getString("custom_message_preference", defMessage);
+        }
+        return message;
+    }
+    
+    //(is driving and driving enabled) or calendar disabled or in event
+    private boolean shouldReply() {
+    	return (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)) || !prefs.getBoolean("calendar_preference", true) || calendar.inEvent();
     }
 }

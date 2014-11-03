@@ -11,7 +11,7 @@
 		android:defaultValue="3"/>
     
 	<PreferenceCategory
-       	android:title="Customizable Response">
+       	android:title="Customizable Responses">
             
         <EditTextPreference
         	android:dependency="calendar_preference"
@@ -27,7 +27,14 @@
             android:summary="This is the message that your recipient will receive when Text Secretary replies for you."
             android:dialogTitle="Enter your custom message:"
             android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you as soon as possible."/>
-
+        
+        <EditTextPreference
+            android:dependency="driving_preference"
+            android:key="custom_driving_message_preference"
+            android:title="Response while Driving"
+            android:summary="This is the message your recipient will receive when Text Secretary replies for you when you are driving and Driving Mode is enabled"
+            android:dialogTitle="Enter your custom message:"
+            android:defaultValue="Sorry, I'm on the road. I'll get back to you as soon as possible."/>
         
     </PreferenceCategory>
     
