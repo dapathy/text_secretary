@@ -375,15 +375,16 @@ public class SMS_Service extends Service{
     	ringerManager.setRingerMode(currentRingerMode);
     }
     
+    //retrieves correct message
     private String getCorrectMessage() {
-    	//retrieves correct message
     	String message;
-        if(prefs.getBoolean("calendar_preference", true)){
+    	//check driving, then calendar, then get default
+    	if (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)){
+        	message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
+        }
+        else if(prefs.getBoolean("calendar_preference", true)){
         	message = prefs.getString("custom_calendar_message_preference", defMessage);
         	message = replaceInsertables(message);	//replaces insertables
-        }
-        else if (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)){
-        	message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
         }
         else{
         	message = prefs.getString("custom_message_preference", defMessage);
