@@ -276,7 +276,7 @@ public class SMS_Service extends Service{
 	}
 	
 	//parses message for [end] and [name] and replaces with info from calendar
-	private String getNewMessage(String oldMessage){
+	private String replaceInsertables(String oldMessage){
 		String newMessage;
 		CharSequence end = "[end]";
 		CharSequence name = "[name]";
@@ -380,7 +380,7 @@ public class SMS_Service extends Service{
     	String message;
         if(prefs.getBoolean("calendar_preference", true)){
         	message = prefs.getString("custom_calendar_message_preference", defMessage);
-        	message = getNewMessage(message);	//replaces insertables
+        	message = replaceInsertables(message);	//replaces insertables
         }
         else if (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)){
         	message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
