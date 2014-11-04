@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
@@ -44,6 +45,8 @@ public class SMS_Service extends Service{
 	private SharedPreferences prefs;
 	private int respondTo;
 	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
+	private DrivingNotification drivingNotification = new DrivingNotification(this);
+	//private Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
 	private OutgoingListener outgoingListener;
@@ -149,7 +152,9 @@ public class SMS_Service extends Service{
 			}
 			
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
-				lastActivityState = intent.getIntExtra("type", DetectedActivity.STILL);
+				lastActivityState = intent.getIntExtra("type", DetectedActivity.UNKNOWN);
+				drivingNotification.displayNotification(lastActivityState);
+				//vibrator.vibrate(500);
 				Log.d(TAG, "received activity state: " + lastActivityState);
 			}
 		}
@@ -375,16 +380,15 @@ public class SMS_Service extends Service{
     	ringerManager.setRingerMode(currentRingerMode);
     }
     
-    //retrieves correct message
     private String getCorrectMessage() {
+    	//retrieves correct message
     	String message;
-    	//check driving, then calendar, then get default
-    	if (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)){
-        	message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
-        }
-        else if(prefs.getBoolean("calendar_preference", true)){
+        if(prefs.getBoolean("calendar_preference", true)){
         	message = prefs.getString("custom_calendar_message_preference", defMessage);
         	message = replaceInsertables(message);	//replaces insertables
+        }
+        else if (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)){
+        	message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
         }
         else{
         	message = prefs.getString("custom_message_preference", defMessage);
