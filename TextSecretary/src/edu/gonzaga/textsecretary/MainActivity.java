@@ -1,5 +1,6 @@
 package edu.gonzaga.textsecretary;
 
+import edu.gonzaga.textsecretary.R.color;
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -8,12 +9,16 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	
@@ -42,6 +48,8 @@ public class MainActivity extends Activity {
 	private ServiceListFragment myFragment;
 	private boolean enableButton = false;
 	private ProgressBar spinner;
+	private String lightestgray = "#DBDBDB";
+	private String lightgray = "#4b4b4b";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +60,7 @@ public class MainActivity extends Activity {
         
         setUpGui();
 		setUpWidget();
-
+				
         // get an instance of FragmentTransaction from your Activity
         fragmentManager = getFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
@@ -63,7 +71,7 @@ public class MainActivity extends Activity {
 	        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
 	        fragmentTransaction.commit();
         }
-        
+                
         spinner.setVisibility(View.VISIBLE);
         new Thread(checkActivation).start();
         
@@ -80,8 +88,9 @@ public class MainActivity extends Activity {
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
 		imageState = (ImageButton) findViewById(R.id.stateImage);
-		if (!settings.getBoolean("smsState", false))		//if setting is off, button should be off
+		if (!settings.getBoolean("smsState", false)){		//if setting is off, button should be off
 			imageState.setImageResource(R.drawable.button_off);
+		}
 		imageState.setOnClickListener(imgButtonHandler);
 		
 		//Set the on click listener for the custom message
@@ -92,6 +101,7 @@ public class MainActivity extends Activity {
 					startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 		        }
 		    });
+		
 		setMessage();
 		Log.d(TAG, "gui");
 	}
@@ -122,6 +132,8 @@ public class MainActivity extends Activity {
 			if(settings.getBoolean("smsState", false) == true){			//if service is on -> turn off
 				stopService();
 		        editor.putBoolean("smsState", false).commit();
+		        changeFragmentTextColor(false);
+				custom.setTextColor(Color.parseColor(lightestgray));
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
 	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
@@ -132,6 +144,8 @@ public class MainActivity extends Activity {
 				if(enableButton){
 					startService();
 					editor.putBoolean("smsState", true).commit();
+					changeFragmentTextColor(true);
+					custom.setTextColor(Color.parseColor(lightgray));
 			        lowerBar.setBackgroundResource(R.drawable.lowbaron);
 			        imageState.setImageResource(R.drawable.button_on);
 		        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
@@ -158,11 +172,14 @@ public class MainActivity extends Activity {
     	if(settings.getBoolean("smsState", false)){
 	        imageState.setImageResource(R.drawable.button_on);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaron);
+			custom.setTextColor(Color.parseColor(lightgray));
+
     	}
     	
     	else{
 	        imageState.setImageResource(R.drawable.button_off);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
+			custom.setTextColor(Color.parseColor(lightestgray));
     	}
     }
         
@@ -226,6 +243,10 @@ public class MainActivity extends Activity {
 		 };
 		 r.run();
 	}	
+	
+	private void changeFragmentTextColor(boolean dark){
+        myFragment.changeTextColor(dark);
+	}
 	
 	//This dialogue is here to teach users how to toggle the service on and off
 	private void showToggleDialogue(){

@@ -71,7 +71,7 @@
 	    <CheckBoxPreference 
 	        android:key="driving_preference"
 	        android:title="Driving Detection"
-	        android:summary="If you in a moving vehicle with Text Secretary enabled, it will automatically auto-respond."
+	        android:summary="Text Secretary will auto-respond when you are driving."
 	        android:defaultValue="false"/>
     
 	</PreferenceCategory>

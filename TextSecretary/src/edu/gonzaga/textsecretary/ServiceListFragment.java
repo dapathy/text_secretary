@@ -5,34 +5,57 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
+
 
 public class ServiceListFragment extends ListFragment{
-	  private SimpleAdapter adapter;
+	  private SimpleAdapter adapter, adapteroff;
       private ArrayList<Map<String, String>> list;
+      private SharedPreferences settings;
 
-      
 	  @Override
 	  public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		buildData();
 		
+		
 		String[] from = { "name", "purpose" };
 		int[] to = { android.R.id.text1, android.R.id.text2 };
 		
 		adapter = new SimpleAdapter(getActivity(), list,
-		        //android.R.layout.simple_list_item_2, from, to);
 				R.layout.list_fragment_layout, from, to);
+		
+		adapteroff = new SimpleAdapter(getActivity(), list,
+				R.layout.list_fragment_layout_off, from, to);
+		
 		setListAdapter(adapter);
 		Log.d("TAG" , "set adapter");
 	  }
+	  
+	  class ViewHolder {
+	        TextView textLong;
+	        TextView textShort;
+	    }
+	  
+      public void changeTextColor(boolean dark){
+    	  if(dark){
+   	  		setListAdapter(adapter);
+    	  }
+    	  else
+   	  		setListAdapter(adapteroff);
+      }
 	  
 	  private ArrayList<Map<String, String>> buildData() {
 	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());	  
@@ -127,9 +150,11 @@ public class ServiceListFragment extends ListFragment{
 	  @Override
 	  public void onResume(){
 		  super.onResume();
+		  		  
+		  settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		  
 		  String[] from = { "name", "purpose" };
-		  int[] to = { android.R.id.text1, android.R.id.text2 };
+		  int[] to = { R.id.text1, R.id.text2 };
 		  list.clear();
 		  Log.d("TAG", "cleared adapter");
 		  buildData();
@@ -137,8 +162,14 @@ public class ServiceListFragment extends ListFragment{
 	    
 		  adapter = new SimpleAdapter(getActivity(), list,
 		            R.layout.list_fragment_layout, from, to);
-		    
-		  setListAdapter(adapter);
+		  
+		  adapteroff = new SimpleAdapter(getActivity(), list,
+					R.layout.list_fragment_layout_off, from, to);
+		   
+		  if(settings.getBoolean("smsState", true))
+			  setListAdapter(adapter);
+		  
+		  else
+			  setListAdapter(adapteroff);
 	  }
-
 }
