@@ -153,7 +153,7 @@ public class ServiceListFragment extends ListFragment{
 	  public void onResume(){
 		  super.onResume();
 		  		  
-		  settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		  settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 		  
 		  String[] from = { "name", "purpose" };
 		  int[] to = { R.id.text1, R.id.text2 };

@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
@@ -46,8 +45,6 @@ public class SMS_Service extends Service{
     private SharedPreferences.Editor editor;
 	private int respondTo;
 	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
-	private DrivingNotification drivingNotification = new DrivingNotification();
-	//private Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
 	private OutgoingListener outgoingListener;
@@ -155,14 +152,13 @@ public class SMS_Service extends Service{
 			
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
 				lastActivityState = intent.getIntExtra("type", DetectedActivity.UNKNOWN);
-				if((lastActivityState == 0 || lastActivityState == 1) && !prefs.getBoolean("drivingTempOff", false)){
+				if(ActivityRecognitionIntentService.isMoving(lastActivityState) && !prefs.getBoolean("drivingTempOff", false)){
 					Intent intentDriving = new Intent(getApplicationContext(), DrivingNotification.class);
 					startService(intentDriving);
 				}
 				else{
 					editor.putBoolean("drivingTempOff", false);
 				}
-				//vibrator.vibrate(500);
 				Log.d(TAG, "received activity state: " + lastActivityState);
 			}
 		}

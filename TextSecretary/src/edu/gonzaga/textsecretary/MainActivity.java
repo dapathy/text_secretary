@@ -1,6 +1,5 @@
 package edu.gonzaga.textsecretary;
 
-import edu.gonzaga.textsecretary.R.color;
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -9,16 +8,12 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +24,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	
@@ -48,8 +42,6 @@ public class MainActivity extends Activity {
 	private ServiceListFragment myFragment;
 	private boolean enableButton = false;
 	private ProgressBar spinner;
-	private String lightestgray = "#DBDBDB";
-	private String lightgray = "#4b4b4b";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +125,7 @@ public class MainActivity extends Activity {
 				stopService();
 		        editor.putBoolean("smsState", false).commit();
 		        changeFragmentTextColor(false);
-				custom.setTextColor(Color.parseColor(lightestgray));
+				custom.setTextColor(getResources().getColor(R.color.lightestgrey));
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
 	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
@@ -145,7 +137,7 @@ public class MainActivity extends Activity {
 					startService();
 					editor.putBoolean("smsState", true).commit();
 					changeFragmentTextColor(true);
-					custom.setTextColor(Color.parseColor(lightgray));
+					custom.setTextColor(getResources().getColor(R.color.lightgrey));
 			        lowerBar.setBackgroundResource(R.drawable.lowbaron);
 			        imageState.setImageResource(R.drawable.button_on);
 		        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
@@ -172,14 +164,14 @@ public class MainActivity extends Activity {
     	if(settings.getBoolean("smsState", false)){
 	        imageState.setImageResource(R.drawable.button_on);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaron);
-			custom.setTextColor(Color.parseColor(lightgray));
+			custom.setTextColor(getResources().getColor(R.color.lightgrey));
 
     	}
     	
     	else{
 	        imageState.setImageResource(R.drawable.button_off);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
-			custom.setTextColor(Color.parseColor(lightestgray));
+			custom.setTextColor(getResources().getColor(R.color.lightestgrey));
     	}
     }
         
@@ -202,7 +194,7 @@ public class MainActivity extends Activity {
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 			return true;
 		}
-		if(id == R.id.action_help){
+		else if(id == R.id.action_help){
 			startActivity(new Intent(getApplicationContext(), Help_Activity.class));
 			return true;
 		}

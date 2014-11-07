@@ -18,7 +18,7 @@ public class DrivingNotification extends IntentService{
         super("DrivingNotification"); 
     } 
 	
-	public void displayNotification(int activityType) {
+	public void displayNotification() {
 		Log.d(TAG, "notification");
 				
 		/* Invoking the default notification service */
@@ -45,12 +45,11 @@ public class DrivingNotification extends IntentService{
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		// TODO Auto-generated method stub
 		mContext = getApplicationContext();
         Toast toast = Toast.makeText(mContext, "handeling", Toast.LENGTH_LONG);
         toast.show();
 		
-		displayNotification(0);
+		displayNotification();
 	}
 
 }

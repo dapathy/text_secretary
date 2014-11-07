@@ -14,9 +14,7 @@ import android.widget.Toast;
 		public class Driving_Temp_Off extends BroadcastReceiver {
 	
 			@Override
-			public void onReceive(Context context, Intent intent) {
-				// TODO Auto-generated method stub
-				
+			public void onReceive(Context context, Intent intent) {				
 				NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 				manager.cancel(11001100);
 				
