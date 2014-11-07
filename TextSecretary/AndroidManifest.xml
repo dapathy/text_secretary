@@ -89,6 +89,14 @@
 		        android:name="android.support.PARENT_ACTIVITY"
 		        android:value="edu.gonzaga.textsecretary.MainActivity" />
         </activity>
+        
+        <service 
+            android:enabled="true"
+            android:name="edu.gonzaga.textsecretary.DrivingNotification" />
+        
+		<receiver 
+		    android:name="edu.gonzaga.textsecretary.Driving_Temp_Off"/>
+
     </application>
 
 </manifest>

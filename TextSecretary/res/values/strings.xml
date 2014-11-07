@@ -8,6 +8,7 @@
     <string name="current_message">Current custom message:</string>
     <string name="current_services">Current services:</string>
     <string name="title_activity_help_">Help_Activity</string>
+    <string name="title_driving_off_">Turn Driving Temporarily Off</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>

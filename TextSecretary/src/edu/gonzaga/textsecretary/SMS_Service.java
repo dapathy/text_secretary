@@ -43,9 +43,10 @@ public class SMS_Service extends Service{
 	
 	private Calendar_Service calendar;
 	private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
 	private int respondTo;
 	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
-	private DrivingNotification drivingNotification = new DrivingNotification(this);
+	private DrivingNotification drivingNotification = new DrivingNotification();
 	//private Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
@@ -98,6 +99,7 @@ public class SMS_Service extends Service{
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			editor = prefs.edit();
 				
 			respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "3"));
 			
@@ -153,7 +155,13 @@ public class SMS_Service extends Service{
 			
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
 				lastActivityState = intent.getIntExtra("type", DetectedActivity.UNKNOWN);
-				drivingNotification.displayNotification(lastActivityState);
+				if((lastActivityState == 0 || lastActivityState == 1) && !prefs.getBoolean("drivingTempOff", false)){
+					Intent intentDriving = new Intent(getApplicationContext(), DrivingNotification.class);
+					startService(intentDriving);
+				}
+				else{
+					editor.putBoolean("drivingTempOff", false);
+				}
 				//vibrator.vibrate(500);
 				Log.d(TAG, "received activity state: " + lastActivityState);
 			}
