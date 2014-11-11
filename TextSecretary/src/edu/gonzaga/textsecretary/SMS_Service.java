@@ -51,7 +51,7 @@ public class SMS_Service extends Service{
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	private boolean listenerLock = false;
 	private AudioManager ringerManager;
-    private int currentRingerMode = AudioManager.RINGER_MODE_SILENT;
+    private int prevRingerMode = 100;	//initialize to garbage mode
     private int lastActivityState = DetectedActivity.UNKNOWN;
 	
 	@Override
@@ -373,15 +373,19 @@ public class SMS_Service extends Service{
     	int tempRingerMode = ringerManager.getRingerMode();
     	//prevents possible conflicts between listeners
     	if (tempRingerMode != AudioManager.RINGER_MODE_SILENT) {
-    		Log.d(TAG, currentRingerMode + " silence");
+    		Log.d(TAG, tempRingerMode + " silence");
         	ringerManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        	currentRingerMode = tempRingerMode;	//save current mode
+        	prevRingerMode = tempRingerMode;	//save current mode
     	}
     }
     
     private void restoreRingerMode() {
-    	Log.d(TAG, currentRingerMode + " restore");
-    	ringerManager.setRingerMode(currentRingerMode);
+    	Log.d(TAG, prevRingerMode + " restore");
+    	//if restore necessary
+    	if (prevRingerMode != 100) {
+    		ringerManager.setRingerMode(prevRingerMode);
+    		prevRingerMode = 100;
+    	}
     }
     
     //retrieves correct message
