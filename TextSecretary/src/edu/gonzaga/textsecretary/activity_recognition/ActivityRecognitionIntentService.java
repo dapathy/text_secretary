@@ -99,7 +99,7 @@ public class ActivityRecognitionIntentService extends IntentService {
     public static boolean isMoving(int type) {
         switch (type) {
             // These types mean that the user is probably in a vehicle
-            case DetectedActivity.IN_VEHICLE :
+            case DetectedActivity.IN_VEHICLE:
             case DetectedActivity.ON_BICYCLE:
                 return true;
             default:

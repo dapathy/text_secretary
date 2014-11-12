@@ -9,6 +9,7 @@ import com.google.android.gms.location.DetectedActivity;
 
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognitionIntentService;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -42,15 +43,15 @@ public class SMS_Service extends Service{
 	
 	private Calendar_Service calendar;
 	private SharedPreferences prefs;
-    private SharedPreferences.Editor editor;
 	private int respondTo;
-	private final Notification_Service mnotification = new Notification_Service(SMS_Service.this);
+	private final Notification_Service mnotification = new Notification_Service(this);
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
 	private OutgoingListener outgoingListener;
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	private boolean listenerLock = false;
 	private AudioManager ringerManager;
+	private DrivingNotification drivingNotification = new DrivingNotification(this);
     private int prevRingerMode = 100;	//initialize to garbage mode
     private int lastActivityState = DetectedActivity.UNKNOWN;
 	
@@ -64,6 +65,9 @@ public class SMS_Service extends Service{
 		super.onCreate();
 		calendar = new Calendar_Service(getApplicationContext());
 		ringerManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean("isPassenger", false).commit();
 		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
@@ -95,7 +99,7 @@ public class SMS_Service extends Service{
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			SharedPreferences.Editor editor;
 			editor = prefs.edit();
 				
 			respondTo = Integer.parseInt(prefs.getString("respond_to_preference", "3"));
@@ -152,12 +156,14 @@ public class SMS_Service extends Service{
 			
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
 				lastActivityState = intent.getIntExtra("type", DetectedActivity.UNKNOWN);
-				if(ActivityRecognitionIntentService.isMoving(lastActivityState) && !prefs.getBoolean("drivingTempOff", false)){
-					Intent intentDriving = new Intent(getApplicationContext(), DrivingNotification.class);
-					startService(intentDriving);
+				//actually driving
+				if(isDriving()){
+					drivingNotification.displayNotification();
 				}
-				else{
-					editor.putBoolean("drivingTempOff", false);
+				else {
+					NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+					manager.cancel(11001100);
+					editor.putBoolean("isPassenger", false).commit();
 				}
 				Log.d(TAG, "received activity state: " + lastActivityState);
 			}
@@ -305,7 +311,7 @@ public class SMS_Service extends Service{
 	}
 	
 	//sends auto reply
-	private static void sendSMS(String phoneNumber, String message){
+	private void sendSMS(String phoneNumber, String message){
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
 	}
@@ -392,7 +398,7 @@ public class SMS_Service extends Service{
     private String getCorrectMessage() {
     	String message;
     	//check driving, then calendar, then get default
-        if (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)){
+        if (isDriving()){
         	message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
         }
         else if(prefs.getBoolean("calendar_preference", true)){
@@ -405,8 +411,12 @@ public class SMS_Service extends Service{
         return message;
     }
     
+    private boolean isDriving() {
+    	return ActivityRecognitionIntentService.isMoving(lastActivityState) && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
+    }
+    
     //(is driving and driving enabled) or calendar disabled or in event
     private boolean shouldReply() {
-    	return (ActivityRecognitionIntentService.isMoving(lastActivityState) && prefs.getBoolean("driving_preference", false)) || !prefs.getBoolean("calendar_preference", true) || calendar.inEvent();
+    	return isDriving() || !prefs.getBoolean("calendar_preference", true) || calendar.inEvent();
     }
 }
