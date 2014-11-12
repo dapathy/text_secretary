@@ -1,9 +1,8 @@
 package edu.gonzaga.textsecretary.activity_recognition;
 
 import android.app.Activity;
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -11,30 +10,16 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import edu.gonzaga.textsecretary.activity_recognition.ActivityUtils.REQUEST_TYPE;
 
-public class ActivityRecognizer extends Service {
+public class ActivityRecognizer {
 	
-	private REQUEST_TYPE mRequestType;
-	private DetectionRequester mDetectionRequester;
-    private DetectionRemover mDetectionRemover;
-	
-	@Override
-	public void onCreate () {
-        super.onCreate();
-        mDetectionRequester = new DetectionRequester(getApplicationContext());
-        mDetectionRemover = new DetectionRemover(getApplicationContext());
-        
-        startUpdates();
-	}
-	
-	@Override
-	public void onDestroy() {
-		stopUpdates();
-		super.onDestroy();
-	}
+	private static REQUEST_TYPE mRequestType;
+	private static DetectionRequester mDetectionRequester;
+    private static DetectionRemover mDetectionRemover;
+    private static Context mContext;
     
-    private boolean servicesConnected() {
+    private static boolean servicesConnected() {
         // Check that Google Play services is available
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
 
         // If Google Play services is available
         if (ConnectionResult.SUCCESS == resultCode) {
@@ -48,8 +33,11 @@ public class ActivityRecognizer extends Service {
     }
 	
 	//start listening for updates
-	public void startUpdates() {
-
+	public static void startUpdates(Context context) {
+		mDetectionRequester = new DetectionRequester(context);
+        mDetectionRemover = new DetectionRemover(context);
+        mContext = context;
+        
         // Check for Google Play services
         if (!servicesConnected()) {
             return;
@@ -66,8 +54,7 @@ public class ActivityRecognizer extends Service {
     }
 	
 	//stop checking for activity updates
-	public void stopUpdates() {
-
+	public static void stopUpdates() {
         // Check for Google Play services
         if (!servicesConnected()) {
             return;
@@ -142,9 +129,4 @@ public class ActivityRecognizer extends Service {
                break;
         }
     }
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
-	}
 }

@@ -205,7 +205,7 @@ public class MainActivity extends Activity {
 		
 		//if driving enabled, start that service
 		if (settings.getBoolean("driving_preference", false)) {
-			startService(new Intent(this, ActivityRecognizer.class));
+			ActivityRecognizer.startUpdates(getApplicationContext());
 			Log.d(TAG, "driving service started");
 		}
 	}
@@ -216,7 +216,7 @@ public class MainActivity extends Activity {
 		
 		//if driving enabled, turn it off too
 		if (settings.getBoolean("driving_preference", false))
-			stopService(new Intent(this, ActivityRecognizer.class));
+			ActivityRecognizer.stopUpdates();
 	}
 	
 	private void jiggleLayout(final RelativeLayout l){

@@ -36,10 +36,6 @@
             android:exported="false" />
         
         <service
-            android:name="edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer"
-            android:exported="false" />
-        
-        <service
             android:name="edu.gonzaga.textsecretary.activity_recognition.ActivityRecognitionIntentService" />
 
         <receiver android:name="edu.gonzaga.textsecretary.StartOnBoot" >

@@ -8,6 +8,7 @@ import java.util.Locale;
 import com.google.android.gms.location.DetectedActivity;
 
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognitionIntentService;
+import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 
 import android.app.NotificationManager;
 import android.app.Service;
@@ -66,8 +67,11 @@ public class SMS_Service extends Service{
 		calendar = new Calendar_Service(getApplicationContext());
 		ringerManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putBoolean("isPassenger", false).commit();
+		prefs.edit().putBoolean("isPassenger", false).commit();		//"set passenget to false on start up
+		
+		//start driving service if necessary
+		if (prefs.getBoolean("driving_preference", false))
+			ActivityRecognizer.startUpdates(getApplicationContext());
 		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
@@ -93,6 +97,10 @@ public class SMS_Service extends Service{
 			tm = null;
 			listenerLock = false;
 		}
+		
+		//stop driving service if necessary
+		if (prefs.getBoolean("driving_preference", false))
+			ActivityRecognizer.stopUpdates();
 		super.onDestroy();
 	}
 	
@@ -311,7 +319,7 @@ public class SMS_Service extends Service{
 	}
 	
 	//sends auto reply
-	private void sendSMS(String phoneNumber, String message){
+	private static void sendSMS(String phoneNumber, String message){
 		SmsManager sms = SmsManager.getDefault();
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
 	}
