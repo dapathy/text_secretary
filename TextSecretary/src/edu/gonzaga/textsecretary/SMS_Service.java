@@ -423,8 +423,11 @@ public class SMS_Service extends Service{
     	return ActivityRecognitionIntentService.isMoving(lastActivityState) && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
     }
     
-    //(is driving and driving enabled) or calendar disabled or in event
+    private boolean replyToEverything() {
+		return !prefs.getBoolean("driving_preference", false) && !prefs.getBoolean("calendar_preference", true);
+	}
+    
     private boolean shouldReply() {
-    	return isDriving() || !prefs.getBoolean("calendar_preference", true) || calendar.inEvent();
+    	return isDriving() || replyToEverything() || calendar.inEvent();
     }
 }
