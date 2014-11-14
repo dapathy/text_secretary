@@ -45,7 +45,8 @@ public class SMS_Service extends Service{
 	private Calendar_Service calendar;
 	private SharedPreferences prefs;
 	private int respondTo;
-	private final Notification_Service mnotification = new Notification_Service(this);
+	private Notification_Service mNotification = new Notification_Service(this);
+	private NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
 	private OutgoingListener outgoingListener;
@@ -169,8 +170,7 @@ public class SMS_Service extends Service{
 					drivingNotification.displayNotification();
 				}
 				else {
-					NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-					manager.cancel(11001100);
+					notificationManager.cancel(11001100);
 					editor.putBoolean("isPassenger", false).commit();
 				}
 				Log.d(TAG, "received activity state: " + lastActivityState);
@@ -258,7 +258,7 @@ public class SMS_Service extends Service{
 			
 			//create notification
 			if(prefs.getBoolean("notification_preference", true))
-				mnotification.displayNotification(msg_from);
+				mNotification.displayNotification(msg_from);
 			
 			//store message
 			final String savefrom = msg_from;
@@ -423,11 +423,11 @@ public class SMS_Service extends Service{
     	return ActivityRecognitionIntentService.isMoving(lastActivityState) && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
     }
     
-    private boolean replyToEverything() {
-		return !prefs.getBoolean("driving_preference", false) && !prefs.getBoolean("calendar_preference", true);
+    private boolean shouldAlwaysReply() {
+    	return !prefs.getBoolean("driving_preference", false) && !prefs.getBoolean("calendar_preference", true);
 	}
     
     private boolean shouldReply() {
-    	return isDriving() || replyToEverything() || calendar.inEvent();
+    	return isDriving() || shouldAlwaysReply() || calendar.inEvent();
     }
 }
