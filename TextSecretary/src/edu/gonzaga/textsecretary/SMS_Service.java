@@ -46,7 +46,7 @@ public class SMS_Service extends Service{
 	private SharedPreferences prefs;
 	private int respondTo;
 	private Notification_Service mNotification = new Notification_Service(this);
-	private NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+	private NotificationManager notificationManager;
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
 	private OutgoingListener outgoingListener;
@@ -69,6 +69,7 @@ public class SMS_Service extends Service{
 		ringerManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		prefs.edit().putBoolean("isPassenger", false).commit();		//"set passenget to false on start up
+		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		
 		//start driving service if necessary
 		if (prefs.getBoolean("driving_preference", false))
