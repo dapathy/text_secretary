@@ -157,15 +157,17 @@ public class ServiceListFragment extends ListFragment{
 		  buildData();
 		  Log.d("TAG", "setValues");
 		   
+		  adapter = new SimpleAdapter(getActivity(), list,
+		            R.layout.list_fragment_layout, from, to);
+		  
+		  adapteroff = new SimpleAdapter(getActivity(), list,
+					R.layout.list_fragment_layout_off, from, to);
+		  
 		  if(settings.getBoolean("smsState", true)) {
-			  adapter = new SimpleAdapter(getActivity(), list,
-			            R.layout.list_fragment_layout, from, to);
 			  setListAdapter(adapter);
 		  }
 		  
 		  else {
-			  adapteroff = new SimpleAdapter(getActivity(), list,
-						R.layout.list_fragment_layout_off, from, to);
 			  setListAdapter(adapteroff);
 		  }
 	  }
