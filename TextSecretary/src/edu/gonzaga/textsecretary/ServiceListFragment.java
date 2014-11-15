@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 
 public class ServiceListFragment extends ListFragment{
+	  private static final String[] from = { "name", "purpose" };
+	  private static final int[] to = { R.id.text1, R.id.text2 };
 	  private SimpleAdapter adapter, adapteroff;
       private ArrayList<Map<String, String>> list;
       private SharedPreferences settings;
@@ -24,11 +26,8 @@ public class ServiceListFragment extends ListFragment{
 	  @Override
 	  public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 		buildData();
-		
-		
-		String[] from = { "name", "purpose" };
-		int[] to = { android.R.id.text1, android.R.id.text2 };
 		
 		adapter = new SimpleAdapter(getActivity(), list,
 				R.layout.list_fragment_layout, from, to);
@@ -152,26 +151,22 @@ public class ServiceListFragment extends ListFragment{
 	  @Override
 	  public void onResume(){
 		  super.onResume();
-		  		  
-		  settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 		  
-		  String[] from = { "name", "purpose" };
-		  int[] to = { R.id.text1, R.id.text2 };
 		  list.clear();
 		  Log.d("TAG", "cleared adapter");
 		  buildData();
 		  Log.d("TAG", "setValues");
-	    
-		  adapter = new SimpleAdapter(getActivity(), list,
-		            R.layout.list_fragment_layout, from, to);
-		  
-		  adapteroff = new SimpleAdapter(getActivity(), list,
-					R.layout.list_fragment_layout_off, from, to);
 		   
-		  if(settings.getBoolean("smsState", true))
+		  if(settings.getBoolean("smsState", true)) {
+			  adapter = new SimpleAdapter(getActivity(), list,
+			            R.layout.list_fragment_layout, from, to);
 			  setListAdapter(adapter);
+		  }
 		  
-		  else
+		  else {
+			  adapteroff = new SimpleAdapter(getActivity(), list,
+						R.layout.list_fragment_layout_off, from, to);
 			  setListAdapter(adapteroff);
+		  }
 	  }
 }
