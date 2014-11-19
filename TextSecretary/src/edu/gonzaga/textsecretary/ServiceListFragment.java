@@ -120,18 +120,12 @@ public class ServiceListFragment extends ListFragment{
         		break;
 	        }
 			
-			//Sleep
-			if(prefs.getBoolean("sleep_timer_preference", true)){
-				list.add(putData("Sleep Timer", "ON"));
-				list.add(putData("Sleep Length", Long.valueOf(prefs.getString("list_preference", "1800000"))/60000 + " minutes"));
-				
-				if(prefs.getBoolean("smart_sent_message", true))
-					list.add(putData("Smart Sent Message", "ON"));
-				else
-					list.add(putData("Smart Sent Message", "OFF"));
-			}
-			else
-				list.add(putData("Sleep Timer", "OFF"));
+			//Single Response
+	        long singleResponse = Long.valueOf(prefs.getString("single_response_preference", "0"));
+	        if (singleResponse == 0)
+	        	list.add(putData("Single Response", "Off"));
+	        else 
+	        	list.add(putData("Single Response", Long.valueOf(prefs.getString("list_preference", "1800000"))/60000 + " minutes"));
 			
 		    return list;
 		  }

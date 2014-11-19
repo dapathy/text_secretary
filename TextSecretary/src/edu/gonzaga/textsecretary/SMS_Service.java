@@ -40,6 +40,7 @@ public class SMS_Service extends Service{
 	
 	private static final String TAG = "SMS_SERVICE";
 	private static final String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
+	private static final String defCalMsg = "Sorry, I'm busy at the moment. I'll get back to you around [end].";
 	private static final String defDrivingMsg = "Sorry, I'm on the road. I'll get back to you as soon as possible.";
 	
 	private Calendar_Service calendar;
@@ -251,8 +252,9 @@ public class SMS_Service extends Service{
 	}
 	
 	private void handleSMSReply(String msg_from) {
+		long singleResponse = Long.valueOf(prefs.getString("single_response_preference", "0"));
 		//if timer is disabled or is not recent
-		if (!prefs.getBoolean("sleep_timer_preference", true) || !isRecent(msg_from, Long.valueOf(prefs.getString("list_preference", "1800000")))){
+		if ((singleResponse == 0) || !isRecent(msg_from, singleResponse)){
 	        String message = getCorrectMessage();
 	        
 			sendSMS(msg_from, message);
@@ -344,8 +346,8 @@ public class SMS_Service extends Service{
             super.onChange(selfChange);
             
             prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			//calendar integration is disabled or is in event
-			if(prefs.getBoolean("smart_sent_message", false) && prefs.getBoolean("sleep_timer_preference", true) && (!prefs.getBoolean("calendar_preference", true) || calendar.inEvent())){
+			//single response disabled and should reply
+			if(Long.valueOf(prefs.getString("single_response_preference", "0")) != 0 && shouldReply()){
 				Cursor cursor = getApplicationContext().getContentResolver().query(
 						Uri.parse("content://sms"), null, null, null, null);
 				
@@ -411,7 +413,7 @@ public class SMS_Service extends Service{
         	message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
         }
         else if(prefs.getBoolean("calendar_preference", true)){
-        	message = prefs.getString("custom_calendar_message_preference", defMessage);
+        	message = prefs.getString("custom_calendar_message_preference", defCalMsg);
         	message = replaceInsertables(message);
         }
         else{

@@ -17,14 +17,14 @@
         	android:dependency="calendar_preference"
             android:key="custom_calendar_message_preference"
             android:title="Response with Calendar On"
-            android:summary="This is the message that your recipient will receive when Calendar Integration is enabled. This message supports the [end] and [name] insertables."
+            android:summary="This message supports the [end] and [name] insertables."
             android:dialogTitle="Enter your custom message:"
-            android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you as soon as possible."/>
+            android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you around [end]."/>
 	    
         <EditTextPreference
             android:key="custom_message_preference"
             android:title="Response with Calendar Off"
-            android:summary="This is the message that your recipient will receive when Text Secretary replies for you."
+            android:summary="The message used when Calendar Integration and Driving Detection are both disabled."
             android:dialogTitle="Enter your custom message:"
             android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you as soon as possible."/>
         
@@ -32,7 +32,6 @@
             android:dependency="driving_preference"
             android:key="custom_driving_message_preference"
             android:title="Response while Driving"
-            android:summary="This is the message your recipient will receive when Text Secretary replies for you when you are driving and Driving Mode is enabled"
             android:dialogTitle="Enter your custom message:"
             android:defaultValue="Sorry, I'm on the road. I'll get back to you as soon as possible."/>
         
@@ -44,7 +43,7 @@
 		<CheckBoxPreference 
             android:key="calendar_preference"
             android:title="Calendar Integration"
-            android:summary="Only auto responds if you are currently in an event marked as busy. You can further customize your message with the name and end time of your event with [name] and [end] respectively. View the help page for an example."
+            android:summary="Only auto responds if you are currently in an event marked as busy."
 			android:defaultValue="true"/>
 		
 		<CheckBoxPreference 
@@ -67,46 +66,28 @@
             
 	    <ListPreference 
 		    android:title="Do Not Disturb"
-		    android:summary="The ringer will be silenced when Text Secretary is enabled or if you are in an event with Calendar Integration enabled. *Experimental*"
+		    android:summary="Silence the ringer for texts or incoming calls when Text Secretary would normally auto-reply. *Experimental*"
 		    android:key="silencer_preference"
 		    android:entries="@array/entries_silencer"
 			android:entryValues="@array/entryvalues_silencer"
 		    android:dialogTitle="Silence..."
 			android:defaultValue="0"/>
-    
-	</PreferenceCategory>
-    
-    <PreferenceCategory
-        android:title="Sleep Timer">
-        
-        <CheckBoxPreference
-            android:key="sleep_timer_preference"
-            android:title="Sleep Timer"
-            android:summary="Enables a minimum time between auto responses to a single contact to avoid spamming the recipient. View the help page for more information and an example."
-            android:defaultValue="true"/>
-        
-        <ListPreference
-            android:key="list_preference"
-            android:dependency="sleep_timer_preference"
-            android:title="Sleep Length"
-            android:summary="Customize the minimum length of time between responses."
-            android:entries="@array/entries_list_preference"
-            android:entryValues="@array/entryvalues_list_preference"
-            android:dialogTitle="Sleep timer delay:"
-            android:defaultValue="1800000"/>
-        
- 		<CheckBoxPreference
-            android:key="smart_sent_message"
-            android:title="Smart Sent Messages"
-            android:dependency="sleep_timer_preference"
-            android:summary="If you send a text, the recipient is added to the sleep timer. If the recipient were to respond, Text Secretary would not auto-respond if within the Sleep Length."
-            android:defaultValue="false"/>
+	    
+	    <ListPreference
+	        android:key="single_response_preference"
+	        android:title="Single Response"
+	        android:summary="Only respond once to a recipient for a selectable amount of time."
+	        android:entries="@array/entries_single_response"
+	        android:entryValues="@array/entryvalues_single_response"
+	        android:dialogTitle="Single Response delay:"
+            android:defaultValue="0"/>
             
     </PreferenceCategory>
     
     <PreferenceCategory
 		android:title="Activation"
 		android:key="Activation">
+	    
         	<Preference
             	android:title="Unlock For Life"
             	android:summary="This product has a 30 day trial.  Purchase the Unlock here."/>

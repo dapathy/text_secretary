@@ -75,7 +75,7 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 		calendarTab.setTabListener(this);
 		
 		sleepTab = actionBar.newTab();
-		sleepTab.setText("Sleep");
+		sleepTab.setText("Single Response");
 		sleepTab.setTabListener(this);
 		
 		smartsentTab = actionBar.newTab();
