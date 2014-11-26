@@ -26,8 +26,7 @@ import android.widget.RemoteViews;
 
 public class MainActivity extends Activity {
 	
-	private final String TAG = "MAIN";
-	private Boolean SMS_Service_State;
+	private final static String TAG = "MAIN";
 	private Boolean remindToggleDialogue;
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
 	private ImageButton imageState;
@@ -39,7 +38,7 @@ public class MainActivity extends Activity {
 	private AppWidgetManager appWidgetManager;
 	private FragmentManager fragmentManager;
 	private FragmentTransaction fragmentTransaction;
-	private ServiceListFragment myFragment;
+	private ServiceListFragment serviceList;
 	private boolean enableButton = false;
 	private ProgressBar spinner;
 	
@@ -50,22 +49,20 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         
-        SMS_Service_State = settings.getBoolean("smsState", false);
-        
         setUpGui();
 		setUpWidget();
-
+				
         // get an instance of FragmentTransaction from your Activity
         fragmentManager = getFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
 
         //add a fragment
         if(savedInstanceState == null){
-	        myFragment = new ServiceListFragment();
-	        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
+        	serviceList = new ServiceListFragment();
+	        fragmentTransaction.add(R.id.listFragmentLayout, serviceList);
 	        fragmentTransaction.commit();
         }
-        
+                
         spinner.setVisibility(View.VISIBLE);
         new Thread(checkActivation).start();
         
@@ -82,8 +79,9 @@ public class MainActivity extends Activity {
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
 		imageState = (ImageButton) findViewById(R.id.stateImage);
-		if (!SMS_Service_State)		//if setting is off, button should be off
+		if (!settings.getBoolean("smsState", false)){		//if setting is off, button should be off
 			imageState.setImageResource(R.drawable.button_off);
+		}
 		imageState.setOnClickListener(imgButtonHandler);
 		
 		//Set the on click listener for the custom message
@@ -94,6 +92,7 @@ public class MainActivity extends Activity {
 					startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 		        }
 		    });
+		
 		setMessage();
 		Log.d(TAG, "gui");
 	}
@@ -120,9 +119,12 @@ public class MainActivity extends Activity {
 	View.OnClickListener imgButtonHandler = new View.OnClickListener() {
 	    @SuppressLint("ResourceAsColor")
 		public void onClick(View v) {
-			if(SMS_Service_State == true){			//if service is on -> turn off
+	    	SharedPreferences.Editor editor = settings.edit();
+			if(settings.getBoolean("smsState", false) == true){			//if service is on -> turn off
 				stopService();
-		        SMS_Service_State = false;
+		        editor.putBoolean("smsState", false).commit();
+		        changeFragmentTextColor(false);
+				custom.setTextColor(getResources().getColor(R.color.lightestgrey));
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
 		        imageState.setImageResource(R.drawable.button_off);
 	        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgetoff);
@@ -132,7 +134,9 @@ public class MainActivity extends Activity {
 			else{						//else service is off -> turn on
 				if(enableButton){
 					startService();
-			        SMS_Service_State = true;
+					editor.putBoolean("smsState", true).commit();
+					changeFragmentTextColor(true);
+					custom.setTextColor(getResources().getColor(R.color.lightgrey));
 			        lowerBar.setBackgroundResource(R.drawable.lowbaron);
 			        imageState.setImageResource(R.drawable.button_on);
 		        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
@@ -151,30 +155,22 @@ public class MainActivity extends Activity {
 	}
 
     @Override
-    protected void onStop(){
-    	super.onStop();
-        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	SharedPreferences.Editor editor = settings.edit();
-    	editor.putBoolean("smsState", SMS_Service_State);
-    	editor.commit();
-    }
-    
-    @Override
     protected void onResume(){
     	super.onResume();
-        settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    	SMS_Service_State = settings.getBoolean("smsState", false);
     	
 		setMessage();
         
-    	if(SMS_Service_State){
+    	if(settings.getBoolean("smsState", false)){
 	        imageState.setImageResource(R.drawable.button_on);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaron);
+			custom.setTextColor(getResources().getColor(R.color.lightgrey));
+
     	}
     	
     	else{
 	        imageState.setImageResource(R.drawable.button_off);
 	        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
+			custom.setTextColor(getResources().getColor(R.color.lightestgrey));
     	}
     }
         
@@ -195,7 +191,7 @@ public class MainActivity extends Activity {
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 			return true;
 		}
-		if(id == R.id.action_help){
+		else if(id == R.id.action_help){
 			startActivity(new Intent(getApplicationContext(), Help_Activity.class));
 			return true;
 		}
@@ -228,6 +224,11 @@ public class MainActivity extends Activity {
 		 };
 		 r.run();
 	}	
+	
+	private void changeFragmentTextColor(boolean dark){
+		if (serviceList != null)
+			serviceList.changeTextColor(dark);
+	}
 	
 	//This dialogue is here to teach users how to toggle the service on and off
 	private void showToggleDialogue(){

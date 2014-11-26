@@ -17,10 +17,10 @@ public class Help_Adapter extends FragmentPagerAdapter{
 			fragment = new HelpCalendarFragment();
 		}
 		else if(tab == 1){
-			fragment = new HelpSleepFragment();
+			fragment = new HelpDrivingFragment();
 		}
 		else if(tab == 2){
-			fragment = new HelpSmartSentFragment();
+			fragment = new HelpSleepFragment();
 		}
 		else if(tab == 3){
 			fragment = new HelpWidgetFragment();

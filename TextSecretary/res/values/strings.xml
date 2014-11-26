@@ -8,15 +8,18 @@
     <string name="current_message">Current custom message:</string>
     <string name="current_services">Current services:</string>
     <string name="title_activity_help_">Help_Activity</string>
+    <string name="title_driving_off_">Turn Driving Temporarily Off</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
     <string name="action_help">Help</string>
     <string name="calendar_body">When enabled, Text Secretary will only auto respond if the user is in a calendar event. Text Secretary will check all of the available calendars in the user’s device. Text Secretary will also enter the name and end time of the event if the user puts [name] and/or [end] into their Custom Message with Calendar On. For example:</string>
-    <string name="sleep_body">Text Secretary’s Sleep capability is used to prevent auto responding too quickly to the same contact. In other words, when Text Secretary auto responds to a contact, Text Secretary will not auto respond to that same contact for a certain amount of time. For example:</string>
+    <string name="sleep_body">Text Secretary’s Single Response capability is used to prevent auto responding too quickly to the same contact. In other words, when Text Secretary auto responds to a contact, Text Secretary will not auto respond to that same contact for a certain amount of time. For example:</string>
     <string name="about_body">Outbreak Mobile 2014</string>
-    <string name="smartsent_body">By enabling Smart Sent, user sent messages are added to the Sleep and Sleep Timer (which must be enabled). In other words, if the user sends a message and someone were to respond to that message, Text Secretary will not auto-respond. For example:</string>
+    <string name="smartsent_body">Enabling Single Response also adds sophistication to outgoing messages. For example, if the user sends a message and someone then responds while Single Response is enabled, Text Secretary will not auto-respond. For example:</string>
     <string name="widget_body">The Text Secretary widget allows users to quickly turn on and off all Text Secretary features without ever opening up the app.</string>
-    <string name="silencer_body">If enabled, phone calls and/or text message tones will be silenced. If Calendar Integration is on, silencing will only happen when in an event. After the ringtone is finished, the previous sound profile will be restored. For example, if a user receives a phone call and/or text message, that ringtone will be silenced during the tone but then restored to the volume previously set after the tone is finished.</string>
+    <string name="silencer_body">If enabled, phone calls and/or text message tones will be silenced. If Calendar Integration is on, silencing will only happen when in an event. After the ringtone is finished, the previous sound profile will be restored. In other words, if you are in a meeting and your phone rings, Text Secretary will silence that ringtone.</string>
+    <string name="driving_body">When Driving Detection is enabled, Text Secretary, using Google location services (which must be enabled), will auto-respond to texts and missed phone calls when the user is driving. This detection is done automatically in the background with minimal battery impact.</string>
+    <string name="driving_body2">Text Secretary will notify the user when it detects that they are driving. There is a button in this notification to dismiss the driving detection for the ride. This is useful if the user is simply a passenger.</string>
     
 </resources>

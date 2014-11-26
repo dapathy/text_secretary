@@ -13,26 +13,44 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
+
 
 public class ServiceListFragment extends ListFragment{
-	  private SimpleAdapter adapter;
+	  private static final String[] from = { "name", "purpose" };
+	  private static final int[] to = { R.id.text1, R.id.text2 };
+	  private SimpleAdapter adapter, adapteroff;
       private ArrayList<Map<String, String>> list;
+      private SharedPreferences settings;
 
-      
 	  @Override
 	  public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
 		buildData();
 		
-		String[] from = { "name", "purpose" };
-		int[] to = { android.R.id.text1, android.R.id.text2 };
-		
 		adapter = new SimpleAdapter(getActivity(), list,
-		        //android.R.layout.simple_list_item_2, from, to);
 				R.layout.list_fragment_layout, from, to);
+		
+		adapteroff = new SimpleAdapter(getActivity(), list,
+				R.layout.list_fragment_layout_off, from, to);
+		
 		setListAdapter(adapter);
 		Log.d("TAG" , "set adapter");
 	  }
+	  
+	  class ViewHolder {
+	        TextView textLong;
+	        TextView textShort;
+	    }
+	  
+      public void changeTextColor(boolean dark){
+    	  if(dark){
+   	  		setListAdapter(adapter);
+    	  }
+    	  else
+   	  		setListAdapter(adapteroff);
+      }
 	  
 	  private ArrayList<Map<String, String>> buildData() {
 	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());	  
@@ -65,6 +83,12 @@ public class ServiceListFragment extends ListFragment{
 		    else
 		    	list.add(putData("Calendar", "OFF"));
 		    
+		    //Driving
+		    if(prefs.getBoolean("driving_preference", true))
+		    	list.add(putData("Driving Detection", "ON"));
+		    else
+		    	list.add(putData("Driving Detection", "OFF"));
+		    
 		    //Start on Boot
 			if(prefs.getBoolean("start_on_boot_preference", false))
 				list.add(putData("Start on Boot", "ON"));
@@ -82,6 +106,7 @@ public class ServiceListFragment extends ListFragment{
 	        switch(silencerType){
 	        case "0":
 	        	list.add(putData("Do Not Disturb", "Off"));
+	        	break;
 	        case "1":
 	        	list.add(putData("Do Not Disturb", "Texts"));
 	        	break;
@@ -91,20 +116,16 @@ public class ServiceListFragment extends ListFragment{
         	case "3":
         		list.add(putData("Do Not Disturb", "Texts & Calls"));
         		break;
+        	default:
+        		break;
 	        }
 			
-			//Sleep
-			if(prefs.getBoolean("sleep_timer_preference", true)){
-				list.add(putData("Sleep Timer", "ON"));
-				list.add(putData("Sleep Length", Long.valueOf(prefs.getString("list_preference", "1800000"))/60000 + " minutes"));
-				
-				if(prefs.getBoolean("smart_sent_message", true))
-					list.add(putData("Smart Sent Message", "ON"));
-				else
-					list.add(putData("Smart Sent Message", "OFF"));
-			}
-			else
-				list.add(putData("Sleep Timer", "OFF"));
+			//Single Response
+	        long singleResponse = Long.valueOf(prefs.getString("single_response_preference", "0"));
+	        if (singleResponse == 0)
+	        	list.add(putData("Single Response", "Off"));
+	        else 
+	        	list.add(putData("Single Response", Long.valueOf(prefs.getString("list_preference", "1800000"))/60000 + " minutes"));
 			
 		    return list;
 		  }
@@ -125,17 +146,23 @@ public class ServiceListFragment extends ListFragment{
 	  public void onResume(){
 		  super.onResume();
 		  
-		  String[] from = { "name", "purpose" };
-		  int[] to = { android.R.id.text1, android.R.id.text2 };
 		  list.clear();
 		  Log.d("TAG", "cleared adapter");
 		  buildData();
 		  Log.d("TAG", "setValues");
-	    
+		   
 		  adapter = new SimpleAdapter(getActivity(), list,
 		            R.layout.list_fragment_layout, from, to);
-		    
-		  setListAdapter(adapter);
+		  
+		  adapteroff = new SimpleAdapter(getActivity(), list,
+					R.layout.list_fragment_layout_off, from, to);
+		  
+		  if(settings.getBoolean("smsState", true)) {
+			  setListAdapter(adapter);
+		  }
+		  
+		  else {
+			  setListAdapter(adapteroff);
+		  }
 	  }
-
 }

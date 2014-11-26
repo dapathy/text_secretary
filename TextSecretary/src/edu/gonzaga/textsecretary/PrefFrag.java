@@ -1,5 +1,6 @@
 package edu.gonzaga.textsecretary;
 
+import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -43,8 +44,17 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
 	    if (key.equals("calendar_preference")){
-	        Preference preference = findPreference("custom_message_preference");
-	        preference.setEnabled(!sharedPreferences.getBoolean("calendar_preference", false));
+	        Preference messagePreference = findPreference("custom_message_preference");
+	        messagePreference.setEnabled(!sharedPreferences.getBoolean("calendar_preference", false));
+	    }
+	    else if (key.equals("driving_preference")){
+	    	//starts or stops services when selected or deselected on preference screen and sms service is already enabled
+	    	if (sharedPreferences.getBoolean("smsState", false)) {
+	    		if (sharedPreferences.getBoolean("driving_preference", false))
+	    			ActivityRecognizer.startUpdates(getActivity().getApplicationContext());
+	    		else
+	    			ActivityRecognizer.stopUpdates();
+	    	}	    		
 	    }
 	}
 }
