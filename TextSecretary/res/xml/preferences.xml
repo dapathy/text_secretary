@@ -24,7 +24,7 @@
         <EditTextPreference
             android:key="custom_message_preference"
             android:title="Response with Calendar Off"
-            android:summary="The message used when Calendar Integration and Driving Detection are both disabled."
+            android:summary="This message is used when Calendar Integration and Driving Detection are both disabled."
             android:dialogTitle="Enter your custom message:"
             android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you as soon as possible."/>
         
