@@ -7,11 +7,13 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.DetectedActivity;
 
 import edu.gonzaga.textsecretary.activity_recognition.ActivityUtils.REQUEST_TYPE;
 
 public class ActivityRecognizer {
 	
+	public static int previousActivityType;
 	private static REQUEST_TYPE mRequestType;
 	private static DetectionRequester mDetectionRequester;
     private static DetectionRemover mDetectionRemover;
@@ -34,6 +36,7 @@ public class ActivityRecognizer {
 	
 	//start listening for updates
 	public static void startUpdates(Context context) {
+		previousActivityType = DetectedActivity.UNKNOWN;
 		mDetectionRequester = new DetectionRequester(context);
         mDetectionRemover = new DetectionRemover(context);
         mContext = context;

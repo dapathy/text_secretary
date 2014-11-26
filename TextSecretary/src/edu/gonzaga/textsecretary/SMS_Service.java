@@ -53,7 +53,6 @@ public class SMS_Service extends Service{
 	private OutgoingListener outgoingListener;
 	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
 	private boolean listenerLock = false;
-	private boolean alreadyDriving = false;
 	private AudioManager ringerManager;
 	private DrivingNotification drivingNotification = new DrivingNotification(this);
     private int prevRingerMode = 100;	//initialize to garbage mode
@@ -169,14 +168,12 @@ public class SMS_Service extends Service{
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
 				lastActivityState = intent.getIntExtra("type", DetectedActivity.UNKNOWN);
 				//actually driving
-				if(isDriving() && !alreadyDriving){
+				if(isDriving()){
 					drivingNotification.displayNotification();
-					alreadyDriving = true;
 				}
 				else {
 					notificationManager.cancel(11001100);
 					editor.putBoolean("isPassenger", false).commit();
-					alreadyDriving = false;
 				}
 				Log.d(TAG, "received activity state: " + lastActivityState);
 			}

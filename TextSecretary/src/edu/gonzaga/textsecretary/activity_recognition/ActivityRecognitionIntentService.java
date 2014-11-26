@@ -28,8 +28,6 @@ import android.util.Log;
  * in the background, even if the main Activity is not visible.
  */
 public class ActivityRecognitionIntentService extends IntentService {
-
-	private int previousActivityType = DetectedActivity.UNKNOWN;
 	
 	public ActivityRecognitionIntentService() {
         // Set the label for the service's background thread
@@ -80,8 +78,8 @@ public class ActivityRecognitionIntentService extends IntentService {
      */
     private boolean activityChanged(int currentType) {
         // If the previous type isn't the same as the current type, the activity has changed
-        if (previousActivityType != currentType) {
-        	previousActivityType = currentType;
+        if (ActivityRecognizer.previousActivityType != currentType) {
+        	ActivityRecognizer.previousActivityType = currentType;
             return true;
 
         // Otherwise, it hasn't.
