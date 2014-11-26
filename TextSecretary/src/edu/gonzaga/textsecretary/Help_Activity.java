@@ -13,11 +13,12 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 	private ActionBar actionBar;
 	private ViewPager view;
 	private ActionBar.Tab calendarTab;
-	private ActionBar.Tab sleepTab;
+	private ActionBar.Tab singleresponseTab;
 	private ActionBar.Tab aboutTab;
 	private ActionBar.Tab smartsentTab;
 	private ActionBar.Tab widgetTab;
 	private ActionBar.Tab silencerTab;
+	private ActionBar.Tab drivingTab;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +75,13 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 		calendarTab.setText("Calendar");
 		calendarTab.setTabListener(this);
 		
-		sleepTab = actionBar.newTab();
-		sleepTab.setText("Single Response");
-		sleepTab.setTabListener(this);
+		drivingTab = actionBar.newTab();
+		drivingTab.setText("Driving");
+		drivingTab.setTabListener(this);
 		
-		smartsentTab = actionBar.newTab();
-		smartsentTab.setText("Smart Sent");
-		smartsentTab.setTabListener(this);
+		singleresponseTab = actionBar.newTab();
+		singleresponseTab.setText("Single Response");
+		singleresponseTab.setTabListener(this);
 		
 		widgetTab = actionBar.newTab();
 		widgetTab.setText("Widget");
@@ -97,8 +98,8 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 	
 	private void addTabs(){
 		actionBar.addTab(calendarTab);
-		actionBar.addTab(sleepTab);
-		actionBar.addTab(smartsentTab);
+		actionBar.addTab(drivingTab);
+		actionBar.addTab(singleresponseTab);
 		actionBar.addTab(widgetTab);
 		actionBar.addTab(silencerTab);
 		actionBar.addTab(aboutTab);
