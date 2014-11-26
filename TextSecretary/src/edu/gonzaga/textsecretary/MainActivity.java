@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
 	private AppWidgetManager appWidgetManager;
 	private FragmentManager fragmentManager;
 	private FragmentTransaction fragmentTransaction;
-	private ServiceListFragment myFragment;
+	private ServiceListFragment serviceList;
 	private boolean enableButton = false;
 	private ProgressBar spinner;
 	
@@ -58,8 +58,8 @@ public class MainActivity extends Activity {
 
         //add a fragment
         if(savedInstanceState == null){
-	        myFragment = new ServiceListFragment();
-	        fragmentTransaction.add(R.id.listFragmentLayout, myFragment);
+        	serviceList = new ServiceListFragment();
+	        fragmentTransaction.add(R.id.listFragmentLayout, serviceList);
 	        fragmentTransaction.commit();
         }
                 
@@ -226,7 +226,8 @@ public class MainActivity extends Activity {
 	}	
 	
 	private void changeFragmentTextColor(boolean dark){
-        myFragment.changeTextColor(dark);
+		if (serviceList != null)
+			serviceList.changeTextColor(dark);
 	}
 	
 	//This dialogue is here to teach users how to toggle the service on and off
