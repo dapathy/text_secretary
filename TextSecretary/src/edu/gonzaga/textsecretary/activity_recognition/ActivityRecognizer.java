@@ -1,6 +1,7 @@
 package edu.gonzaga.textsecretary.activity_recognition;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -77,6 +78,9 @@ public class ActivityRecognizer {
          * will stop the updates.
          */
         mDetectionRequester.getRequestPendingIntent().cancel();
+        
+        //kill any remaining notification
+        ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11001100);
     }
 	
 	/*
