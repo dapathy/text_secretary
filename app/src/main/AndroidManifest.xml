@@ -69,10 +69,6 @@
 		        android:value="edu.gonzaga.textsecretary.MainActivity" />
         </activity>
         <activity
-            android:name="edu.gonzaga.textsecretary.PrefFrag"
-            android:label="@string/title_activity_pref_frag" >
-        </activity>
-        <activity
             android:name="edu.gonzaga.textsecretary.Help_Activity"
             android:label="@string/title_activity_help_" 
             android:screenOrientation="portrait"

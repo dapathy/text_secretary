@@ -15,7 +15,6 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 	private ActionBar.Tab calendarTab;
 	private ActionBar.Tab singleresponseTab;
 	private ActionBar.Tab aboutTab;
-	private ActionBar.Tab smartsentTab;
 	private ActionBar.Tab widgetTab;
 	private ActionBar.Tab silencerTab;
 	private ActionBar.Tab drivingTab;
