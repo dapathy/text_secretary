@@ -5,8 +5,6 @@
     android:background="@color/grey"
     tools:context="edu.gonzaga.textsecretary.HelpBootFragment" >
 
-    <!-- TODO: Update blank fragment layout -->
-
     <ImageView
         android:id="@+id/imageCalendar"
         android:layout_width="wrap_content"
