@@ -4,8 +4,6 @@
     android:layout_height="match_parent"
     tools:context="edu.gonzaga.textsecretary.HelpBootFragment" >
 
-    <!-- TODO: Update blank fragment layout -->
-
     <ImageView
         android:id="@+id/imageSmartSent"
         android:layout_width="wrap_content"
