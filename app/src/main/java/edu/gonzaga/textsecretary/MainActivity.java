@@ -22,9 +22,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
+import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
-	
+
 	private final static String TAG = "MAIN";
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
 	private ImageButton imageState;
@@ -35,6 +36,7 @@ public class MainActivity extends Activity {
 	private ComponentName widget;
 	private AppWidgetManager appWidgetManager;
 	private ServiceListFragment serviceList;
+    private ProgressBar spinner;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,7 @@ public class MainActivity extends Activity {
 	
 	private void setUpGui(){
 		 //GUI stuff
+        spinner = (ProgressBar) findViewById(R.id.progressBar1);
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
@@ -236,4 +239,21 @@ public class MainActivity extends Activity {
 	     })
 	     .show();
 	}
+
+    //thread to check activation
+    Runnable checkActivation = new Runnable() {
+        @Override
+        public void run() {
+            //check unlock
+            RegCheck.isActivated(MainActivity.this);
+
+            //remove spinner
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    spinner.setVisibility(View.GONE);
+                }
+            });
+        }
+    };
 }

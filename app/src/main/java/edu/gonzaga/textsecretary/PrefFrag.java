@@ -9,8 +9,8 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
 public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceChangeListener{
-		
-	@Override
+
+    @Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
@@ -40,7 +40,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
 		//this is ridiculous
-		if(key.toString().equals("This product has a 30 day trial. After the trial, a tagline will be appended to every auto-reply. Purchase the Unlock here to remove the tagline.")){
+		if(key.toString().equals("unlock")){
 			((SettingsActivity) getActivity()).purchaseUnlock();
 		}
 		return false;
