@@ -90,7 +90,7 @@
 	    
         	<Preference
             	android:title="Unlock For Life"
-            	android:summary="This product has a 30 day trial.  Purchase the Unlock here."/>
+                android:key="unlock"/>
     </PreferenceCategory>
     
 </PreferenceScreen>

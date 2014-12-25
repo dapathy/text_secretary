@@ -197,7 +197,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		    .setMessage("Your device was not able to verify activation.  Please check your internet connection and ensure you are using the latest version of the application.")
 		    .setNeutralButton("Close", new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) {
-		        	System.exit(1);
+		        	dialog.dismiss();
 		        }
 		     })
 		     .show();

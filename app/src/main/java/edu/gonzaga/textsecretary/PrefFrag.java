@@ -20,6 +20,10 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 			Preference messagePreference = findPreference("custom_message_preference");
 	        messagePreference.setEnabled(false);
 		}
+
+        //change unlock message text
+        Preference unlockPreference = findPreference("unlock");
+        unlockPreference.setSummary("There are " + RegCheck.getTrialDaysRemaining(getActivity().getApplicationContext()) + " days remaining in your trial. After the trial, a tagline will be appended to every auto-reply. Purchase the Unlock here to remove the tagline.");
 	}
 	
 	@Override
@@ -36,7 +40,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
 		//this is ridiculous
-		if(key.toString().equals("Unlock For Life This product has a 30 day trial.  Purchase the Unlock here.")){
+		if(key.toString().equals("This product has a 30 day trial. After the trial, a tagline will be appended to every auto-reply. Purchase the Unlock here to remove the tagline.")){
 			((SettingsActivity) getActivity()).purchaseUnlock();
 		}
 		return false;
