@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 
 public class ServiceListFragment extends ListFragment{
@@ -39,11 +38,6 @@ public class ServiceListFragment extends ListFragment{
 		Log.d("TAG" , "set adapter");
 	  }
 	  
-	  class ViewHolder {
-	        TextView textLong;
-	        TextView textShort;
-	    }
-	  
       public void changeTextColor(boolean dark){
     	  if(dark){
    	  		setListAdapter(adapter);
@@ -54,7 +48,7 @@ public class ServiceListFragment extends ListFragment{
 	  
 	  private ArrayList<Map<String, String>> buildData() {
 	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());	  
-	        list = new ArrayList<Map<String, String>>();
+	        list = new ArrayList<>();
         	
 	        //respond to
 	        String respondTo = prefs.getString("respond_to_preference", "2");
@@ -131,7 +125,7 @@ public class ServiceListFragment extends ListFragment{
 		  }
 
 	  private HashMap<String, String> putData(String name, String purpose) {
-	    HashMap<String, String> item = new HashMap<String, String>();
+	    HashMap<String, String> item = new HashMap<>();
 	    item.put("name", name);
 	    item.put("purpose", purpose);
 	    return item;

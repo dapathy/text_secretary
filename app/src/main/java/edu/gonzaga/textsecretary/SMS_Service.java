@@ -42,6 +42,7 @@ public class SMS_Service extends Service{
 	private static final String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	private static final String defCalMsg = "Sorry, I'm busy at the moment. I'll get back to you around [end].";
 	private static final String defDrivingMsg = "Sorry, I'm on the road. I'll get back to you as soon as possible.";
+    private static final String appendMsg = " Sent by Text Secretary.";
 	
 	private Calendar_Service calendar;
 	private SharedPreferences prefs;
@@ -51,7 +52,7 @@ public class SMS_Service extends Service{
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
 	private OutgoingListener outgoingListener;
-	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
+	private HashMap<String, Long> recentNumbers = new HashMap<>();
 	private boolean listenerLock = false;
 	private AudioManager ringerManager;
 	private DrivingNotification drivingNotification = new DrivingNotification(this);
@@ -69,7 +70,7 @@ public class SMS_Service extends Service{
 		calendar = new Calendar_Service(getApplicationContext());
 		ringerManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		prefs.edit().putBoolean("isPassenger", false).commit();		//"set passenget to false on start up
+		prefs.edit().putBoolean("isPassenger", false).apply();		//"set passenget to false on start up
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		
 		//start driving service if necessary
@@ -135,7 +136,7 @@ public class SMS_Service extends Service{
 				//now check auto reply settings
 				if (respondTo != 1 && respondTo != 2) {
 					Bundle bundle = intent.getExtras();
-					SmsMessage[] msgs = null;
+					SmsMessage[] msgs;
 					String msg_from = "empty";
 					if (bundle != null){
 						try{
@@ -173,7 +174,7 @@ public class SMS_Service extends Service{
 				}
 				else {
 					notificationManager.cancel(11001100);
-					editor.putBoolean("isPassenger", false).commit();
+					editor.putBoolean("isPassenger", false).apply();
 				}
 				Log.d(TAG, "received activity state: " + lastActivityState);
 			}
@@ -322,8 +323,12 @@ public class SMS_Service extends Service{
 	}
 	
 	//sends auto reply
-	private static void sendSMS(String phoneNumber, String message){
+	private void sendSMS(String phoneNumber, String message){
 		SmsManager sms = SmsManager.getDefault();
+        //if not activated, append
+        if (!RegCheck.isActivated(getApplicationContext())) {
+            message = message + appendMsg;
+        }
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
 	}
 	

@@ -9,7 +9,6 @@ import android.util.Log;
 
 public class DrivingNotification{
 	private static final String TAG = "NOTIFICATION";
-	private NotificationManager mNotificationManager;
 	private Context mContext;
 
     public DrivingNotification(Context context) { 
@@ -35,9 +34,9 @@ public class DrivingNotification{
 				.setAutoCancel(false)
 				.setVibrate(pattern)
 				.setOngoing(true);
-				
-	         
-		mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+        NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		
 		/* notificationID allows you to update the notification later on. */
 		mNotificationManager.notify(11001100 , mBuilder.build());

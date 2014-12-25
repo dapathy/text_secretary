@@ -21,7 +21,7 @@ import android.util.Log;
 		        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 		        SharedPreferences.Editor editor = settings.edit();
 	        	editor.putBoolean("isPassenger", true);
-	        	editor.commit();
+	        	editor.apply();
 			}
 
 	}

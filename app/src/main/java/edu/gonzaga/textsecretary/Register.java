@@ -24,7 +24,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	
 	private static final String TAG = "REGISTER";
 	private Context mContext;
-	private boolean problemHappenned = false;
+	private boolean problemHappened = false;
 	
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
@@ -43,10 +43,10 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	@Override
 	protected Boolean doInBackground(Boolean... pay) {
 		String paid;
-		String date = null;
+		String date;
 		String userEmail = UserEmailFetcher.getEmail(mContext);
-		String serverPay = "0";
-		JSONObject json = null;
+		String serverPay;
+		JSONObject json;
 		int count = 0;
 		
 		if(pay[0]) {
@@ -57,7 +57,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         	paid = "0";
         
         // Building Parameters
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("userIDD", userEmail));
         params.add(new BasicNameValuePair("just_paid", paid));
         
@@ -88,22 +88,19 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
         }
         
         //user is screwed so set boolean to show message
-        problemHappenned = true;
+        problemHappened = true;
         return false;
 	}
 	
 	protected void onPostExecute(final Boolean result){
-		//if not in trial and not paid, then show dialog
-		if (mContext instanceof Activity) {
+		//if error show dialogue
+        if (mContext instanceof Activity) {
 			((Activity) mContext).runOnUiThread(new Runnable() {
 	
 				@Override
 				public void run() {
-					if(!result) {
-				    	if (problemHappenned)
-				    		showErrorDialogue();
-				    	else
-				    		showTrialOver();
+					if(!result && problemHappened) {
+                        showErrorDialogue();
 				    }
 				}
 				
@@ -152,7 +149,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	    		
 	    		SharedPreferences.Editor secureEdit = secureSettings.edit();
 				secureEdit.putLong(account+"_trial", endDate.getTime());
-				secureEdit.commit();
+				secureEdit.apply();
     		}
     		catch(ParseException e){
     			Log.e(TAG, "parse exception");
@@ -170,7 +167,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		//update preference
 		SharedPreferences.Editor secureEdit = secureSettings.edit();
 		secureEdit.putBoolean(account+"_paid", true);
-		secureEdit.commit();
+		secureEdit.apply();
 	}
     
     private static boolean isInTrialDate(String endTrial, String currentDate) {
@@ -196,9 +193,9 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
     private void showErrorDialogue() {
     	try {
 	    	new AlertDialog.Builder(mContext)
-		    .setTitle("Something unfortunate happenned...")
-		    .setMessage("Your device was not able to launch the app correctly.  Please check your internet connection and restart the app.")
-		    .setNeutralButton("Exit application", new DialogInterface.OnClickListener() {
+		    .setTitle("Something unfortunate happened...")
+		    .setMessage("Your device was not able to verify activation.  Please check your internet connection and ensure you are using the latest version of the application.")
+		    .setNeutralButton("Close", new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) {
 		        	System.exit(1);
 		        }
@@ -218,7 +215,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	
 			new AlertDialog.Builder(mContext)
 		    .setTitle("End of Trial Period")
-		    .setMessage("You 30 day trial period of Text Secretary is over. Please go to the bottom of the settings page to purchase the unlock.")
+		    .setMessage("Your 30 day trial period of Text Secretary is over. Please go to the bottom of the settings page to purchase the unlock.")
 		    .setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int which) {
 		        	//go to settings intent to purchase

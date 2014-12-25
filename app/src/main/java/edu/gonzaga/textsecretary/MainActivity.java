@@ -27,7 +27,6 @@ import android.widget.RemoteViews;
 public class MainActivity extends Activity {
 	
 	private final static String TAG = "MAIN";
-	private Boolean remindToggleDialogue;
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
 	private ImageButton imageState;
 	private Animation out;
@@ -36,8 +35,6 @@ public class MainActivity extends Activity {
 	private RemoteViews remoteViews;
 	private ComponentName widget;
 	private AppWidgetManager appWidgetManager;
-	private FragmentManager fragmentManager;
-	private FragmentTransaction fragmentTransaction;
 	private ServiceListFragment serviceList;
 	private boolean enableButton = false;
 	private ProgressBar spinner;
@@ -53,8 +50,8 @@ public class MainActivity extends Activity {
 		setUpWidget();
 				
         // get an instance of FragmentTransaction from your Activity
-        fragmentManager = getFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         //add a fragment
         if(savedInstanceState == null){
@@ -67,8 +64,7 @@ public class MainActivity extends Activity {
         new Thread(checkActivation).start();
         
         //Remind users how to use toggle
-		remindToggleDialogue = settings.getBoolean("remindToggleDialogue", true);
-		if(remindToggleDialogue)
+		if(settings.getBoolean("remindToggleDialogue", true))
 			showToggleDialogue();
 	}
 	
@@ -120,9 +116,9 @@ public class MainActivity extends Activity {
 	    @SuppressLint("ResourceAsColor")
 		public void onClick(View v) {
 	    	SharedPreferences.Editor editor = settings.edit();
-			if(settings.getBoolean("smsState", false) == true){			//if service is on -> turn off
+			if(settings.getBoolean("smsState", false)){			//if service is on -> turn off
 				stopService();
-		        editor.putBoolean("smsState", false).commit();
+		        editor.putBoolean("smsState", false).apply();
 		        changeFragmentTextColor(false);
 				custom.setTextColor(getResources().getColor(R.color.lightestgrey));
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
@@ -134,7 +130,7 @@ public class MainActivity extends Activity {
 			else{						//else service is off -> turn on
 				if(enableButton){
 					startService();
-					editor.putBoolean("smsState", true).commit();
+					editor.putBoolean("smsState", true).apply();
 					changeFragmentTextColor(true);
 					custom.setTextColor(getResources().getColor(R.color.lightgrey));
 			        lowerBar.setBackgroundResource(R.drawable.lowbaron);
@@ -239,7 +235,7 @@ public class MainActivity extends Activity {
 	        public void onClick(DialogInterface dialog, int which) { 
 	        	SharedPreferences.Editor editor = settings.edit();
 	        	editor.putBoolean("remindToggleDialogue", false);
-	        	editor.commit();
+	        	editor.apply();
 	        }
 	     })
 	    .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
