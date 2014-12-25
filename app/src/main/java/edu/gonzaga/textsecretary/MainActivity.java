@@ -58,8 +58,12 @@ public class MainActivity extends Activity {
 	        fragmentTransaction.add(R.id.listFragmentLayout, serviceList);
 	        fragmentTransaction.commit();
         }
+
+        //check activation
+        spinner.setVisibility(View.VISIBLE);
+        new Thread(checkActivation).start();
         
-        //Remind users how to use toggle
+        //show intro dialog
 		if(settings.getBoolean("remindToggleDialogue", true))
 			showToggleDialogue();
 	}

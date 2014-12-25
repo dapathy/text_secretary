@@ -10,6 +10,8 @@ import android.preference.PreferenceScreen;
 
 public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceChangeListener{
 
+    private String unlockMsg;
+
     @Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -21,10 +23,8 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	        messagePreference.setEnabled(false);
 		}
 
-        //change unlock message text
-        Preference unlockPreference = findPreference("unlock");
-        unlockPreference.setSummary("There are " + RegCheck.getTrialDaysRemaining(getActivity().getApplicationContext()) + " days remaining in your trial. After the trial, a tagline will be appended to every auto-reply. Purchase the Unlock here to remove the tagline.");
-	}
+        changeUnlockMsg();
+    }
 	
 	@Override
 	public void onResume(){
@@ -39,8 +39,8 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	}
 	
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
-		//this is ridiculous
-		if(key.toString().equals("unlock")){
+        //this is ridiculous
+		if(key.toString().equals("Unlock for Life " + unlockMsg)){
 			((SettingsActivity) getActivity()).purchaseUnlock();
 		}
 		return false;
@@ -61,4 +61,17 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	    	}	    		
 	    }
 	}
+
+    private void changeUnlockMsg() {
+        Preference unlockPreference = findPreference("unlock");
+        int daysLeft = RegCheck.getTrialDaysRemaining(getActivity().getApplicationContext());
+        final String msgSuf = " remaining in your trial. After the trial, a tagline will be appended to every auto-reply. Purchase the Unlock here to remove the tagline.";
+
+        //grammar!
+        if (daysLeft == 1)
+            unlockMsg = "There is 1 day"  + msgSuf;
+        else
+            unlockMsg = "There are " + daysLeft + " days" + msgSuf;
+        unlockPreference.setSummary(unlockMsg);
+    }
 }
