@@ -49,7 +49,7 @@ public class ServiceListFragment extends ListFragment{
 	  private ArrayList<Map<String, String>> buildData() {
 	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());	  
 	        list = new ArrayList<>();
-        	
+
 	        //respond to
 	        String respondTo = prefs.getString("respond_to_preference", "2");
 	        switch(respondTo){
