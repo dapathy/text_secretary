@@ -89,7 +89,7 @@
 		android:key="Activation">
 	    
         	<Preference
-            	android:title="Unlock For Life"
+            	android:title="Unlock for Life"
                 android:key="unlock"/>
     </PreferenceCategory>
     

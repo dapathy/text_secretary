@@ -41,7 +41,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
         //this is ridiculous
 		if(key.toString().equals("Unlock for Life " + unlockMsg)){
-			((SettingsActivity) getActivity()).purchaseUnlock();
+            ((SettingsActivity) getActivity()).purchaseUnlock();
 		}
 		return false;
 	}
