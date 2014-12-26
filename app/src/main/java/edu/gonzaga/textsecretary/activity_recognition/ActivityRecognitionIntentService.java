@@ -55,17 +55,11 @@ public class ActivityRecognitionIntentService extends IntentService {
             // Get the type of activity
             int activityType = mostProbableActivity.getType();
 
-            // If the repository contains a type
-            if (
-                       // The activity has changed from the previous activity
-                       activityChanged(activityType)
+            // if confident, change overall confidence level
+            if (confidence >= 50)
+                ActivityRecognizer.raiseLowerDrivingConfidence(activityType);
 
-                       // The confidence level for the current activity is > 50%
-                       && (confidence >= 50)) {
-
-                //broadcast current type
-            	broadcastActivityState(activityType);
-            }
+            decideToBroadcast();
         }
     }
 
@@ -76,7 +70,7 @@ public class ActivityRecognitionIntentService extends IntentService {
      * @return true if the user's current activity is different from the previous most probable
      * activity; otherwise, false.
      */
-    private boolean activityChanged(int currentType) {
+    /*private boolean activityChanged(int currentType) {
         // If the previous type isn't the same as the current type, the activity has changed
         if (ActivityRecognizer.previousActivityType != currentType) {
         	ActivityRecognizer.previousActivityType = currentType;
@@ -86,7 +80,7 @@ public class ActivityRecognitionIntentService extends IntentService {
         } else {
             return false;
         }
-    }
+    }*/
 
     /**
      * Determine if an activity means that the user is in a vehicle.
@@ -104,11 +98,23 @@ public class ActivityRecognitionIntentService extends IntentService {
                 return false;
         }
     }
-    
-    private void broadcastActivityState(int activityType) {
+
+    private void decideToBroadcast() {
+        //if driving and was not previously driving, broadcast
+        if (ActivityRecognizer.isDriving() && !ActivityRecognizer.wasDriving) {
+            broadcastActivityState();
+            ActivityRecognizer.wasDriving = true;
+        }
+        //if not driving and was previously driving, broadcast
+        else if (!ActivityRecognizer.isDriving() && ActivityRecognizer.wasDriving) {
+            broadcastActivityState();
+            ActivityRecognizer.wasDriving = false;
+        }
+    }
+
+    private void broadcastActivityState() {
     	Intent state = new Intent();
     	state.setAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE");
-    	state.putExtra("type", activityType);
     	sendBroadcast(state);
     	Log.d(ActivityUtils.APPTAG, "activity broadcast sent");
     }

@@ -5,9 +5,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 
-import com.google.android.gms.location.DetectedActivity;
-
-import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognitionIntentService;
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 
 import android.app.NotificationManager;
@@ -57,8 +54,7 @@ public class SMS_Service extends Service{
 	private AudioManager ringerManager;
 	private DrivingNotification drivingNotification = new DrivingNotification(this);
     private int prevRingerMode = 100;	//initialize to garbage mode
-    private int lastActivityState = DetectedActivity.UNKNOWN;
-	
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
@@ -167,7 +163,6 @@ public class SMS_Service extends Service{
 			}
 			
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
-				lastActivityState = intent.getIntExtra("type", DetectedActivity.UNKNOWN);
 				//actually driving
 				if(isDriving()){
 					drivingNotification.displayNotification();
@@ -176,7 +171,6 @@ public class SMS_Service extends Service{
 					notificationManager.cancel(11001100);
 					editor.putBoolean("isPassenger", false).apply();
 				}
-				Log.d(TAG, "received activity state: " + lastActivityState);
 			}
 		}
 	};
@@ -428,7 +422,7 @@ public class SMS_Service extends Service{
     }
     
     private boolean isDriving() {
-    	return ActivityRecognitionIntentService.isMoving(lastActivityState) && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
+    	return ActivityRecognizer.isDriving() && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
     }
     
     private boolean shouldAlwaysReply() {

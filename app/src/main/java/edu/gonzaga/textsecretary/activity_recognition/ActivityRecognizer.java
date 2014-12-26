@@ -14,7 +14,8 @@ import edu.gonzaga.textsecretary.activity_recognition.ActivityUtils.REQUEST_TYPE
 
 public class ActivityRecognizer {
 	
-	public static int previousActivityType;
+	protected static boolean wasDriving;
+    protected static int drivingConfidence;     // -2 <= dC <= 3
 	private static REQUEST_TYPE mRequestType;
 	private static DetectionRequester mDetectionRequester;
     private static DetectionRemover mDetectionRemover;
@@ -24,20 +25,14 @@ public class ActivityRecognizer {
         // Check that Google Play services is available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
 
-        // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-
-            return true;
-
-        // Google Play services was not available for some reason
-        } else {
-            return false;
-        }
+        //return Google Services availability
+        return ConnectionResult.SUCCESS == resultCode;
     }
 	
 	//start listening for updates
 	public static void startUpdates(Context context) {
-		previousActivityType = DetectedActivity.UNKNOWN;
+		wasDriving = false;
+        drivingConfidence = 0;
 		mDetectionRequester = new DetectionRequester(context);
         mDetectionRemover = new DetectionRemover(context);
         mContext = context;
@@ -81,6 +76,15 @@ public class ActivityRecognizer {
         
         //kill any remaining notification
         ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11001100);
+    }
+
+    protected static void raiseLowerDrivingConfidence(int activityType) {
+        //if driving
+        if (((activityType == DetectedActivity.IN_VEHICLE) || (activityType == DetectedActivity.ON_BICYCLE)) && (drivingConfidence < 3))
+            drivingConfidence += 1;
+        //if not driving and not unknown
+        else if ((activityType != DetectedActivity.IN_VEHICLE) && (activityType != DetectedActivity.ON_BICYCLE) && (activityType != DetectedActivity.UNKNOWN) && (drivingConfidence > -2))
+            drivingConfidence -= 1;
     }
 	
 	/*
@@ -135,5 +139,14 @@ public class ActivityRecognizer {
 
                break;
         }
+    }
+
+    public static boolean isDriving() {
+        return drivingConfidence > 0;
+    }
+
+    //if user tells app that she is not driving
+    public static void notDriving() {
+        drivingConfidence = -2;
     }
 }
