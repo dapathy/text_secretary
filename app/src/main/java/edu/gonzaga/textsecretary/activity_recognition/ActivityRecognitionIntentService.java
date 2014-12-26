@@ -64,25 +64,6 @@ public class ActivityRecognitionIntentService extends IntentService {
     }
 
     /**
-     * Tests to see if the activity has changed
-     *
-     * @param currentType The current activity type
-     * @return true if the user's current activity is different from the previous most probable
-     * activity; otherwise, false.
-     */
-    /*private boolean activityChanged(int currentType) {
-        // If the previous type isn't the same as the current type, the activity has changed
-        if (ActivityRecognizer.previousActivityType != currentType) {
-        	ActivityRecognizer.previousActivityType = currentType;
-            return true;
-
-        // Otherwise, it hasn't.
-        } else {
-            return false;
-        }
-    }*/
-
-    /**
      * Determine if an activity means that the user is in a vehicle.
      *
      * @param type The type of activity the user is doing (see DetectedActivity constants)

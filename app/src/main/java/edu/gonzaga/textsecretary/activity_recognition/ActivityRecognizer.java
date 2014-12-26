@@ -85,6 +85,8 @@ public class ActivityRecognizer {
         //if not driving and not unknown
         else if ((activityType != DetectedActivity.IN_VEHICLE) && (activityType != DetectedActivity.ON_BICYCLE) && (activityType != DetectedActivity.UNKNOWN) && (drivingConfidence > -2))
             drivingConfidence -= 1;
+
+        Log.d(ActivityUtils.APPTAG, "driving confidence: " + drivingConfidence);
     }
 	
 	/*

@@ -36,7 +36,7 @@
         <item>Off</item>
         <item>1) Text messages</item>
         <item>2) Phone Calls</item>
-        <item>3) Both 1 and 2</item>
+        <item>Both 1 and 2</item>
     </string-array>
     <string-array name="entryvalues_silencer">
         <item>0</item>
