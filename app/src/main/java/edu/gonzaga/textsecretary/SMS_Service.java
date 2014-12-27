@@ -161,16 +161,18 @@ public class SMS_Service extends Service{
 			        }
 			    }, 5000);
 			}
-			
+
+            //broadcast is sent upon change in activity (driving or not)
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
 				//actually driving
 				if(isDriving()){
 					drivingNotification.displayNotification();
 				}
-				else {
-					notificationManager.cancel(11001100);
-					editor.putBoolean("isPassenger", false).apply();
-				}
+                //if not in moving vehicle
+                else if (!ActivityRecognizer.isDriving()) {
+                    notificationManager.cancel(11001100);
+                    editor.putBoolean("isPassenger", false).apply();
+                }
 			}
 		}
 	};

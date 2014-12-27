@@ -20,8 +20,6 @@ import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 				
 				Log.d("NOTIFICATION", "BROADCAST RECEIVED");
 
-                ActivityRecognizer.notDriving();    //tells activity recognition to shut up for a bit
-		        		        
 		        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 		        SharedPreferences.Editor editor = settings.edit();
 	        	editor.putBoolean("isPassenger", true);

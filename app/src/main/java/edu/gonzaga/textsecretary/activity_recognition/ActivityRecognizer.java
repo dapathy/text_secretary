@@ -146,9 +146,4 @@ public class ActivityRecognizer {
     public static boolean isDriving() {
         return drivingConfidence > 0;
     }
-
-    //if user tells app that she is not driving
-    public static void notDriving() {
-        drivingConfidence = -2;
-    }
 }
