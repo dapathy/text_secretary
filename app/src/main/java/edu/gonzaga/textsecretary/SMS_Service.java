@@ -164,6 +164,8 @@ public class SMS_Service extends Service{
 
             //broadcast is sent upon change in activity (driving or not)
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
+                editor.putBoolean("isPassenger", false).apply();    //reset passenger upon change in state
+
 				//actually driving
 				if(isDriving()){
 					drivingNotification.displayNotification();
@@ -171,7 +173,6 @@ public class SMS_Service extends Service{
                 //if not in moving vehicle
                 else if (!ActivityRecognizer.isDriving()) {
                     notificationManager.cancel(11001100);
-                    editor.putBoolean("isPassenger", false).apply();
                 }
 			}
 		}
