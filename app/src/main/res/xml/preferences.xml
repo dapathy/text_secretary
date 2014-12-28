@@ -85,11 +85,11 @@
     </PreferenceCategory>
     
     <PreferenceCategory
-		android:title="Purchase Full Version"
+		android:title="Full Version"
 		android:key="Activation">
 	    
         	<Preference
-            	android:title="Remove Tagline"
+            	android:title="Remove Signature"
                 android:key="unlock"/>
     </PreferenceCategory>
     

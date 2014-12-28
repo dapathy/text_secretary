@@ -278,6 +278,11 @@ public class SMS_Service extends Service{
 	private boolean isRecent(String phoneNumber, long repeatTime){
 		//if number is new
 		String newNumber = formatPhoneNumber(phoneNumber);
+
+        //avoid dumb phones
+        if (newNumber.length() < 4)
+            return false;
+
 		long currentTime = Calendar.getInstance().getTimeInMillis();
 		if (!recentNumbers.containsKey(newNumber)){
 			recentNumbers.put(newNumber, currentTime);
@@ -378,10 +383,15 @@ public class SMS_Service extends Service{
     	
     	//replace non-numbers
     	newNumber = newNumber.replaceAll("\\W", "");
-    	
-    	//replace starting '1' if exists
-    	if (newNumber.charAt(0) == '1') 
-    		newNumber = newNumber.substring(1);
+
+        try {
+            //replace starting '1' if exists
+            if (newNumber.charAt(0) == '1')
+                newNumber = newNumber.substring(1);
+        }
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
     	
     	Log.d(TAG, "formatted number is: " + newNumber);
     	

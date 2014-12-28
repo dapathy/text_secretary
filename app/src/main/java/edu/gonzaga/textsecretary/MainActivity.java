@@ -228,7 +228,7 @@ public class MainActivity extends Activity {
 	private void showToggleDialogue(){
 		new AlertDialog.Builder(this)
 	    .setTitle("How to use Text Secretary")
-	    .setMessage("Press the typewriter to toggle Text Secretary ON/OFF.\n\nThis product has a 30 day trial. After the trial, a tagline will be appended to every auto-reply. Purchase the Unlock in the Settings page to remove the tagline.")
+	    .setMessage("Press the typewriter to toggle Text Secretary ON/OFF.\n\nThis product has a 30 day trial. After the trial, a signature will be appended to every auto-reply. Purchase the Full Version in the Settings page to remove the signature.")
 	    .setPositiveButton("Dismiss Forever", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) { 
 	        	SharedPreferences.Editor editor = settings.edit();

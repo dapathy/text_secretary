@@ -65,7 +65,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
     private void changeUnlockMsg() {
         Preference unlockPreference = findPreference("unlock");
         int daysLeft = RegCheck.getTrialDaysRemaining(getActivity().getApplicationContext());
-        final String msgSuf = " remaining in your trial. After the trial, a tagline will be appended to every auto-reply. Purchase the Unlock here to remove the tagline.";
+        final String msgSuf = " remaining in your trial. After the trial, a signature will be appended to every auto-reply. Purchase the Unlock here to remove the signature.";
 
         //grammar!
         if (daysLeft == 1)
