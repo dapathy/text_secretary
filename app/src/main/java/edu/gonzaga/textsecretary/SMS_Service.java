@@ -330,8 +330,10 @@ public class SMS_Service extends Service{
         //if not activated, append
         if (!RegCheck.isActivated(getApplicationContext())) {
             message = message + appendMsg;
+            Log.d(TAG, "auto: not activated so appending message");
         }
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
+        Log.d(TAG, "AUTO REPLIED!");
 	}
 	
 	//puts auto reply in conversation
@@ -370,7 +372,7 @@ public class SMS_Service extends Service{
 		    			long currentTime = Calendar.getInstance().getTimeInMillis();
 		    			String newNumber = formatPhoneNumber(number);
 		    			recentNumbers.put(newNumber, currentTime);
-	    				Log.d(TAG, "Sent message to: " + newNumber);
+	    				Log.d(TAG, "You sent a message to: " + newNumber);
 	    			}
 	    		}
 				cursor.close();

@@ -19,10 +19,12 @@ public class RegCheck {
 		
 		//if application paid in shared preferences
 		if(secureSettings.getBoolean(account+"_paid", false)){
+            Log.d(TAG, "activated");
 			return true;
 		}
 		//if current date is less than date stored
 		else if(secureSettings.getLong(account+"_trial", 0) > new Date().getTime()){
+            Log.d(TAG, "in trial");
 			return true;
 		}
 		//not in shared preferences, so check server
@@ -30,6 +32,7 @@ public class RegCheck {
 	        Register task = new Register(context);
 	        task.execute(false);
 	        try {
+                Log.d(TAG, "hitting server");
 				return task.get();
 			} catch (InterruptedException | ExecutionException e) {
 				Log.e(TAG, "task.get failed");
