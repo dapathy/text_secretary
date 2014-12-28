@@ -8,7 +8,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-		//Receiver
+import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
+
+//Receiver
 		public class Driving_Temp_Off extends BroadcastReceiver {
 	
 			@Override
@@ -17,11 +19,11 @@ import android.util.Log;
 				manager.cancel(11001100);
 				
 				Log.d("NOTIFICATION", "BROADCAST RECEIVED");
-		        		        
+
 		        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 		        SharedPreferences.Editor editor = settings.edit();
 	        	editor.putBoolean("isPassenger", true);
-	        	editor.commit();
+	        	editor.apply();
 			}
 
 	}

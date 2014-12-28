@@ -9,8 +9,10 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
 public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceChangeListener{
-		
-	@Override
+
+    private String unlockMsg;
+
+    @Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
@@ -20,7 +22,9 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 			Preference messagePreference = findPreference("custom_message_preference");
 	        messagePreference.setEnabled(false);
 		}
-	}
+
+        changeUnlockMsg();
+    }
 	
 	@Override
 	public void onResume(){
@@ -35,9 +39,9 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	}
 	
 	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key){
-		//this is ridiculous
-		if(key.toString().equals("Unlock For Life This product has a 30 day trial.  Purchase the Unlock here.")){
-			((SettingsActivity) getActivity()).purchaseUnlock();
+        //this is ridiculous
+		if(key.toString().equals("Remove Signature " + unlockMsg)){
+            ((SettingsActivity) getActivity()).purchaseUnlock();
 		}
 		return false;
 	}
@@ -57,4 +61,17 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	    	}	    		
 	    }
 	}
+
+    private void changeUnlockMsg() {
+        Preference unlockPreference = findPreference("unlock");
+        int daysLeft = RegCheck.getTrialDaysRemaining(getActivity().getApplicationContext());
+        final String msgSuf = " remaining in your trial. After the trial, a signature will be appended to every auto-reply. Purchase the Unlock here to remove the signature.";
+
+        //grammar!
+        if (daysLeft == 1)
+            unlockMsg = "There is 1 day"  + msgSuf;
+        else
+            unlockMsg = "There are " + daysLeft + " days" + msgSuf;
+        unlockPreference.setSummary(unlockMsg);
+    }
 }

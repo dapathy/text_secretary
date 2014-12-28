@@ -20,14 +20,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
+import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
-	
+
 	private final static String TAG = "MAIN";
-	private Boolean remindToggleDialogue;
 	private RelativeLayout lowerBar, lowerHalf, listFragment;
 	private ImageButton imageState;
 	private Animation out;
@@ -36,11 +35,8 @@ public class MainActivity extends Activity {
 	private RemoteViews remoteViews;
 	private ComponentName widget;
 	private AppWidgetManager appWidgetManager;
-	private FragmentManager fragmentManager;
-	private FragmentTransaction fragmentTransaction;
 	private ServiceListFragment serviceList;
-	private boolean enableButton = false;
-	private ProgressBar spinner;
+    private ProgressBar spinner;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +49,8 @@ public class MainActivity extends Activity {
 		setUpWidget();
 				
         // get an instance of FragmentTransaction from your Activity
-        fragmentManager = getFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         //add a fragment
         if(savedInstanceState == null){
@@ -62,19 +58,19 @@ public class MainActivity extends Activity {
 	        fragmentTransaction.add(R.id.listFragmentLayout, serviceList);
 	        fragmentTransaction.commit();
         }
-                
+
+        //check activation
         spinner.setVisibility(View.VISIBLE);
         new Thread(checkActivation).start();
         
-        //Remind users how to use toggle
-		remindToggleDialogue = settings.getBoolean("remindToggleDialogue", true);
-		if(remindToggleDialogue)
+        //show intro dialog
+		if(settings.getBoolean("remindToggleDialogue", true))
 			showToggleDialogue();
 	}
 	
 	private void setUpGui(){
 		 //GUI stuff
-		spinner = (ProgressBar) findViewById(R.id.progressBar1);
+        spinner = (ProgressBar) findViewById(R.id.progressBar1);
 		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
 		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
 		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
@@ -120,9 +116,9 @@ public class MainActivity extends Activity {
 	    @SuppressLint("ResourceAsColor")
 		public void onClick(View v) {
 	    	SharedPreferences.Editor editor = settings.edit();
-			if(settings.getBoolean("smsState", false) == true){			//if service is on -> turn off
+			if(settings.getBoolean("smsState", false)){			//if service is on -> turn off
 				stopService();
-		        editor.putBoolean("smsState", false).commit();
+		        editor.putBoolean("smsState", false).apply();
 		        changeFragmentTextColor(false);
 				custom.setTextColor(getResources().getColor(R.color.lightestgrey));
 		        lowerBar.setBackgroundResource(R.drawable.lowbaroff);
@@ -132,17 +128,15 @@ public class MainActivity extends Activity {
 		        appWidgetManager.updateAppWidget(widget, remoteViews);
 			}
 			else{						//else service is off -> turn on
-				if(enableButton){
-					startService();
-					editor.putBoolean("smsState", true).commit();
-					changeFragmentTextColor(true);
-					custom.setTextColor(getResources().getColor(R.color.lightgrey));
-			        lowerBar.setBackgroundResource(R.drawable.lowbaron);
-			        imageState.setImageResource(R.drawable.button_on);
-		        	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
-			        jiggleGui();
-			        appWidgetManager.updateAppWidget(widget, remoteViews);
-				}
+                startService();
+                editor.putBoolean("smsState", true).apply();
+                changeFragmentTextColor(true);
+                custom.setTextColor(getResources().getColor(R.color.lightgrey));
+                lowerBar.setBackgroundResource(R.drawable.lowbaron);
+                imageState.setImageResource(R.drawable.button_on);
+                remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
+                jiggleGui();
+                appWidgetManager.updateAppWidget(widget, remoteViews);
 			}
 
 	    }
@@ -234,37 +228,36 @@ public class MainActivity extends Activity {
 	private void showToggleDialogue(){
 		new AlertDialog.Builder(this)
 	    .setTitle("How to use Text Secretary")
-	    .setMessage("Press the typewriter to toggle the Text Secretary ON/OFF")
+	    .setMessage("Press the typewriter to toggle Text Secretary ON/OFF.\n\nThis product has a 30 day trial. After the trial, a signature will be appended to every auto-reply. Purchase the Full Version in the Settings page to remove the signature.")
 	    .setPositiveButton("Dismiss Forever", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) { 
 	        	SharedPreferences.Editor editor = settings.edit();
 	        	editor.putBoolean("remindToggleDialogue", false);
-	        	editor.commit();
+	        	editor.apply();
 	        }
 	     })
 	    .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) { 
-	            // do nothing
+	            dialog.dismiss();
 	        }
 	     })
 	     .show();
 	}
-	
-	//thread to check activation
-	Runnable checkActivation = new Runnable() {
-	    @Override
-	    public void run() {
-	    	//check unlock
-	        enableButton = RegCheck.isActivated(MainActivity.this);
-	        Log.d(TAG, String.valueOf(enableButton));
-	        
-	        //remove spinner
-	        MainActivity.this.runOnUiThread(new Runnable() {
-	            @Override
-	            public void run() {
-	            	 spinner.setVisibility(View.GONE);
-	           }
-	       });
-	    }
-	};
+
+    //thread to check activation
+    Runnable checkActivation = new Runnable() {
+        @Override
+        public void run() {
+            //check unlock
+            RegCheck.isActivated(MainActivity.this);
+
+            //remove spinner
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    spinner.setVisibility(View.GONE);
+                }
+            });
+        }
+    };
 }

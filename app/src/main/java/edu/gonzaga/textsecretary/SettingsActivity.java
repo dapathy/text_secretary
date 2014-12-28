@@ -19,7 +19,6 @@ public class SettingsActivity extends PreferenceActivity {
 	
 	private static final String TAG = "PURCHASE";
 	private IabHelper mHelper;
-	private Register task;
 	private static final String UNLOCK_SKU = "text_secretary_unlock";
 	
 	@Override
@@ -124,7 +123,7 @@ public class SettingsActivity extends PreferenceActivity {
 	//securely stores data locally, then stores on server
 	private void storeActivation(){
 		//store on server
-		task = new Register(getApplicationContext());
+        Register task = new Register(getApplicationContext());
 		task.execute(true);
 		
 		//retry task until true or 5 times tried

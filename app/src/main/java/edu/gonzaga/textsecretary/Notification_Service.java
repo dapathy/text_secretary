@@ -13,7 +13,6 @@ import android.util.Log;
 
 public class Notification_Service{
 	private static final String TAG = "NOTIFICATION";
-	private NotificationManager mNotificationManager;
 	private Context mContext;
 	   
 	public Notification_Service (Context context){
@@ -68,7 +67,7 @@ public class Notification_Service{
 	         
 		mBuilder.setContentIntent(resultPendingIntent);
 
-		mNotificationManager =
+        NotificationManager mNotificationManager =
 				(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 		
 	    int randomInt = (int)(1000.0 * Math.random());

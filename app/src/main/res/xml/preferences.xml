@@ -85,12 +85,12 @@
     </PreferenceCategory>
     
     <PreferenceCategory
-		android:title="Activation"
+		android:title="Full Version"
 		android:key="Activation">
 	    
         	<Preference
-            	android:title="Unlock For Life"
-            	android:summary="This product has a 30 day trial.  Purchase the Unlock here."/>
+            	android:title="Remove Signature"
+                android:key="unlock"/>
     </PreferenceCategory>
     
 </PreferenceScreen>

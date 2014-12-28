@@ -18,28 +18,17 @@ public class StartOnBoot extends BroadcastReceiver{
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 			SharedPreferences.Editor editor = settings.edit();
 			
-			//if boot is enabled
+			//if boot is enabled, start service
 	    	if(settings.getBoolean("start_on_boot_preference", false)){
-	    		//if activated, start service
-	    		if (RegCheck.isActivated(context)) {
-	    			Log.d(TAG, "auto start");
-		    		Intent smsService = new Intent(context, SMS_Service.class);
-					context.startService(smsService);				
-			    	editor.putBoolean("smsState", true);
-	    		}
-	    		//otherwise open app to display trial over dialogue
-	    		else {
-	    			Log.d(TAG, "opening main");
-	    			Intent activity = new Intent(context, MainActivity.class);
-	    			activity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	    	        context.startActivity(activity);
-	    			editor.putBoolean("smsState", false);
-	    		}
+                Log.d(TAG, "auto start");
+                Intent smsService = new Intent(context, SMS_Service.class);
+                context.startService(smsService);
+                editor.putBoolean("smsState", true);
 	    	}
 	    	else{
 	    		editor.putBoolean("smsState", false);
 	    	}
-	    	editor.commit();
+	    	editor.apply();
 		}
 	}
 	

@@ -1,7 +1,6 @@
 package edu.gonzaga.textsecretary;
 
 import android.app.PendingIntent;
-import android.app.PendingIntent.CanceledException;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -55,34 +54,17 @@ public class Widget extends AppWidgetProvider {
             	context.stopService(serviceIntent);
             	editor.putBoolean("smsState", false);
             }
-            //check activation, start service
+            //start service
             else{
-            	if (RegCheck.isActivated(context)){
-	            	Log.d(TAG,"widget toggling service on");
-	            	remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
-	            	context.startService(serviceIntent);
-	            	editor.putBoolean("smsState", true);
-            	}
-            	//not activated, open app to get money
-            	else {
-            		startMainActivity(context);
-            		return;
-            	}
+                Log.d(TAG,"widget toggling service on");
+                remoteViews.setImageViewResource(R.id.imageview_icon, R.drawable.widgeton);
+                context.startService(serviceIntent);
+                editor.putBoolean("smsState", true);
            	}
             
             appWidgetManager.updateAppWidget(textWidget, remoteViews);
-        	editor.commit();
+        	editor.apply();
         }
-    }
-    
-    //start main activity of app
-    private void startMainActivity(Context context) {
-    	Intent activity = new Intent (context, MainActivity.class);
-		try {
-			PendingIntent.getActivity(context, 0, activity, 0).send();
-		} catch (CanceledException e) {
-			e.printStackTrace();
-		}
     }
     
     //sets widget icon image

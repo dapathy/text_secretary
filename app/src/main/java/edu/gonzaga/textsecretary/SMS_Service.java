@@ -5,9 +5,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 
-import com.google.android.gms.location.DetectedActivity;
-
-import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognitionIntentService;
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 
 import android.app.NotificationManager;
@@ -42,6 +39,7 @@ public class SMS_Service extends Service{
 	private static final String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
 	private static final String defCalMsg = "Sorry, I'm busy at the moment. I'll get back to you around [end].";
 	private static final String defDrivingMsg = "Sorry, I'm on the road. I'll get back to you as soon as possible.";
+    private static final String appendMsg = " Sent by Text Secretary.";
 	
 	private Calendar_Service calendar;
 	private SharedPreferences prefs;
@@ -51,13 +49,12 @@ public class SMS_Service extends Service{
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
 	private OutgoingListener outgoingListener;
-	private HashMap<String, Long> recentNumbers = new HashMap<String, Long>();
+	private HashMap<String, Long> recentNumbers = new HashMap<>();
 	private boolean listenerLock = false;
 	private AudioManager ringerManager;
 	private DrivingNotification drivingNotification = new DrivingNotification(this);
     private int prevRingerMode = 100;	//initialize to garbage mode
-    private int lastActivityState = DetectedActivity.UNKNOWN;
-	
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
@@ -69,7 +66,7 @@ public class SMS_Service extends Service{
 		calendar = new Calendar_Service(getApplicationContext());
 		ringerManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		prefs.edit().putBoolean("isPassenger", false).commit();		//"set passenget to false on start up
+		prefs.edit().putBoolean("isPassenger", false).apply();		//"set passenget to false on start up
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		
 		//start driving service if necessary
@@ -135,7 +132,7 @@ public class SMS_Service extends Service{
 				//now check auto reply settings
 				if (respondTo != 1 && respondTo != 2) {
 					Bundle bundle = intent.getExtras();
-					SmsMessage[] msgs = null;
+					SmsMessage[] msgs;
 					String msg_from = "empty";
 					if (bundle != null){
 						try{
@@ -164,18 +161,19 @@ public class SMS_Service extends Service{
 			        }
 			    }, 5000);
 			}
-			
+
+            //broadcast is sent upon change in activity (driving or not)
 			else if (intent.getAction().equals("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE")) {
-				lastActivityState = intent.getIntExtra("type", DetectedActivity.UNKNOWN);
+                editor.putBoolean("isPassenger", false).apply();    //reset passenger upon change in state
+
 				//actually driving
 				if(isDriving()){
 					drivingNotification.displayNotification();
 				}
-				else {
-					notificationManager.cancel(11001100);
-					editor.putBoolean("isPassenger", false).commit();
-				}
-				Log.d(TAG, "received activity state: " + lastActivityState);
+                //if not in moving vehicle
+                else if (!ActivityRecognizer.isDriving()) {
+                    notificationManager.cancel(11001100);
+                }
 			}
 		}
 	};
@@ -280,6 +278,11 @@ public class SMS_Service extends Service{
 	private boolean isRecent(String phoneNumber, long repeatTime){
 		//if number is new
 		String newNumber = formatPhoneNumber(phoneNumber);
+
+        //avoid dumb phones
+        if (newNumber.length() < 4)
+            return false;
+
 		long currentTime = Calendar.getInstance().getTimeInMillis();
 		if (!recentNumbers.containsKey(newNumber)){
 			recentNumbers.put(newNumber, currentTime);
@@ -322,9 +325,15 @@ public class SMS_Service extends Service{
 	}
 	
 	//sends auto reply
-	private static void sendSMS(String phoneNumber, String message){
+	private void sendSMS(String phoneNumber, String message){
 		SmsManager sms = SmsManager.getDefault();
+        //if not activated, append
+        if (!RegCheck.isActivated(getApplicationContext())) {
+            message = message + appendMsg;
+            Log.d(TAG, "auto: not activated so appending message");
+        }
 		sms.sendTextMessage(phoneNumber, null, message, null, null);
+        Log.d(TAG, "AUTO REPLIED!");
 	}
 	
 	//puts auto reply in conversation
@@ -363,7 +372,7 @@ public class SMS_Service extends Service{
 		    			long currentTime = Calendar.getInstance().getTimeInMillis();
 		    			String newNumber = formatPhoneNumber(number);
 		    			recentNumbers.put(newNumber, currentTime);
-	    				Log.d(TAG, "Sent message to: " + newNumber);
+	    				Log.d(TAG, "You sent a message to: " + newNumber);
 	    			}
 	    		}
 				cursor.close();
@@ -376,10 +385,15 @@ public class SMS_Service extends Service{
     	
     	//replace non-numbers
     	newNumber = newNumber.replaceAll("\\W", "");
-    	
-    	//replace starting '1' if exists
-    	if (newNumber.charAt(0) == '1') 
-    		newNumber = newNumber.substring(1);
+
+        try {
+            //replace starting '1' if exists
+            if (newNumber.charAt(0) == '1')
+                newNumber = newNumber.substring(1);
+        }
+        catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
     	
     	Log.d(TAG, "formatted number is: " + newNumber);
     	
@@ -423,7 +437,7 @@ public class SMS_Service extends Service{
     }
     
     private boolean isDriving() {
-    	return ActivityRecognitionIntentService.isMoving(lastActivityState) && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
+    	return ActivityRecognizer.isDriving() && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
     }
     
     private boolean shouldAlwaysReply() {
