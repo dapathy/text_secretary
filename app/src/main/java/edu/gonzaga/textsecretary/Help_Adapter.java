@@ -11,27 +11,22 @@ public class Help_Adapter extends FragmentPagerAdapter{
 	}
 
 	@Override
-	public Fragment getItem(int tab) {
-		Fragment fragment = null;
-		if(tab == 0){
-			fragment = new HelpCalendarFragment();
-		}
-		else if(tab == 1){
-			fragment = new HelpDrivingFragment();
-		}
-		else if(tab == 2){
-			fragment = new HelpSleepFragment();
-		}
-		else if(tab == 3){
-			fragment = new HelpWidgetFragment();
-		}
-		else if(tab == 4){
-			fragment = new HelpSilencerFragment();
-		}
-		else if(tab == 5){
-			fragment = new HelpAboutFragment();
-		}
-		return fragment;
+	public Fragment getItem(int position) {
+        switch (position) {
+            case 0:
+                return new HelpCalendarFragment();
+            case 1:
+                return new HelpDrivingFragment();
+            case 2:
+                return new HelpSleepFragment();
+            case 3:
+                return new HelpWidgetFragment();
+            case 4:
+                return new HelpSilencerFragment();
+            case 5:
+                return new HelpAboutFragment();
+        }
+        return null;
 	}
 
     @Override
