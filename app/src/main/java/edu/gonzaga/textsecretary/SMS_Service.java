@@ -18,7 +18,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,9 +50,7 @@ public class SMS_Service extends Service{
 	private OutgoingListener outgoingListener;
 	private HashMap<String, Long> recentNumbers = new HashMap<>();
 	private boolean listenerLock = false;
-	private AudioManager ringerManager;
 	private DrivingNotification drivingNotification = new DrivingNotification(this);
-    private int prevRingerMode = 100;	//initialize to garbage mode
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -64,7 +61,6 @@ public class SMS_Service extends Service{
 	public void onCreate(){
 		super.onCreate();
 		calendar = new Calendar_Service(getApplicationContext());
-		ringerManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		prefs.edit().putBoolean("isPassenger", false).apply();		//"set passenget to false on start up
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -123,12 +119,6 @@ public class SMS_Service extends Service{
 			
 			//if received SMS
 			else if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && shouldReply()){
-				//silence ringer regardless of auto reply settings
-	    		final int silencerType = Integer.parseInt(prefs.getString("silencer_preference", "0"));
-	    		
-				if (silencerType == 1 || silencerType == 3)
-					silenceRinger();
-				
 				//now check auto reply settings
 				if (respondTo != 1 && respondTo != 2) {
 					Bundle bundle = intent.getExtras();
@@ -151,15 +141,6 @@ public class SMS_Service extends Service{
 						}
 					}
 				}
-				
-				//need delay for turning off sms sound
-				new Handler().postDelayed(new Runnable() {
-			        @Override
-			        public void run() {
-			        	if (silencerType == 1 || silencerType == 3)
-							restoreRingerMode();
-			        }
-			    }, 5000);
 			}
 
             //broadcast is sent upon change in activity (driving or not)
@@ -168,10 +149,14 @@ public class SMS_Service extends Service{
 
 				//actually driving
 				if(isDriving()){
+                    if (prefs.getBoolean("silencer_preference", false))
+                        Silencer.silenceRinger();
 					drivingNotification.displayNotification();
 				}
                 //if not in moving vehicle
                 else if (!ActivityRecognizer.isDriving()) {
+                    if (prefs.getBoolean("silencer_preference", false))
+                        Silencer.restoreRingerMode();
                     notificationManager.cancel(11001100);
                 }
 			}
@@ -191,7 +176,6 @@ public class SMS_Service extends Service{
 	    @Override
 	    public void onCallStateChanged(int state, String incomingNumber) {    	
 	    	if (shouldReply()) {
-	    		int silencerType = Integer.parseInt(prefs.getString("silencer_preference", "0"));
 	    		switch(state){
 		            case TelephonyManager.CALL_STATE_RINGING:
 		                 Log.d(TAG, "RINGING"); 
@@ -199,16 +183,10 @@ public class SMS_Service extends Service{
 			                 wasRinging = true;
 			                 number = incomingNumber;
 		                 }
-		                 
-		                 if (silencerType == 2 || silencerType == 3)
-		                	 silenceRinger();
 		                 break;
 		            case TelephonyManager.CALL_STATE_OFFHOOK:
 		                 Log.d(TAG, "OFFHOOK");
 		                 wasRinging = false;
-		                 
-		                 if (silencerType == 2 || silencerType == 3)
-		                 	restoreRingerMode();
 		                 break;
 		            case TelephonyManager.CALL_STATE_IDLE:
 		                 Log.d(TAG, "IDLE");
@@ -217,9 +195,6 @@ public class SMS_Service extends Service{
 		                 
 		                 wasRinging = false;
 		                 number = "";
-		                 
-		                 if (silencerType == 2 || silencerType == 3)
-		                	 restoreRingerMode();
 		                 break;
 		        }
 	    	}
@@ -398,25 +373,6 @@ public class SMS_Service extends Service{
     	Log.d(TAG, "formatted number is: " + newNumber);
     	
     	return newNumber;
-    }
-    
-    private void silenceRinger() {
-    	int tempRingerMode = ringerManager.getRingerMode();
-    	//prevents possible conflicts between listeners
-    	if (tempRingerMode != AudioManager.RINGER_MODE_SILENT) {
-    		Log.d(TAG, tempRingerMode + " silence");
-        	ringerManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        	prevRingerMode = tempRingerMode;	//save current mode
-    	}
-    }
-    
-    private void restoreRingerMode() {
-    	Log.d(TAG, prevRingerMode + " restore");
-    	//if restore necessary
-    	if (prevRingerMode != 100) {
-    		ringerManager.setRingerMode(prevRingerMode);
-    		prevRingerMode = 100;
-    	}
     }
     
     //retrieves correct message

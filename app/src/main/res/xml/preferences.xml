@@ -64,14 +64,11 @@
             android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
             android:defaultValue="true"/>
             
-	    <ListPreference 
+	    <CheckBoxPreference
 		    android:title="Do Not Disturb"
-		    android:summary="Silence the ringer for texts or incoming calls when Text Secretary would normally auto-reply. *Experimental*"
+		    android:summary="Silence your device when Text Secretary would normally auto-reply."
 		    android:key="silencer_preference"
-		    android:entries="@array/entries_silencer"
-			android:entryValues="@array/entryvalues_silencer"
-		    android:dialogTitle="Silence..."
-			android:defaultValue="0"/>
+			android:defaultValue="false"/>
 	    
 	    <ListPreference
 	        android:key="single_response_preference"
