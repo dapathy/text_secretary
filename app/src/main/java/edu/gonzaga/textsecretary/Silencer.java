@@ -29,13 +29,17 @@ public class Silencer extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         //don't schedule if silencer is already on
         if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE") && !isSilenced) {
-            scheduleSilencing(retrieveCalendarEvents());
+            Log.d(TAG, "UPDATE");
+            scheduleSilencing();
         }
         else if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.ENABLE")) {
+            Log.d(TAG, "ENABLE");
             silenceRinger();
         }
         else if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.DISABLE")) {
+            Log.d(TAG, "DISABLE");
             restoreRingerMode();
+            scheduleSilencing(); //since we're up, let's do an update
         }
     }
 
@@ -44,25 +48,44 @@ public class Silencer extends BroadcastReceiver {
         mContext = context;
         calendarService = new Calendar_Service(mContext);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, Silencer.class);
-        intent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        Intent updateIntent = new Intent(context, Silencer.class);
+        updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
+        PendingIntent updatePendingIntent = PendingIntent.getBroadcast(context, 0, updateIntent, 0);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,System.currentTimeMillis(),CALENDAR_POLL_FREQ,
-                pendingIntent);
+                updatePendingIntent);
+
+        scheduleSilencing();    //schedule immediately
     }
 
+    //remove all alarms
     public static void stopSilencerPoller() {
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(mContext, Silencer.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
-        alarmManager.cancel(pendingIntent);
+
+        Intent updateIntent = new Intent(mContext, Silencer.class);
+        updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
+        PendingIntent updatePendingIntent = PendingIntent.getBroadcast(mContext, 0, updateIntent, 0);
+
+        Intent enableIntent = new Intent(mContext, Silencer.class);
+        enableIntent.setAction("edu.gonzaga.text_secretary.silencer.ENABLE");
+        PendingIntent enablePendingIntent = PendingIntent.getBroadcast(mContext, 0, enableIntent, 0);
+
+        Intent disableIntent = new Intent(mContext, Silencer.class);
+        enableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
+        PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
+
+        alarmManager.cancel(updatePendingIntent);
+        alarmManager.cancel(enablePendingIntent);
+        alarmManager.cancel(disablePendingIntent);
 
         restoreRingerMode();
     }
 
-    private void scheduleSilencing(Cursor cursor) {
+    private static void scheduleSilencing() {
+        Cursor cursor = retrieveCalendarEvents();
+
         //if event exists
         if (cursor.moveToNext()) {
+            Log.d(TAG, "event found");
             //get first event info
             long start = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
             long end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
@@ -80,10 +103,12 @@ public class Silencer extends BroadcastReceiver {
             PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
             alarmManager.set(AlarmManager.RTC_WAKEUP,end,disablePendingIntent);
         }
+        else
+            Log.d(TAG, "event not found");
         cursor.close();
     }
 
-    private Cursor retrieveCalendarEvents() {
+    private static Cursor retrieveCalendarEvents() {
         Calendar start = Calendar.getInstance();
         Calendar end = Calendar.getInstance();
         end.add(Calendar.MINUTE, 30);
@@ -112,6 +137,4 @@ public class Silencer extends BroadcastReceiver {
             isSilenced = false;
         }
     }
-
-
 }

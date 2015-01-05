@@ -66,7 +66,7 @@ public class SMS_Service extends Service{
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         //start silencer service if necessary
-        if (prefs.getBoolean("silencer_preference", false))
+        if (prefs.getBoolean("silence_preference", false))
             Silencer.startSilencerPoller(getApplicationContext());
 
 		//start driving service if necessary
@@ -103,7 +103,7 @@ public class SMS_Service extends Service{
 			ActivityRecognizer.stopUpdates();
 
         //stop silencer service if necessary
-        if (prefs.getBoolean("silencer_preference", false))
+        if (prefs.getBoolean("silence_preference", false))
             Silencer.stopSilencerPoller();
 		super.onDestroy();
 	}
@@ -157,13 +157,13 @@ public class SMS_Service extends Service{
 
 				//actually driving
 				if(isDriving()){
-                    if (prefs.getBoolean("silencer_preference", false))
+                    if (prefs.getBoolean("silence_preference", false))
                         Silencer.silenceRinger();
 					drivingNotification.displayNotification();
 				}
                 //if not in moving vehicle
                 else if (!ActivityRecognizer.isDriving()) {
-                    if (prefs.getBoolean("silencer_preference", false))
+                    if (prefs.getBoolean("silence_preference", false))
                         Silencer.restoreRingerMode();
                     notificationManager.cancel(11001100);
                 }

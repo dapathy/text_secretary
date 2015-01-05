@@ -67,7 +67,7 @@
 	    <CheckBoxPreference
 		    android:title="Do Not Disturb"
 		    android:summary="Silence your device when Text Secretary would normally auto-reply."
-		    android:key="silencer_preference"
+		    android:key="silence_preference"
 			android:defaultValue="false"/>
 	    
 	    <ListPreference
