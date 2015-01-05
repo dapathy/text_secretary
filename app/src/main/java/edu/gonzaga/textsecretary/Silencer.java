@@ -27,6 +27,7 @@ public class Silencer extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        //don't schedule if silencer is already on
         if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE") && !isSilenced) {
             scheduleSilencing(retrieveCalendarEvents());
         }

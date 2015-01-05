@@ -64,7 +64,11 @@ public class SMS_Service extends Service{
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		prefs.edit().putBoolean("isPassenger", false).apply();		//"set passenget to false on start up
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		
+
+        //start silencer service if necessary
+        if (prefs.getBoolean("silencer_preference", false))
+            Silencer.startSilencerPoller(getApplicationContext());
+
 		//start driving service if necessary
 		if (prefs.getBoolean("driving_preference", false))
 			ActivityRecognizer.startUpdates(getApplicationContext());
@@ -97,6 +101,10 @@ public class SMS_Service extends Service{
 		//stop driving service if necessary
 		if (prefs.getBoolean("driving_preference", false))
 			ActivityRecognizer.stopUpdates();
+
+        //stop silencer service if necessary
+        if (prefs.getBoolean("silencer_preference", false))
+            Silencer.stopSilencerPoller();
 		super.onDestroy();
 	}
 	
