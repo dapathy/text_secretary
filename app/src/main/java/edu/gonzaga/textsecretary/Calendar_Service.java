@@ -11,11 +11,20 @@ import android.provider.CalendarContract.Instances;
 import android.util.Log;
 
 public class Calendar_Service {
+
 	private static final String TAG = "CALENDAR";
 	private Context context;
 	private long eventEnd = Long.MAX_VALUE;
 	private String eventName = "";
-	
+
+    public class ProjectionAttributes {
+        public static final int TITLE = 0;
+        public static final int BEGIN = 1;
+        public static final int END = 2;
+        public static final int AVAILABILITY = 3;
+        public static final int ALL_DAY = 4;
+    }
+
 	public Calendar_Service(Context context){
 		this.context = context;
 	}
@@ -34,17 +43,17 @@ public class Calendar_Service {
 			Cursor calendarCursor = getCursorForDates(cStart, cEnd);
 			//iterate over all events returned by query checking existence during current time
 			while (calendarCursor.moveToNext()){
-				start = calendarCursor.getLong(1);  //BEGIN
-				end = calendarCursor.getLong(2);    //END
+				start = calendarCursor.getLong(ProjectionAttributes.BEGIN);
+				end = calendarCursor.getLong(ProjectionAttributes.END);
 				
 				//adjust start time for all day event
-				if (calendarCursor.getInt(4) == 1)  //ALL_DAY
+				if (calendarCursor.getInt(ProjectionAttributes.ALL_DAY) == 1)
 					start = getAllDayStart(start);
 								
 				//checks if during current time
 				if (start <= currentMillis && end >= currentMillis){
 					eventEnd = end;
-					eventName = calendarCursor.getString(0);    //TITLE
+					eventName = calendarCursor.getString(ProjectionAttributes.TITLE);
 					Log.d(TAG, "event present");
 					calendarCursor.close();
 					return true;
