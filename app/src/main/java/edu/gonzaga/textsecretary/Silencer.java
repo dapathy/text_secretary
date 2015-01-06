@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.AudioManager;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -70,7 +71,7 @@ public class Silencer extends BroadcastReceiver {
         PendingIntent enablePendingIntent = PendingIntent.getBroadcast(mContext, 0, enableIntent, 0);
 
         Intent disableIntent = new Intent(mContext, Silencer.class);
-        enableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
+        disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
         PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
 
         alarmManager.cancel(updatePendingIntent);
@@ -95,13 +96,22 @@ public class Silencer extends BroadcastReceiver {
             Intent enableIntent = new Intent(mContext, Silencer.class);
             enableIntent.setAction("edu.gonzaga.text_secretary.silencer.ENABLE");
             PendingIntent enablePendingIntent = PendingIntent.getBroadcast(mContext, 0, enableIntent, 0);
-            alarmManager.set(AlarmManager.RTC_WAKEUP,start,enablePendingIntent);
 
             //schedule silencer shut off at end of event
             Intent disableIntent = new Intent(mContext, Silencer.class);
             enableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
             PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
-            alarmManager.set(AlarmManager.RTC_WAKEUP,end,disablePendingIntent);
+
+            //if running 4.4 or higher ensure os uses exact timing
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP,start,enablePendingIntent);
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP,end,disablePendingIntent);
+            }
+            //android didn't manage alarms at this point, so use regular method
+            else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP,start,enablePendingIntent);
+                alarmManager.set(AlarmManager.RTC_WAKEUP,end,disablePendingIntent);
+            }
         }
         else
             Log.d(TAG, "event not found");
@@ -111,7 +121,7 @@ public class Silencer extends BroadcastReceiver {
     private static Cursor retrieveCalendarEvents() {
         Calendar start = Calendar.getInstance();
         Calendar end = Calendar.getInstance();
-        end.add(Calendar.MINUTE, 30);
+        end.add(Calendar.DATE, 1);
         return calendarService.getCursorForDates(start, end);
     }
 
