@@ -25,6 +25,7 @@ public class Silencer extends BroadcastReceiver {
     private static int prevRingerMode = SILENCER_GARBAGE_MODE;
     private static Context mContext;
     private static Calendar_Service calendarService;
+    private static AlarmManager alarmManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -48,24 +49,37 @@ public class Silencer extends BroadcastReceiver {
     public static void startSilencerPoller(Context context) {
         mContext = context;
         calendarService = new Calendar_Service(mContext);
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent updateIntent = new Intent(context, Silencer.class);
         updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
         PendingIntent updatePendingIntent = PendingIntent.getBroadcast(context, 0, updateIntent, 0);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,System.currentTimeMillis(),CALENDAR_POLL_FREQ,
                 updatePendingIntent);
 
+        //if silencer enabled while in event, then silence
+        if (calendarService.inEvent()) {
+            silenceRinger();
+            Intent disableIntent = new Intent(mContext, Silencer.class);
+            disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
+            PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
+            setExactAlarm(calendarService.getEventEnd(), disablePendingIntent);
+        }
+
         scheduleSilencing();    //schedule immediately
     }
 
     //remove all alarms
     public static void stopSilencerPoller() {
-        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-
         Intent updateIntent = new Intent(mContext, Silencer.class);
         updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
         PendingIntent updatePendingIntent = PendingIntent.getBroadcast(mContext, 0, updateIntent, 0);
 
+        alarmManager.cancel(updatePendingIntent);
+        cancelSilencerAlarms();
+        restoreRingerMode();
+    }
+
+    private static void cancelSilencerAlarms() {
         Intent enableIntent = new Intent(mContext, Silencer.class);
         enableIntent.setAction("edu.gonzaga.text_secretary.silencer.ENABLE");
         PendingIntent enablePendingIntent = PendingIntent.getBroadcast(mContext, 0, enableIntent, 0);
@@ -74,11 +88,8 @@ public class Silencer extends BroadcastReceiver {
         disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
         PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
 
-        alarmManager.cancel(updatePendingIntent);
         alarmManager.cancel(enablePendingIntent);
         alarmManager.cancel(disablePendingIntent);
-
-        restoreRingerMode();
     }
 
     private static void scheduleSilencing() {
@@ -90,7 +101,6 @@ public class Silencer extends BroadcastReceiver {
             //get first event info
             long start = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
             long end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
-            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
             //schedule silencer enable at start of event
             Intent enableIntent = new Intent(mContext, Silencer.class);
@@ -99,23 +109,27 @@ public class Silencer extends BroadcastReceiver {
 
             //schedule silencer shut off at end of event
             Intent disableIntent = new Intent(mContext, Silencer.class);
-            enableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
+            disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
             PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
 
-            //if running 4.4 or higher ensure os uses exact timing
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP,start,enablePendingIntent);
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP,end,disablePendingIntent);
-            }
-            //android didn't manage alarms at this point, so use regular method
-            else {
-                alarmManager.set(AlarmManager.RTC_WAKEUP,start,enablePendingIntent);
-                alarmManager.set(AlarmManager.RTC_WAKEUP,end,disablePendingIntent);
-            }
+            cancelSilencerAlarms();     //remove previously scheduled alarms
+            setExactAlarm(start, enablePendingIntent);
+            setExactAlarm(end, disablePendingIntent);
         }
         else
             Log.d(TAG, "event not found");
         cursor.close();
+    }
+
+    private static void setExactAlarm(long time, PendingIntent pendingIntent) {
+        //if running 4.4 or higher ensure os uses exact timing
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP,time,pendingIntent);
+        }
+        //android didn't manage alarms at this point, so use regular method
+        else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP,time,pendingIntent);
+        }
     }
 
     private static Cursor retrieveCalendarEvents() {
