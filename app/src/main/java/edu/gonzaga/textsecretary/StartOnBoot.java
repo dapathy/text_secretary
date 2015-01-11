@@ -31,7 +31,4 @@ public class StartOnBoot extends BroadcastReceiver{
 	    	editor.apply();
 		}
 	}
-	
-
-
 }

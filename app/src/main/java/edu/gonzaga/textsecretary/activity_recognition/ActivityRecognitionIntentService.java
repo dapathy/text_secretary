@@ -29,9 +29,12 @@ import android.util.Log;
  */
 public class ActivityRecognitionIntentService extends IntentService {
 	
-	public ActivityRecognitionIntentService() {
+	private ActivityRecognizer activityRecognizer;
+
+    public ActivityRecognitionIntentService() {
         // Set the label for the service's background thread
         super("ActivityRecognitionIntentService");
+        activityRecognizer = ActivityRecognizer.getInstance(null);
     }
 
     /**
@@ -57,7 +60,7 @@ public class ActivityRecognitionIntentService extends IntentService {
 
             // if confident, change overall confidence level
             if (confidence >= 50)
-                ActivityRecognizer.raiseLowerDrivingConfidence(activityType);
+                activityRecognizer.raiseLowerDrivingConfidence(activityType);
 
             decideToBroadcast();
         }
@@ -82,14 +85,14 @@ public class ActivityRecognitionIntentService extends IntentService {
 
     private void decideToBroadcast() {
         //if driving and was not previously driving, broadcast
-        if (ActivityRecognizer.isDriving() && !ActivityRecognizer.wasDriving) {
+        if (activityRecognizer.isDriving() && !activityRecognizer.wasDriving) {
             broadcastActivityState();
-            ActivityRecognizer.wasDriving = true;
+            activityRecognizer.wasDriving = true;
         }
         //if not driving and was previously driving, broadcast
-        else if (!ActivityRecognizer.isDriving() && ActivityRecognizer.wasDriving) {
+        else if (!activityRecognizer.isDriving() && activityRecognizer.wasDriving) {
             broadcastActivityState();
-            ActivityRecognizer.wasDriving = false;
+            activityRecognizer.wasDriving = false;
         }
     }
 

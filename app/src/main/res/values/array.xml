@@ -32,17 +32,5 @@
         <item>3</item>
         <item>4</item>
     </string-array>
-        <string-array name="entries_silencer">
-        <item>Off</item>
-        <item>1) Text messages</item>
-        <item>2) Phone Calls</item>
-        <item>Both 1 and 2</item>
-    </string-array>
-    <string-array name="entryvalues_silencer">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
     
 </resources>
