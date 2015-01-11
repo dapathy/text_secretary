@@ -54,7 +54,7 @@ public class Calendar_Service {
 				if (start <= currentMillis && end >= currentMillis){
 					eventEnd = end;
 					eventName = calendarCursor.getString(ProjectionAttributes.TITLE);
-					Log.d(TAG, "event present");
+					Log.d(TAG, "in event");
 					calendarCursor.close();
 					return true;
 				}
@@ -65,7 +65,7 @@ public class Calendar_Service {
 			Log.d(TAG, e.getMessage());
 		}
 		
-		Log.d(TAG, "not event");
+		Log.d(TAG, "not in event");
 		return false;
 	}
 

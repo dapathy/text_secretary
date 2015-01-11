@@ -304,7 +304,7 @@ public class SMS_Service extends Service{
 	}
 	
 	//converts milliseconds to date
-	private static String convertDateToString (long date){
+	public static String convertDateToString (long date){
 		SimpleDateFormat dateFormat = new SimpleDateFormat ("hh:mm a", Locale.US);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(date);

@@ -37,11 +37,11 @@ public class Silencer {
 
         Intent enableIntent = new Intent(mContext, SilencerReceiver.class);
         enableIntent.setAction("edu.gonzaga.text_secretary.silencer.ENABLE");
-        enablePendingIntent = PendingIntent.getBroadcast(mContext, 0, enableIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        enablePendingIntent = PendingIntent.getBroadcast(mContext, 5222, enableIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent disableIntent = new Intent(mContext, SilencerReceiver.class);
         disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
-        disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        disablePendingIntent = PendingIntent.getBroadcast(mContext, 5223, disableIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public static Silencer getInstance(Context context) {
@@ -60,7 +60,7 @@ public class Silencer {
     public void startSilencerPoller() {
         Intent updateIntent = new Intent(mContext, SilencerReceiver.class);
         updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
-        PendingIntent updatePendingIntent = PendingIntent.getBroadcast(mContext, 0, updateIntent, 0);
+        PendingIntent updatePendingIntent = PendingIntent.getBroadcast(mContext, 5224, updateIntent, 0);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,System.currentTimeMillis(),CALENDAR_POLL_FREQ,
                 updatePendingIntent);
 
@@ -93,16 +93,24 @@ public class Silencer {
 
     protected void scheduleSilencing() {
         Cursor cursor = retrieveCalendarEvents();
+        long tempStart;
+        long end = Long.MAX_VALUE;
+        long start = Long.MAX_VALUE;
 
-        //if event exists
-        if (cursor.moveToNext()) {
-            Log.d(TAG, "event found");
-            //get first event info
-            long start = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
-            long end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
+        //iterate over events
+        while (cursor.moveToNext()) {
+            //get first event
+            tempStart = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
+            if(tempStart < start) {
+                start = tempStart;
+                end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
+            }
+        }
 
+        if (start != Long.MAX_VALUE) {
             setExactAlarm(start, enablePendingIntent);
             setExactAlarm(end, disablePendingIntent);
+            Log.d(TAG, "event found");
         }
         else
             Log.d(TAG, "event not found");
