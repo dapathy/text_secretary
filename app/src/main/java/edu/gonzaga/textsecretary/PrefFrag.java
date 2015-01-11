@@ -60,13 +60,13 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	    			ActivityRecognizer.stopUpdates();
 	    	}	    		
 	    }
-        else if (key.equals("silencer_preference")) {
+        else if (key.equals("silence_preference")) {
             //starts or stops silencer service when selected or deselected on preference screen and sms service is already enabled
             if (sharedPreferences.getBoolean("smsState", false)) {
                 if (sharedPreferences.getBoolean("silence_preference", false))
-                    Silencer.startSilencerPoller(getActivity().getApplicationContext());
+                    Silencer.getInstance(getActivity().getApplicationContext()).startSilencerPoller();
                 else
-                    Silencer.stopSilencerPoller();
+                    Silencer.getInstance(getActivity().getApplicationContext()).stopSilencerPoller();
             }
         }
 	}

@@ -96,24 +96,11 @@ public class ServiceListFragment extends ListFragment{
 				list.add(putData("Notifications", "OFF"));
 
 	    	//Do Not Disturb
-	        String silencerType = prefs.getString("silencer_preference", "0");
-	        switch(silencerType){
-	        case "0":
-	        	list.add(putData("Do Not Disturb", "Off"));
-	        	break;
-	        case "1":
-	        	list.add(putData("Do Not Disturb", "Texts"));
-	        	break;
-        	case "2":
-        		list.add(putData("Do Not Disturb", "Calls"));
-        		break;
-        	case "3":
-        		list.add(putData("Do Not Disturb", "Texts & Calls"));
-        		break;
-        	default:
-        		break;
-	        }
-			
+	        if (prefs.getBoolean("silence_preference", false))
+                list.add(putData("Do Not Disturb", "ON"));
+            else
+                list.add(putData("Do Not Disturb", "OFF"));
+
 			//Single Response
 	        long singleResponse = Long.valueOf(prefs.getString("single_response_preference", "0"));
 	        if (singleResponse == 0)

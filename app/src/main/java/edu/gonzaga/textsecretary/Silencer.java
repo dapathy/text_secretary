@@ -19,13 +19,43 @@ public class Silencer extends BroadcastReceiver {
 
     private static final int SILENCER_GARBAGE_MODE = 100;   //used for when silencer is not active
     private static final int CALENDAR_POLL_FREQ = 15 * 60 * 1000;   //15 minutes
-
     private static final String TAG = "SILENCER";
-    private static boolean isSilenced = false;
-    private static int prevRingerMode = SILENCER_GARBAGE_MODE;
-    private static Context mContext;
-    private static Calendar_Service calendarService;
-    private static AlarmManager alarmManager;
+
+    private static volatile Silencer instance;   //instance of self
+    private boolean isSilenced = false;
+    private int prevRingerMode = SILENCER_GARBAGE_MODE;
+    private Context mContext;
+    private Calendar_Service calendarService;
+    private AlarmManager alarmManager;
+    private PendingIntent enablePendingIntent;
+    private PendingIntent disablePendingIntent;
+
+    //do not create an instance
+    private Silencer (Context context) {
+        mContext = context;
+        calendarService = new Calendar_Service(mContext);
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent enableIntent = new Intent(mContext, Silencer.class);
+        enableIntent.setAction("edu.gonzaga.text_secretary.silencer.ENABLE");
+        enablePendingIntent = PendingIntent.getBroadcast(mContext, 0, enableIntent, 0);
+
+        Intent disableIntent = new Intent(mContext, Silencer.class);
+        disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
+        disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
+    }
+
+    public static Silencer getInstance(Context context) {
+        if (instance == null) {
+            synchronized (Silencer.class) {
+                if (instance == null) {
+                    instance = new Silencer(context);
+                }
+            }
+        }
+
+        return instance;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -46,30 +76,25 @@ public class Silencer extends BroadcastReceiver {
     }
 
     //starts periodic check of calendar for times to enable/disable silencer
-    public static void startSilencerPoller(Context context) {
-        mContext = context;
-        calendarService = new Calendar_Service(mContext);
-        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent updateIntent = new Intent(context, Silencer.class);
+    public void startSilencerPoller() {
+        Intent updateIntent = new Intent(mContext, Silencer.class);
         updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
-        PendingIntent updatePendingIntent = PendingIntent.getBroadcast(context, 0, updateIntent, 0);
+        PendingIntent updatePendingIntent = PendingIntent.getBroadcast(mContext, 0, updateIntent, 0);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,System.currentTimeMillis(),CALENDAR_POLL_FREQ,
                 updatePendingIntent);
 
         //if silencer enabled while in event, then silence
         if (calendarService.inEvent()) {
             silenceRinger();
-            Intent disableIntent = new Intent(mContext, Silencer.class);
-            disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
-            PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
             setExactAlarm(calendarService.getEventEnd(), disablePendingIntent);
         }
 
         scheduleSilencing();    //schedule immediately
+        Log.d(TAG, "started poller");
     }
 
     //remove all alarms
-    public static void stopSilencerPoller() {
+    public void stopSilencerPoller() {
         Intent updateIntent = new Intent(mContext, Silencer.class);
         updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
         PendingIntent updatePendingIntent = PendingIntent.getBroadcast(mContext, 0, updateIntent, 0);
@@ -77,22 +102,15 @@ public class Silencer extends BroadcastReceiver {
         alarmManager.cancel(updatePendingIntent);
         cancelSilencerAlarms();
         restoreRingerMode();
+        Log.d(TAG, "stopped poller");
     }
 
-    private static void cancelSilencerAlarms() {
-        Intent enableIntent = new Intent(mContext, Silencer.class);
-        enableIntent.setAction("edu.gonzaga.text_secretary.silencer.ENABLE");
-        PendingIntent enablePendingIntent = PendingIntent.getBroadcast(mContext, 0, enableIntent, 0);
-
-        Intent disableIntent = new Intent(mContext, Silencer.class);
-        disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
-        PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
-
+    private void cancelSilencerAlarms() {
         alarmManager.cancel(enablePendingIntent);
         alarmManager.cancel(disablePendingIntent);
     }
 
-    private static void scheduleSilencing() {
+    private void scheduleSilencing() {
         Cursor cursor = retrieveCalendarEvents();
 
         //if event exists
@@ -101,16 +119,6 @@ public class Silencer extends BroadcastReceiver {
             //get first event info
             long start = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
             long end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
-
-            //schedule silencer enable at start of event
-            Intent enableIntent = new Intent(mContext, Silencer.class);
-            enableIntent.setAction("edu.gonzaga.text_secretary.silencer.ENABLE");
-            PendingIntent enablePendingIntent = PendingIntent.getBroadcast(mContext, 0, enableIntent, 0);
-
-            //schedule silencer shut off at end of event
-            Intent disableIntent = new Intent(mContext, Silencer.class);
-            disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
-            PendingIntent disablePendingIntent = PendingIntent.getBroadcast(mContext, 0, disableIntent, 0);
 
             cancelSilencerAlarms();     //remove previously scheduled alarms
             setExactAlarm(start, enablePendingIntent);
@@ -121,7 +129,7 @@ public class Silencer extends BroadcastReceiver {
         cursor.close();
     }
 
-    private static void setExactAlarm(long time, PendingIntent pendingIntent) {
+    private void setExactAlarm(long time, PendingIntent pendingIntent) {
         //if running 4.4 or higher ensure os uses exact timing
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP,time,pendingIntent);
@@ -132,14 +140,14 @@ public class Silencer extends BroadcastReceiver {
         }
     }
 
-    private static Cursor retrieveCalendarEvents() {
+    private Cursor retrieveCalendarEvents() {
         Calendar start = Calendar.getInstance();
         Calendar end = Calendar.getInstance();
         end.add(Calendar.DATE, 1);
         return calendarService.getCursorForDates(start, end);
     }
 
-    public static void silenceRinger() {
+    public void silenceRinger() {
         AudioManager ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         int tempRingerMode = ringerManager.getRingerMode();
         //prevents possible conflicts between listeners
@@ -151,7 +159,7 @@ public class Silencer extends BroadcastReceiver {
         }
     }
 
-    public static void restoreRingerMode() {
+    public void restoreRingerMode() {
         Log.d(TAG, prevRingerMode + " restore");
         //if restore necessary
         if (prevRingerMode != SILENCER_GARBAGE_MODE) {
