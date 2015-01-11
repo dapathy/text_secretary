@@ -52,14 +52,23 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	        messagePreference.setEnabled(!sharedPreferences.getBoolean("calendar_preference", false));
 	    }
 	    else if (key.equals("driving_preference")){
-	    	//starts or stops services when selected or deselected on preference screen and sms service is already enabled
+	    	//starts or stops driving service when selected or deselected on preference screen and sms service is already enabled
 	    	if (sharedPreferences.getBoolean("smsState", false)) {
 	    		if (sharedPreferences.getBoolean("driving_preference", false))
-	    			ActivityRecognizer.startUpdates(getActivity().getApplicationContext());
+	    			ActivityRecognizer.getInstance(getActivity().getApplicationContext()).startUpdates();
 	    		else
-	    			ActivityRecognizer.stopUpdates();
+	    			ActivityRecognizer.getInstance(getActivity().getApplicationContext()).stopUpdates();
 	    	}	    		
 	    }
+        else if (key.equals("silence_preference")) {
+            //starts or stops silencer service when selected or deselected on preference screen and sms service is already enabled
+            if (sharedPreferences.getBoolean("smsState", false)) {
+                if (sharedPreferences.getBoolean("silence_preference", false))
+                    Silencer.getInstance(getActivity().getApplicationContext()).startSilencerPoller();
+                else
+                    Silencer.getInstance(getActivity().getApplicationContext()).stopSilencerPoller();
+            }
+        }
 	}
 
     private void changeUnlockMsg() {

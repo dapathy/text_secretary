@@ -14,14 +14,31 @@ import edu.gonzaga.textsecretary.activity_recognition.ActivityUtils.REQUEST_TYPE
 
 public class ActivityRecognizer {
 	
-	protected static boolean wasDriving;
-    protected static int drivingConfidence;     // -2 <= dC <= 3
-	private static REQUEST_TYPE mRequestType;
-	private static DetectionRequester mDetectionRequester;
-    private static DetectionRemover mDetectionRemover;
-    private static Context mContext;
+	private static volatile ActivityRecognizer instance;    //instance of self
+    protected boolean wasDriving;
+    protected int drivingConfidence;     // -2 <= dC <= 3
+	private REQUEST_TYPE mRequestType;
+	private DetectionRequester mDetectionRequester;
+    private DetectionRemover mDetectionRemover;
+    private Context mContext;
+
+    private ActivityRecognizer (Context context) {
+        mContext = context;
+    }
+
+    public static ActivityRecognizer getInstance(Context context) {
+        if (instance == null) {
+            synchronized (ActivityRecognizer.class) {
+                if (instance == null) {
+                    instance = new ActivityRecognizer(context);
+                }
+            }
+        }
+
+        return instance;
+    }
     
-    private static boolean servicesConnected() {
+    private boolean servicesConnected() {
         // Check that Google Play services is available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
 
@@ -30,12 +47,11 @@ public class ActivityRecognizer {
     }
 	
 	//start listening for updates
-	public static void startUpdates(Context context) {
+	public void startUpdates() {
 		wasDriving = false;
         drivingConfidence = 0;
-		mDetectionRequester = new DetectionRequester(context);
-        mDetectionRemover = new DetectionRemover(context);
-        mContext = context;
+		mDetectionRequester = new DetectionRequester(mContext);
+        mDetectionRemover = new DetectionRemover(mContext);
         
         // Check for Google Play services
         if (!servicesConnected()) {
@@ -50,10 +66,11 @@ public class ActivityRecognizer {
 
         // Pass the update request to the requester object
         mDetectionRequester.requestUpdates();
+        Log.d(ActivityUtils.APPTAG, "started driving service");
     }
 	
 	//stop checking for activity updates
-	public static void stopUpdates() {
+	public void stopUpdates() {
         // Check for Google Play services
         if (!servicesConnected()) {
             return;
@@ -76,9 +93,10 @@ public class ActivityRecognizer {
         
         //kill any remaining notification
         ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11001100);
+        Log.d(ActivityUtils.APPTAG, "stopped driving service");
     }
 
-    protected static void raiseLowerDrivingConfidence(int activityType) {
+    protected void raiseLowerDrivingConfidence(int activityType) {
         //if driving
         if (((activityType == DetectedActivity.IN_VEHICLE) || (activityType == DetectedActivity.ON_BICYCLE)) && (drivingConfidence < 3))
             drivingConfidence += 1;
@@ -143,7 +161,7 @@ public class ActivityRecognizer {
         }
     }
 
-    public static boolean isDriving() {
+    public boolean isDriving() {
         return drivingConfidence > 0;
     }
 }

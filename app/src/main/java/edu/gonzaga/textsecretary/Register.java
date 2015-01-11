@@ -15,7 +15,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -27,7 +26,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	private boolean problemHappened = false;
 	
     // JSON parser class
-    JSONParser jsonParser = new JSONParser();
+    private JSONParser jsonParser = new JSONParser();
 
     //server URL:
     private static final String LOGIN_URL = "http://gonzagakennelclub.com/textsecretary/register.php";
@@ -206,33 +205,4 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 			Log.w(TAG, e.getMessage());
     	}
     }
-
-	//This dialogue informs user that they're period is over
-	private void showTrialOver(){
-		try{
-	        Intent serviceIntent = new Intent(mContext, SMS_Service.class);
-	        mContext.stopService(serviceIntent);
-	
-			new AlertDialog.Builder(mContext)
-		    .setTitle("End of Trial Period")
-		    .setMessage("Your 30 day trial period of Text Secretary is over. Please go to the bottom of the settings page to purchase the unlock.")
-		    .setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int which) {
-		        	//go to settings intent to purchase
-		        	Intent intent = new Intent(mContext, SettingsActivity.class);
-		        	mContext.startActivity(intent);
-		        }
-		     })
-		    .setNegativeButton("Exit application", new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int which) {
-		        	System.exit(1);
-		        }
-		     })
-		     .show();
-		} catch(Exception e){
-			//not in main activity, not a problem
-			Log.w(TAG, e.getMessage());
-		}
-	}
-
 }
