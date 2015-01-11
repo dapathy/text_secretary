@@ -16,7 +16,7 @@ public class ActivityRecognizer {
 	
 	private static volatile ActivityRecognizer instance;    //instance of self
     protected boolean wasDriving;
-    protected static int drivingConfidence;     // -2 <= dC <= 3
+    protected int drivingConfidence;     // -2 <= dC <= 3
 	private REQUEST_TYPE mRequestType;
 	private DetectionRequester mDetectionRequester;
     private DetectionRemover mDetectionRemover;
