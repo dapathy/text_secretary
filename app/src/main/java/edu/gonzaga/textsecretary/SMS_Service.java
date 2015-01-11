@@ -51,6 +51,8 @@ public class SMS_Service extends Service{
 	private HashMap<String, Long> recentNumbers = new HashMap<>();
 	private boolean listenerLock = false;
 	private DrivingNotification drivingNotification = new DrivingNotification(this);
+    private Silencer silencer;
+    private ActivityRecognizer activityRecognizer;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -64,14 +66,16 @@ public class SMS_Service extends Service{
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		prefs.edit().putBoolean("isPassenger", false).apply();		//"set passenget to false on start up
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        silencer = Silencer.getInstance(getApplicationContext());
+        activityRecognizer = ActivityRecognizer.getInstance(getApplicationContext());
 
         //start silencer service if necessary
         if (prefs.getBoolean("silence_preference", false))
-            Silencer.getInstance(getApplicationContext()).startSilencerPoller();
+            silencer.startSilencerPoller();
 
 		//start driving service if necessary
 		if (prefs.getBoolean("driving_preference", false))
-			ActivityRecognizer.startUpdates(getApplicationContext());
+            activityRecognizer.startUpdates();
 		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction("android.provider.Telephony.SMS_RECEIVED");
@@ -100,11 +104,11 @@ public class SMS_Service extends Service{
 		
 		//stop driving service if necessary
 		if (prefs.getBoolean("driving_preference", false))
-			ActivityRecognizer.stopUpdates();
+            activityRecognizer.stopUpdates();
 
         //stop silencer service if necessary
         if (prefs.getBoolean("silence_preference", false))
-            Silencer.getInstance(getApplicationContext()).stopSilencerPoller();
+            silencer.stopSilencerPoller();
 		super.onDestroy();
 	}
 	
@@ -158,13 +162,13 @@ public class SMS_Service extends Service{
 				//actually driving
 				if(isDriving()){
                     if (prefs.getBoolean("silence_preference", false))
-                        Silencer.getInstance(getApplicationContext()).silenceRinger();
+                        silencer.silenceRinger();
 					drivingNotification.displayNotification();
 				}
                 //if not in moving vehicle
-                else if (!ActivityRecognizer.isDriving()) {
+                else if (!activityRecognizer.isDriving()) {
                     if (prefs.getBoolean("silence_preference", false))
-                        Silencer.getInstance(getApplicationContext()).restoreRingerMode();
+                        silencer.restoreRingerMode();
                     notificationManager.cancel(11001100);
                 }
 			}
@@ -401,7 +405,7 @@ public class SMS_Service extends Service{
     }
     
     private boolean isDriving() {
-    	return ActivityRecognizer.isDriving() && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
+    	return activityRecognizer.isDriving() && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
     }
     
     private boolean shouldAlwaysReply() {

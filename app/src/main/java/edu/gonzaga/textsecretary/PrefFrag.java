@@ -55,9 +55,9 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 	    	//starts or stops driving service when selected or deselected on preference screen and sms service is already enabled
 	    	if (sharedPreferences.getBoolean("smsState", false)) {
 	    		if (sharedPreferences.getBoolean("driving_preference", false))
-	    			ActivityRecognizer.startUpdates(getActivity().getApplicationContext());
+	    			ActivityRecognizer.getInstance(getActivity().getApplicationContext()).startUpdates();
 	    		else
-	    			ActivityRecognizer.stopUpdates();
+	    			ActivityRecognizer.getInstance(getActivity().getApplicationContext()).stopUpdates();
 	    	}	    		
 	    }
         else if (key.equals("silence_preference")) {
