@@ -82,7 +82,7 @@
 		<receiver 
 		    android:name="edu.gonzaga.textsecretary.Driving_Temp_Off"/>
 
-        <receiver android:name=".Silencer"/>
+        <receiver android:name="edu.gonzaga.textsecretary.SilencerReceiver"/>
 
     </application>
 
