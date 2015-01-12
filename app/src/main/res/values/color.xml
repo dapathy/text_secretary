@@ -5,8 +5,10 @@
         <item name="stateOn" type="color">#67aa47</item>
         <item name="stateOff" type="color">#b34848</item>
         <item name="grey" type="color">#171717</item>
+        <item name="abGrey" type="color">#212121</item>
         <item name="lightgrey" type="color">#4b4b4b</item>
         <item name="lightestgrey" type="color">#DBDBDB</item>
         <item name="white" type="color">#ffffff</item>
+
         
 </resources>

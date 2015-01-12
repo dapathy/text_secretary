@@ -8,9 +8,6 @@ import com.astuetz.PagerSlidingTabStrip;
 
 public class Help_Activity extends FragmentActivity {
 
-	private ViewPager viewPager;
-    PagerSlidingTabStrip tabs;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,12 +15,12 @@ public class Help_Activity extends FragmentActivity {
 
         //set View Pager (ability to swipe the view from left to right)
         //and set its adapter
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(new Help_Adapter(getSupportFragmentManager()));
 
         // Give the SlidingTabLayout the ViewPager, this must be done AFTER the ViewPager has had
         // it's PagerAdapter set.
-        tabs = (PagerSlidingTabStrip) findViewById(R.id.sliding_tabs);
+        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.sliding_tabs);
         tabs.setViewPager(viewPager);
     }
 }
