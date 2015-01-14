@@ -63,10 +63,9 @@ public class Silencer {
 
     //starts periodic check of calendar for times to enable/disable silencer
     public void startSilencerPoller() {
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,System.currentTimeMillis(),AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(),AlarmManager.INTERVAL_FIFTEEN_MINUTES,
                 updatePendingIntent);
 
-        scheduleSilencing();    //schedule immediately
         Log.d(TAG, "started poller");
     }
 
