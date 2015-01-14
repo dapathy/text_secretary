@@ -10,6 +10,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.DetectedActivity;
 
+import edu.gonzaga.textsecretary.Silencer;
 import edu.gonzaga.textsecretary.activity_recognition.ActivityUtils.REQUEST_TYPE;
 
 public class ActivityRecognizer {
@@ -93,6 +94,9 @@ public class ActivityRecognizer {
         
         //kill any remaining notification
         ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11001100);
+        //ensure ringer is restored if necessary
+        if (isDriving())
+            Silencer.getInstance(mContext).restoreRingerMode();
         Log.d(ActivityUtils.APPTAG, "stopped driving service");
     }
 
