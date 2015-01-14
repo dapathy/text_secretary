@@ -17,7 +17,6 @@ import java.util.Calendar;
 public class Silencer {
 
     private static final int SILENCER_GARBAGE_MODE = 100;   //used for when silencer is not active
-    private static final int CALENDAR_POLL_FREQ = 15 * 60 * 1000;   //15 minutes
     private static final String TAG = "SILENCER";
 
     private static volatile Silencer instance;   //instance of self
@@ -28,6 +27,7 @@ public class Silencer {
     private AlarmManager alarmManager;
     private PendingIntent enablePendingIntent;
     private PendingIntent disablePendingIntent;
+    private PendingIntent updatePendingIntent;
 
     //do not create an instance
     private Silencer (Context context) {
@@ -35,6 +35,7 @@ public class Silencer {
         calendarService = new Calendar_Service(mContext);
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
+        //create intents now
         Intent enableIntent = new Intent(mContext, SilencerReceiver.class);
         enableIntent.setAction("edu.gonzaga.text_secretary.silencer.ENABLE");
         enablePendingIntent = PendingIntent.getBroadcast(mContext, 5222, enableIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -42,6 +43,10 @@ public class Silencer {
         Intent disableIntent = new Intent(mContext, SilencerReceiver.class);
         disableIntent.setAction("edu.gonzaga.text_secretary.silencer.DISABLE");
         disablePendingIntent = PendingIntent.getBroadcast(mContext, 5223, disableIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent updateIntent = new Intent(mContext, SilencerReceiver.class);
+        updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
+        updatePendingIntent = PendingIntent.getBroadcast(mContext, 5224, updateIntent, 0);
     }
 
     public static Silencer getInstance(Context context) {
@@ -58,17 +63,8 @@ public class Silencer {
 
     //starts periodic check of calendar for times to enable/disable silencer
     public void startSilencerPoller() {
-        Intent updateIntent = new Intent(mContext, SilencerReceiver.class);
-        updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
-        PendingIntent updatePendingIntent = PendingIntent.getBroadcast(mContext, 5224, updateIntent, 0);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,System.currentTimeMillis(),CALENDAR_POLL_FREQ,
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,System.currentTimeMillis(),AlarmManager.INTERVAL_FIFTEEN_MINUTES,
                 updatePendingIntent);
-
-        //if silencer enabled while in event, then silence
-        if (calendarService.inEvent()) {
-            silenceRinger();
-            setExactAlarm(calendarService.getEventEnd(), disablePendingIntent);
-        }
 
         scheduleSilencing();    //schedule immediately
         Log.d(TAG, "started poller");
@@ -76,45 +72,46 @@ public class Silencer {
 
     //remove all alarms
     public void stopSilencerPoller() {
-        Intent updateIntent = new Intent(mContext, SilencerReceiver.class);
-        updateIntent.setAction("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE");
-        PendingIntent updatePendingIntent = PendingIntent.getBroadcast(mContext, 0, updateIntent, 0);
-
         alarmManager.cancel(updatePendingIntent);
-        cancelSilencerAlarms();
+        alarmManager.cancel(enablePendingIntent);
+        alarmManager.cancel(disablePendingIntent);
+
         restoreRingerMode();
         Log.d(TAG, "stopped poller");
     }
 
-    private void cancelSilencerAlarms() {
-        alarmManager.cancel(enablePendingIntent);
-        alarmManager.cancel(disablePendingIntent);
-    }
-
     protected void scheduleSilencing() {
-        Cursor cursor = retrieveCalendarEvents();
-        long tempStart;
-        long end = Long.MAX_VALUE;
-        long start = Long.MAX_VALUE;
+        //if in event, then silence
+        if (calendarService.inEvent()) {
+            silenceRinger();
+            setExactAlarm(calendarService.getEventEnd(), disablePendingIntent);
+        }
+        //else check future events to schedule
+        else {
+            Cursor cursor = retrieveCalendarEvents();
+            long tempStart;
+            long end = Long.MAX_VALUE;
+            long start = Long.MAX_VALUE;
 
-        //iterate over events
-        while (cursor.moveToNext()) {
-            //get first event
-            tempStart = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
-            if(tempStart < start) {
-                start = tempStart;
-                end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
+            //iterate over events
+            while (cursor.moveToNext()) {
+                //get first event
+                tempStart = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
+                if(tempStart < start) {
+                    start = tempStart;
+                    end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
+                }
             }
-        }
 
-        if (start != Long.MAX_VALUE) {
-            setExactAlarm(start, enablePendingIntent);
-            setExactAlarm(end, disablePendingIntent);
-            Log.d(TAG, "event found");
+            if (start != Long.MAX_VALUE) {
+                setExactAlarm(start, enablePendingIntent);
+                setExactAlarm(end, disablePendingIntent);
+                Log.d(TAG, "event found");
+            }
+            else
+                Log.d(TAG, "event not found");
+            cursor.close();
         }
-        else
-            Log.d(TAG, "event not found");
-        cursor.close();
     }
 
     private void setExactAlarm(long time, PendingIntent pendingIntent) {
