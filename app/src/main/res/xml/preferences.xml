@@ -52,6 +52,12 @@
 
 		<CheckBoxPreference
 			android:defaultValue="false"
+			android:key="silence_preference"
+			android:summary="Silence your device when Text Secretary would normally auto-reply."
+			android:title="Do Not Disturb" />
+
+		<CheckBoxPreference
+			android:defaultValue="false"
 			android:key="start_on_boot_preference"
 			android:summary="Automatically start Text Secretary when you power on your device."
 			android:title="Start Service on Boot" />
@@ -61,12 +67,6 @@
 			android:key="notification_preference"
 			android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
 			android:title="Notifications" />
-
-		<CheckBoxPreference
-			android:defaultValue="false"
-			android:key="silence_preference"
-			android:summary="Silence your device when Text Secretary would normally auto-reply."
-			android:title="Do Not Disturb" />
 
 		<ListPreference
 			android:defaultValue="0"
