@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
- * 
  */
 public class HelpSilencerFragment extends Fragment {
 
@@ -18,7 +17,7 @@ public class HelpSilencerFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+							 Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		return inflater.inflate(R.layout.fragment_help_silencer, container, false);
 	}

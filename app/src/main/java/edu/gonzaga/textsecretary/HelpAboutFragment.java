@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
- * 
  */
 public class HelpAboutFragment extends Fragment {
 
@@ -20,17 +19,17 @@ public class HelpAboutFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+							 Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-	    View myInflatedView =  inflater.inflate(R.layout.fragment_help_about, container, false);
-	    TextView t = (TextView) myInflatedView.findViewById(R.id.aboutVersion);
-	    String versionName = null;
+		View myInflatedView = inflater.inflate(R.layout.fragment_help_about, container, false);
+		TextView t = (TextView) myInflatedView.findViewById(R.id.aboutVersion);
+		String versionName = null;
 		try {
 			versionName = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		}
-	    t.setText("Version: "+ versionName);
+		t.setText("Version: " + versionName);
 		return myInflatedView;
 	}
 }

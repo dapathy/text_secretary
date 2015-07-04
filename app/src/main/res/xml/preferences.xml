@@ -1,93 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    
-   	<ListPreference 
-	    android:title="Reply to:"
-	    android:summary="Select whether an auto reply is sent for missed calls, text messages, or both."
-	    android:key="respond_to_preference"
-	    android:entries="@array/entries_respond_to"
-		android:entryValues="@array/entryvalues_respond_to"
-	    android:dialogTitle="Reply to..."
-		android:defaultValue="3"/>
-    
-	<PreferenceCategory
-       	android:title="Customizable Responses">
-            
-        <EditTextPreference
-        	android:dependency="calendar_preference"
-            android:key="custom_calendar_message_preference"
-            android:title="Response with Calendar On"
-            android:summary="This message supports the [end] and [name] insertables."
-            android:dialogTitle="Enter your custom message:"
-            android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you around [end]."/>
-	    
-        <EditTextPreference
-            android:key="custom_message_preference"
-            android:title="Response with Calendar Off"
-            android:summary="This message is used when Calendar Integration and Driving Detection are both disabled."
-            android:dialogTitle="Enter your custom message:"
-            android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you as soon as possible."/>
-        
-        <EditTextPreference
-            android:dependency="driving_preference"
-            android:key="custom_driving_message_preference"
-            android:title="Response while Driving"
-            android:dialogTitle="Enter your custom message:"
-            android:defaultValue="Sorry, I'm on the road. I'll get back to you as soon as possible."/>
-        
-    </PreferenceCategory>
-    
-    <PreferenceCategory
-        android:title="General">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-		<CheckBoxPreference 
-            android:key="calendar_preference"
-            android:title="Calendar Integration"
-            android:summary="Only auto responds if you are currently in an event marked as busy."
-			android:defaultValue="true"/>
-		
-		<CheckBoxPreference 
-	        android:key="driving_preference"
-	        android:title="Driving Detection"
-	        android:summary="Text Secretary will auto-respond when you are driving."
-	        android:defaultValue="false"/>
+	<ListPreference
+		android:defaultValue="3"
+		android:dialogTitle="Reply to..."
+		android:entries="@array/entries_respond_to"
+		android:entryValues="@array/entryvalues_respond_to"
+		android:key="respond_to_preference"
+		android:summary="Select whether an auto reply is sent for missed calls, text messages, or both."
+		android:title="Reply to:" />
+
+	<PreferenceCategory android:title="Customizable Responses">
+
+		<EditTextPreference
+			android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you around [end]."
+			android:dependency="calendar_preference"
+			android:dialogTitle="Enter your custom message:"
+			android:key="custom_calendar_message_preference"
+			android:summary="This message supports the [end] and [name] insertables."
+			android:title="Response with Calendar On" />
+
+		<EditTextPreference
+			android:defaultValue="Sorry, I'm busy at the moment. I'll get back to you as soon as possible."
+			android:dialogTitle="Enter your custom message:"
+			android:key="custom_message_preference"
+			android:summary="This message is used when Calendar Integration and Driving Detection are both disabled."
+			android:title="Response with Calendar Off" />
+
+		<EditTextPreference
+			android:defaultValue="Sorry, I'm on the road. I'll get back to you as soon as possible."
+			android:dependency="driving_preference"
+			android:dialogTitle="Enter your custom message:"
+			android:key="custom_driving_message_preference"
+			android:title="Response while Driving" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory android:title="General">
 
 		<CheckBoxPreference
-			android:title="Do Not Disturb"
-			android:summary="Silence your device when Text Secretary would normally auto-reply."
+			android:defaultValue="true"
+			android:key="calendar_preference"
+			android:summary="Only auto responds if you are currently in an event marked as busy."
+			android:title="Calendar Integration" />
+
+		<CheckBoxPreference
+			android:defaultValue="false"
+			android:key="driving_preference"
+			android:summary="Text Secretary will auto-respond when you are driving."
+			android:title="Driving Detection" />
+
+		<CheckBoxPreference
+			android:defaultValue="false"
 			android:key="silence_preference"
-			android:defaultValue="false"/>
-        
-        <CheckBoxPreference
+			android:summary="Silence your device when Text Secretary would normally auto-reply."
+			android:title="Do Not Disturb" />
+
+		<CheckBoxPreference
+			android:defaultValue="false"
 			android:key="start_on_boot_preference"
-           	android:title="Start Service on Boot"
-           	android:summary="Automatically start Text Secretary when you power on your device."
-           	android:defaultValue="false"/>
-    
-        <CheckBoxPreference
-            android:key="notification_preference"
-            android:title="Notifications"
-            android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
-            android:defaultValue="true"/>
-	    
-	    <ListPreference
-	        android:key="single_response_preference"
-	        android:title="Single Response"
-	        android:summary="Only respond once to a recipient for a selectable amount of time."
-	        android:entries="@array/entries_single_response"
-	        android:entryValues="@array/entryvalues_single_response"
-	        android:dialogTitle="Single Response delay:"
-            android:defaultValue="0"/>
-            
-    </PreferenceCategory>
-    
-    <PreferenceCategory
-		android:title="Full Version"
-		android:key="Activation">
-	    
-        	<Preference
-            	android:title="Remove Signature"
-                android:key="unlock"/>
-    </PreferenceCategory>
-    
+			android:summary="Automatically start Text Secretary when you power on your device."
+			android:title="Start Service on Boot" />
+
+		<CheckBoxPreference
+			android:defaultValue="true"
+			android:key="notification_preference"
+			android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
+			android:title="Notifications" />
+
+		<ListPreference
+			android:defaultValue="0"
+			android:dialogTitle="Single Response delay:"
+			android:entries="@array/entries_single_response"
+			android:entryValues="@array/entryvalues_single_response"
+			android:key="single_response_preference"
+			android:summary="Only respond once to a recipient for a selectable amount of time."
+			android:title="Single Response" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:key="Activation"
+		android:title="Full Version">
+
+		<Preference
+			android:key="unlock"
+			android:title="Remove Signature" />
+	</PreferenceCategory>
+
 </PreferenceScreen>

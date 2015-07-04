@@ -16,6 +16,16 @@
 
 package edu.gonzaga.textsecretary;
 
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
@@ -26,7 +36,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import android.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -35,29 +44,20 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.text.TextUtils;
-import android.util.Log;
-
 /**
  * Wrapper class for Android's {@link SharedPreferences} interface, which adds a
  * layer of encryption to the persistent storage and retrieval of sensitive
  * key-value pairs of primitive data types.
- * <p>
+ * <p/>
  * This class provides important - but nevertheless imperfect - protection
  * against simple attacks by casual snoopers. It is crucial to remember that
  * even encrypted data may still be susceptible to attacks, especially on rooted
  * or stolen devices!
- * <p>
- * 
+ * <p/>
+ *
  * @see <a
- *      href="http://www.codeproject.com/Articles/549119/Encryption-Wrapper-for-Android-SharedPreferences">CodeProject
- *      article</a>
+ * href="http://www.codeproject.com/Articles/549119/Encryption-Wrapper-for-Android-SharedPreferences">CodeProject
+ * article</a>
  */
 public class SecurePreferences implements SharedPreferences {
 
@@ -71,17 +71,15 @@ public class SecurePreferences implements SharedPreferences {
 	private static final int ITERATIONS = 2000;
 	// change to SC if using Spongycastle crypto libraries
 	private static final String PROVIDER = "BC";
-
+	private static final String TAG = SecurePreferences.class.getName();
 	private static SharedPreferences sFile;
 	private static byte[] sKey;
 	private static boolean sLoggingEnabled = false;
-	private static final String TAG = SecurePreferences.class.getName();
 
 	/**
 	 * Constructor.
-	 * 
-	 * @param context
-	 *            the caller's context
+	 *
+	 * @param context the caller's context
 	 */
 	public SecurePreferences(Context context) {
 		// Proxy design pattern
@@ -139,16 +137,14 @@ public class SecurePreferences implements SharedPreferences {
 
 	/**
 	 * Derive a secure key based on the passphraseOrPin
-	 * 
+	 *
 	 * @param passphraseOrPin
 	 * @param salt
-	 * @param algorthm
-	 *            - which PBE algorthm to use. some <4.0 devices don;t support
-	 *            the prefered PBKDF2WithHmacSHA1
-	 * @param iterations
-	 *            - Number of PBKDF2 hardening rounds to use. Larger values
-	 *            increase computation time (a good thing), defaults to 1000 if
-	 *            not set.
+	 * @param algorthm        - which PBE algorthm to use. some <4.0 devices don;t support
+	 *                        the prefered PBKDF2WithHmacSHA1
+	 * @param iterations      - Number of PBKDF2 hardening rounds to use. Larger values
+	 *                        increase computation time (a good thing), defaults to 1000 if
+	 *                        not set.
 	 * @param keyLength
 	 * @return Derived Secretkey
 	 * @throws NoSuchAlgorithmException
@@ -156,7 +152,7 @@ public class SecurePreferences implements SharedPreferences {
 	 * @throws NoSuchProviderException
 	 */
 	private static SecretKey generatePBEKey(char[] passphraseOrPin,
-			byte[] salt, String algorthm, int iterations, int keyLength)
+											byte[] salt, String algorthm, int iterations, int keyLength)
 			throws NoSuchAlgorithmException, InvalidKeySpecException,
 			NoSuchProviderException {
 
@@ -174,7 +170,7 @@ public class SecurePreferences implements SharedPreferences {
 
 	/**
 	 * Gets the hardware serial number of this device.
-	 * 
+	 *
 	 * @return serial number or Settings.Secure.ANDROID_ID if not available.
 	 */
 	private static String getDeviceSerialNumber(Context context) {
@@ -250,6 +246,14 @@ public class SecurePreferences implements SharedPreferences {
 		}
 	}
 
+	public static boolean isLoggingEnabled() {
+		return sLoggingEnabled;
+	}
+
+	public static void setLoggingEnabled(boolean loggingEnabled) {
+		sLoggingEnabled = loggingEnabled;
+	}
+
 	@Override
 	public Map<String, String> getAll() {
 		final Map<String, ?> encryptedMap = SecurePreferences.sFile.getAll();
@@ -275,10 +279,9 @@ public class SecurePreferences implements SharedPreferences {
 	}
 
 	/**
-	 * 
 	 * Added to get a values as as it can be useful to store values that are
 	 * already encrypted and encoded
-	 * 
+	 *
 	 * @param key
 	 * @param defaultValue
 	 * @return Unencrypted value of the key or the defaultValue if
@@ -372,9 +375,23 @@ public class SecurePreferences implements SharedPreferences {
 		return new Editor();
 	}
 
+	@Override
+	public void registerOnSharedPreferenceChangeListener(
+			OnSharedPreferenceChangeListener listener) {
+		SecurePreferences.sFile
+				.registerOnSharedPreferenceChangeListener(listener);
+	}
+
+	@Override
+	public void unregisterOnSharedPreferenceChangeListener(
+			OnSharedPreferenceChangeListener listener) {
+		SecurePreferences.sFile
+				.unregisterOnSharedPreferenceChangeListener(listener);
+	}
+
 	/**
 	 * Wrapper for Android's {@link android.content.SharedPreferences.Editor}.
-	 * <p>
+	 * <p/>
 	 * Used for modifying values in a {@link SecurePreferences} object. All
 	 * changes you make in an editor are batched, and not copied back to the
 	 * original {@link SecurePreferences} until you call {@link #commit()} or
@@ -400,15 +417,13 @@ public class SecurePreferences implements SharedPreferences {
 		/**
 		 * This is useful for storing values that have be encrypted by something
 		 * else
-		 * 
-		 * @param key
-		 *            - encrypted as usual
-		 * @param value
-		 *            will not be encrypted
+		 *
+		 * @param key   - encrypted as usual
+		 * @param value will not be encrypted
 		 * @return
 		 */
 		public SharedPreferences.Editor putStringNoEncrypted(String key,
-				String value) {
+															 String value) {
 			mEditor.putString(SecurePreferences.encrypt(key), value);
 			return this;
 		}
@@ -416,7 +431,7 @@ public class SecurePreferences implements SharedPreferences {
 		@Override
 		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 		public SharedPreferences.Editor putStringSet(String key,
-				Set<String> values) {
+													 Set<String> values) {
 			final Set<String> encryptedValues = new HashSet<String>(
 					values.size());
 			for (String value : values) {
@@ -481,27 +496,5 @@ public class SecurePreferences implements SharedPreferences {
 				commit();
 			}
 		}
-	}
-
-	public static boolean isLoggingEnabled() {
-		return sLoggingEnabled;
-	}
-
-	public static void setLoggingEnabled(boolean loggingEnabled) {
-		sLoggingEnabled = loggingEnabled;
-	}
-
-	@Override
-	public void registerOnSharedPreferenceChangeListener(
-			OnSharedPreferenceChangeListener listener) {
-		SecurePreferences.sFile
-				.registerOnSharedPreferenceChangeListener(listener);
-	}
-
-	@Override
-	public void unregisterOnSharedPreferenceChangeListener(
-			OnSharedPreferenceChangeListener listener) {
-		SecurePreferences.sFile
-				.unregisterOnSharedPreferenceChangeListener(listener);
 	}
 }

@@ -16,12 +16,6 @@
 
 package edu.gonzaga.textsecretary.activity_recognition;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
-import com.google.android.gms.location.ActivityRecognitionClient;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -30,76 +24,81 @@ import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.ActivityRecognitionClient;
+
 /**
  * Class for connecting to Location Services and removing activity recognition updates.
  * <b>
- * Note: Clients must ensure that Google Play services is available before removing activity 
+ * Note: Clients must ensure that Google Play services is available before removing activity
  * recognition updates.
  * </b> Use GooglePlayServicesUtil.isGooglePlayServicesAvailable() to check.
- *
- *
+ * <p/>
+ * <p/>
  * To use a DetectionRemover, instantiate it, then call removeUpdates().
- *
  */
 public class DetectionRemover
-        implements ConnectionCallbacks, OnConnectionFailedListener {
+		implements ConnectionCallbacks, OnConnectionFailedListener {
 
-    // Storage for a context from the calling client
-    private Context mContext;
+	// Storage for a context from the calling client
+	private Context mContext;
 
-    // Stores the current instantiation of the activity recognition client
-    private ActivityRecognitionClient mActivityRecognitionClient;
+	// Stores the current instantiation of the activity recognition client
+	private ActivityRecognitionClient mActivityRecognitionClient;
 
-    // The PendingIntent sent in removeUpdates()
-    private PendingIntent mCurrentIntent;
+	// The PendingIntent sent in removeUpdates()
+	private PendingIntent mCurrentIntent;
 
 
-    /**
-     * Construct a DetectionRemover for the current Context
-     *
-     * @param context A valid Context
-     */
-    public DetectionRemover(Context context) {
-        // Save the context
-        mContext = context;
+	/**
+	 * Construct a DetectionRemover for the current Context
+	 *
+	 * @param context A valid Context
+	 */
+	public DetectionRemover(Context context) {
+		// Save the context
+		mContext = context;
 
-        // Initialize the globals to null
-        mActivityRecognitionClient = null;
+		// Initialize the globals to null
+		mActivityRecognitionClient = null;
 
-    }
+	}
 
-    /**
-     * Remove the activity recognition updates associated with a PendIntent. The PendingIntent is 
-     * the one used in the request to add activity recognition updates.
-     *
-     * @param requestIntent The PendingIntent used to request activity recognition updates
-     */
-    public void removeUpdates(PendingIntent requestIntent) {
+	/**
+	 * Remove the activity recognition updates associated with a PendIntent. The PendingIntent is
+	 * the one used in the request to add activity recognition updates.
+	 *
+	 * @param requestIntent The PendingIntent used to request activity recognition updates
+	 */
+	public void removeUpdates(PendingIntent requestIntent) {
 
         /*
-         * Set the request type, store the List, and request a activity recognition client
+		 * Set the request type, store the List, and request a activity recognition client
          * connection.
          */
-        mCurrentIntent = requestIntent;
+		mCurrentIntent = requestIntent;
 
-        // Continue the removal by requesting a connection
-        requestConnection();
-    }
+		// Continue the removal by requesting a connection
+		requestConnection();
+	}
 
-    /**
-     * Request a connection to Location Services. This call returns immediately,
-     * but the request is not complete until onConnected() or onConnectionFailure() is called.
-     */
-    private void requestConnection() {
-        getActivityRecognitionClient().connect();
-    }
+	/**
+	 * Request a connection to Location Services. This call returns immediately,
+	 * but the request is not complete until onConnected() or onConnectionFailure() is called.
+	 */
+	private void requestConnection() {
+		getActivityRecognitionClient().connect();
+	}
 
-    /**
-     * Get the current activity recognition client, or create a new one if necessary.
-     *
-     * @return An ActivityRecognitionClient object
-     */
-    public ActivityRecognitionClient getActivityRecognitionClient() {
+	/**
+	 * Get the current activity recognition client, or create a new one if necessary.
+	 *
+	 * @return An ActivityRecognitionClient object
+	 */
+	public ActivityRecognitionClient getActivityRecognitionClient() {
         /*
          * If a client doesn't already exist, create a new one, otherwise
          * return the existing one. This allows multiple attempts to send
@@ -107,85 +106,86 @@ public class DetectionRemover
          * new clients.
          *
          */
-        if (mActivityRecognitionClient == null) {
-            // Create a new one
-            setActivityRecognitionClient(new ActivityRecognitionClient(mContext, this, this));
-        }
-        return mActivityRecognitionClient;
-    }
+		if (mActivityRecognitionClient == null) {
+			// Create a new one
+			setActivityRecognitionClient(new ActivityRecognitionClient(mContext, this, this));
+		}
+		return mActivityRecognitionClient;
+	}
 
-    /**
-     * Get a activity recognition client and disconnect from Location Services
-     */
-    private void requestDisconnection() {
+	/**
+	 * Set the global activity recognition client
+	 *
+	 * @param client An ActivityRecognitionClient object
+	 */
+	public void setActivityRecognitionClient(ActivityRecognitionClient client) {
+		mActivityRecognitionClient = client;
 
-        // Disconnect the client
-        getActivityRecognitionClient().disconnect();
+	}
 
-        // Set the client to null
-        setActivityRecognitionClient(null);
-    }
+	/**
+	 * Get a activity recognition client and disconnect from Location Services
+	 */
+	private void requestDisconnection() {
 
-    /**
-     * Set the global activity recognition client
-     * @param client An ActivityRecognitionClient object
-     */
-    public void setActivityRecognitionClient(ActivityRecognitionClient client) {
-        mActivityRecognitionClient = client;
+		// Disconnect the client
+		getActivityRecognitionClient().disconnect();
 
-    }
+		// Set the client to null
+		setActivityRecognitionClient(null);
+	}
 
-    /*
-     * Called by Location Services once the activity recognition client is connected.
-     *
-     * Continue by removing activity recognition updates.
-     */
-    @Override
-    public void onConnected(Bundle connectionData) {
-        // If debugging, log the connection
-        Log.d(ActivityUtils.APPTAG, "connected to location services");
-        // Send a request to Location Services to remove activity recognition updates
-        continueRemoveUpdates();
-    }
+	/*
+	 * Called by Location Services once the activity recognition client is connected.
+	 *
+	 * Continue by removing activity recognition updates.
+	 */
+	@Override
+	public void onConnected(Bundle connectionData) {
+		// If debugging, log the connection
+		Log.d(ActivityUtils.APPTAG, "connected to location services");
+		// Send a request to Location Services to remove activity recognition updates
+		continueRemoveUpdates();
+	}
 
-    /**
-     * Once the connection is available, send a request to remove activity recognition updates. 
-     */
-    private void continueRemoveUpdates() {
-        
-        // Remove the updates
-        mActivityRecognitionClient.removeActivityUpdates(mCurrentIntent);
+	/**
+	 * Once the connection is available, send a request to remove activity recognition updates.
+	 */
+	private void continueRemoveUpdates() {
+
+		// Remove the updates
+		mActivityRecognitionClient.removeActivityUpdates(mCurrentIntent);
         
         /*
          * Cancel the PendingIntent. This stops Intents from arriving at the IntentService, even if
          * request fails. 
          */
-        mCurrentIntent.cancel();
-        
-        // Disconnect the client
-        requestDisconnection();
-    }
+		mCurrentIntent.cancel();
 
-    /*
-     * Called by Location Services once the activity recognition client is disconnected.
-     */
-    @Override
-    public void onDisconnected() {
+		// Disconnect the client
+		requestDisconnection();
+	}
 
-        // In debug mode, log the disconnection
-        Log.d(ActivityUtils.APPTAG, "disconnected from location services");
+	/*
+	 * Called by Location Services once the activity recognition client is disconnected.
+	 */
+	@Override
+	public void onDisconnected() {
 
-        // Destroy the current activity recognition client
-        mActivityRecognitionClient = null;
-    }
+		// In debug mode, log the disconnection
+		Log.d(ActivityUtils.APPTAG, "disconnected from location services");
 
-    /*
-     * Implementation of OnConnectionFailedListener.onConnectionFailed
-     * If a connection or disconnection request fails, report the error
-     * connectionResult is passed in from Location Services
-     */
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+		// Destroy the current activity recognition client
+		mActivityRecognitionClient = null;
+	}
+
+	/*
+	 * Implementation of OnConnectionFailedListener.onConnectionFailed
+	 * If a connection or disconnection request fails, report the error
+	 * connectionResult is passed in from Location Services
+	 */
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
 
         /*
          * Google Play services can resolve some errors it detects.
@@ -193,19 +193,19 @@ public class DetectionRemover
          * start a Google Play services activity that can resolve
          * error.
          */
-        if (connectionResult.hasResolution()) {
+		if (connectionResult.hasResolution()) {
 
-            try {
-                connectionResult.startResolutionForResult((Activity) mContext,
-                    ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+			try {
+				connectionResult.startResolutionForResult((Activity) mContext,
+						ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
 
             /*
              * Thrown if Google Play services canceled the original
              * PendingIntent
              */
-            } catch (SendIntentException e) {
-               // display an error or log it here.
-            }
+			} catch (SendIntentException e) {
+				// display an error or log it here.
+			}
 
         /*
          * If no resolution is available, display Google
@@ -213,14 +213,14 @@ public class DetectionRemover
          * user to Google Play Store if Google Play services
          * is out of date.
          */
-        } else {
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
-                            connectionResult.getErrorCode(),
-                            (Activity) mContext,
-                            ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            if (dialog != null) {
-                dialog.show();
-            }
-        }
-    }
+		} else {
+			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
+					connectionResult.getErrorCode(),
+					(Activity) mContext,
+					ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+			if (dialog != null) {
+				dialog.show();
+			}
+		}
+	}
 }

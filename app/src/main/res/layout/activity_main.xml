@@ -1,111 +1,108 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/grey"
-    android:paddingBottom="0dp"
-    android:paddingLeft="0dp"
-    android:paddingRight="0dp"
-    android:paddingTop="0dp"
-    tools:context="edu.gonzaga.textsecretary.MainActivity$PlaceholderFragment" >
-    
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="fill_parent"
-        android:layout_height="170dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/shapes" >
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@color/grey"
+	android:paddingBottom="0dp"
+	android:paddingLeft="0dp"
+	android:paddingRight="0dp"
+	android:paddingTop="0dp"
+	tools:context="edu.gonzaga.textsecretary.MainActivity$PlaceholderFragment">
 
-        <ImageButton
-            android:id="@+id/stateImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:background="@null"
-            android:paddingTop="20dp"
-            android:src="@drawable/button_on" 
-            android:contentDescription="@string/image_state"/>
-        
-    </RelativeLayout>
+	<RelativeLayout
+		android:id="@+id/relativeLayout1"
+		android:layout_width="fill_parent"
+		android:layout_height="170dp"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentTop="true"
+		android:background="@drawable/shapes">
 
-    <RelativeLayout
-        android:id="@+id/bottomBar"
-        android:layout_width="fill_parent"
-        android:layout_height="20dp"
-        android:layout_marginTop="155dp"
-        android:background="@drawable/lowbaron" >
-    </RelativeLayout>
+		<ImageButton
+			android:id="@+id/stateImage"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentTop="true"
+			android:layout_centerHorizontal="true"
+			android:background="@null"
+			android:contentDescription="@string/image_state"
+			android:paddingTop="20dp"
+			android:src="@drawable/button_on" />
 
-    <RelativeLayout
-        android:id="@+id/bottomHalf"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/bottomBar"
-        android:background="@color/white"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
+	</RelativeLayout>
 
-        <TextView
-            android:id="@+id/customTextTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="11dp"
-            android:text="@string/current_message"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/lightgrey"
-            android:textSize="20sp"
-            android:typeface="normal" />
+	<RelativeLayout
+		android:id="@+id/bottomBar"
+		android:layout_width="fill_parent"
+		android:layout_height="20dp"
+		android:layout_marginTop="155dp"
+		android:background="@drawable/lowbaron"></RelativeLayout>
 
-        <EditText
-            android:id="@+id/customMessage"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/customTextTitle"
-            android:layout_below="@+id/customTextTitle"
-            android:clickable="false"
-            android:cursorVisible="false"
-            android:ems="10"
-            android:focusable="false"
-            android:inputType="textMultiLine"
-            android:textSize="20sp" >
-        </EditText>
+	<RelativeLayout
+		android:id="@+id/bottomHalf"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/bottomBar"
+		android:background="@color/white"
+		android:paddingLeft="10dp"
+		android:paddingRight="10dp">
 
-        <TextView
-            android:id="@+id/customServices"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/customMessage"
-            android:layout_below="@+id/customMessage"
-            android:paddingTop="10dp"
-            android:text="@string/current_services"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/lightgrey"
-            android:textSize="20sp"
-            android:typeface="normal" />
-    </RelativeLayout>
+		<TextView
+			android:id="@+id/customTextTitle"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true"
+			android:layout_marginTop="11dp"
+			android:text="@string/current_message"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:textColor="@color/lightgrey"
+			android:textSize="20sp"
+			android:typeface="normal" />
 
-    <RelativeLayout
-        android:paddingLeft="12dp"
-        android:id="@+id/listFragmentLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:paddingRight="12dp"
-        android:background="@color/white"
-        android:layout_below="@+id/bottomHalf" >
-    </RelativeLayout>
+		<EditText
+			android:id="@+id/customMessage"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignLeft="@+id/customTextTitle"
+			android:layout_below="@+id/customTextTitle"
+			android:clickable="false"
+			android:cursorVisible="false"
+			android:ems="10"
+			android:focusable="false"
+			android:inputType="textMultiLine"
+			android:textSize="20sp"></EditText>
 
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:indeterminate="true" />
+		<TextView
+			android:id="@+id/customServices"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignLeft="@+id/customMessage"
+			android:layout_below="@+id/customMessage"
+			android:paddingTop="10dp"
+			android:text="@string/current_services"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:textColor="@color/lightgrey"
+			android:textSize="20sp"
+			android:typeface="normal" />
+	</RelativeLayout>
+
+	<RelativeLayout
+		android:id="@+id/listFragmentLayout"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@+id/bottomHalf"
+		android:background="@color/white"
+		android:paddingLeft="12dp"
+		android:paddingRight="12dp"></RelativeLayout>
+
+	<ProgressBar
+		android:id="@+id/progressBar1"
+		style="?android:attr/progressBarStyleLarge"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerInParent="true"
+		android:indeterminate="true" />
 
 </RelativeLayout>

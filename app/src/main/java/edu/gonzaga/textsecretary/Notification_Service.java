@@ -11,15 +11,15 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
-public class Notification_Service{
+public class Notification_Service {
 	private static final String TAG = "NOTIFICATION";
 	private Context mContext;
-	   
-	public Notification_Service (Context context){
+
+	public Notification_Service(Context context) {
 		mContext = context;
 	}
-	
-	private String getId(String number){
+
+	private String getId(String number) {
 		String id = "";
 		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
 		String[] projection = new String[]{
@@ -27,10 +27,9 @@ public class Notification_Service{
 		};
 		Cursor contactCursor = mContext.getContentResolver().query(uri, projection, null, null, null);
 		Log.d(TAG, "query completed");
-		if (contactCursor.moveToFirst()){
+		if (contactCursor.moveToFirst()) {
 			id = contactCursor.getString(0);
-		}
-		else{
+		} else {
 			id = number;
 		}
 		contactCursor.close();
@@ -39,21 +38,21 @@ public class Notification_Service{
 
 	public void displayNotification(String number) {
 		Log.d(TAG, "notification");
-		
+
 		String id = getId(number);
-		
+
 		/* Invoking the default notification service */
-		NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(mContext);	
-		
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext);
+
 		mBuilder.setContentTitle("Auto Replied");
 		mBuilder.setContentText("Text Secretary auto replied to: " + id);
 		mBuilder.setTicker("Text Secretary Auto Reply");
 		mBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
 		mBuilder.setAutoCancel(true);
-	      
+
 		/* Creates an explicit intent for an Activity in your app */
 		Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null));
-	
+
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
 		//stackBuilder.addParentStack(NotificationView.class);
 	
@@ -63,17 +62,17 @@ public class Notification_Service{
 				stackBuilder.getPendingIntent(
 						0,
 						PendingIntent.FLAG_UPDATE_CURRENT
-						);
-	         
+				);
+
 		mBuilder.setContentIntent(resultPendingIntent);
 
-        NotificationManager mNotificationManager =
+		NotificationManager mNotificationManager =
 				(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-		
-	    int randomInt = (int)(1000.0 * Math.random());
+
+		int randomInt = (int) (1000.0 * Math.random());
 		//int notificationID = 100;
 		/* notificationID allows you to update the notification later on. */
-		mNotificationManager.notify(randomInt , mBuilder.build());
+		mNotificationManager.notify(randomInt, mBuilder.build());
 	}
 
 }
