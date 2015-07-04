@@ -42,146 +42,146 @@ import com.google.android.gms.location.ActivityRecognitionClient;
  * automatically.
  */
 public class DetectionRequester
-        implements ConnectionCallbacks, OnConnectionFailedListener {
+		implements ConnectionCallbacks, OnConnectionFailedListener {
 
-    // Storage for a context from the calling client
-    private Context mContext;
+	// Storage for a context from the calling client
+	private Context mContext;
 
-    // Stores the PendingIntent used to send activity recognition events back to the app
-    private PendingIntent mActivityRecognitionPendingIntent;
+	// Stores the PendingIntent used to send activity recognition events back to the app
+	private PendingIntent mActivityRecognitionPendingIntent;
 
-    // Stores the current instantiation of the activity recognition client
-    private ActivityRecognitionClient mActivityRecognitionClient;
+	// Stores the current instantiation of the activity recognition client
+	private ActivityRecognitionClient mActivityRecognitionClient;
 
-    public DetectionRequester(Context context) {
-        // Save the context
-        mContext = context;
+	public DetectionRequester(Context context) {
+		// Save the context
+		mContext = context;
 
-        // Initialize the globals to null
-        mActivityRecognitionPendingIntent = null;
-        mActivityRecognitionClient = null;
+		// Initialize the globals to null
+		mActivityRecognitionPendingIntent = null;
+		mActivityRecognitionClient = null;
 
-    }
+	}
 
-    /**
-     * Returns the current PendingIntent to the caller.
-     *
-     * @return The PendingIntent used to request activity recognition updates
-     */
-    public PendingIntent getRequestPendingIntent() {
-        return mActivityRecognitionPendingIntent;
-    }
+	/**
+	 * Returns the current PendingIntent to the caller.
+	 *
+	 * @return The PendingIntent used to request activity recognition updates
+	 */
+	public PendingIntent getRequestPendingIntent() {
+		return mActivityRecognitionPendingIntent;
+	}
 
-    /**
-     * Sets the PendingIntent used to make activity recognition update requests
-     *
-     * @param intent The PendingIntent
-     */
-    public void setRequestPendingIntent(PendingIntent intent) {
-        mActivityRecognitionPendingIntent = intent;
-    }
+	/**
+	 * Sets the PendingIntent used to make activity recognition update requests
+	 *
+	 * @param intent The PendingIntent
+	 */
+	public void setRequestPendingIntent(PendingIntent intent) {
+		mActivityRecognitionPendingIntent = intent;
+	}
 
-    /**
-     * Start the activity recognition update request process by
-     * getting a connection.
-     */
-    public void requestUpdates() {
-        requestConnection();
-    }
+	/**
+	 * Start the activity recognition update request process by
+	 * getting a connection.
+	 */
+	public void requestUpdates() {
+		requestConnection();
+	}
 
-    /**
-     * Make the actual update request. This is called from onConnected().
-     */
-    private void continueRequestActivityUpdates() {
-        /*
+	/**
+	 * Make the actual update request. This is called from onConnected().
+	 */
+	private void continueRequestActivityUpdates() {
+		/*
          * Request updates, using the default detection interval.
          * The PendingIntent sends updates to ActivityRecognitionIntentService
          */
-        getActivityRecognitionClient().requestActivityUpdates(
-                ActivityUtils.DETECTION_INTERVAL_MILLISECONDS,
-                createRequestPendingIntent());
+		getActivityRecognitionClient().requestActivityUpdates(
+				ActivityUtils.DETECTION_INTERVAL_MILLISECONDS,
+				createRequestPendingIntent());
 
-        // Disconnect the client
-        requestDisconnection();
-    }
+		// Disconnect the client
+		requestDisconnection();
+	}
 
-    /**
-     * Request a connection to Location Services. This call returns immediately,
-     * but the request is not complete until onConnected() or onConnectionFailure() is called.
-     */
-    private void requestConnection() {
-        getActivityRecognitionClient().connect();
-    }
+	/**
+	 * Request a connection to Location Services. This call returns immediately,
+	 * but the request is not complete until onConnected() or onConnectionFailure() is called.
+	 */
+	private void requestConnection() {
+		getActivityRecognitionClient().connect();
+	}
 
-    /**
-     * Get the current activity recognition client, or create a new one if necessary.
-     * This method facilitates multiple requests for a client, even if a previous
-     * request wasn't finished. Since only one client object exists while a connection
-     * is underway, no memory leaks occur.
-     *
-     * @return An ActivityRecognitionClient object
-     */
-    private ActivityRecognitionClient getActivityRecognitionClient() {
-        if (mActivityRecognitionClient == null) {
+	/**
+	 * Get the current activity recognition client, or create a new one if necessary.
+	 * This method facilitates multiple requests for a client, even if a previous
+	 * request wasn't finished. Since only one client object exists while a connection
+	 * is underway, no memory leaks occur.
+	 *
+	 * @return An ActivityRecognitionClient object
+	 */
+	private ActivityRecognitionClient getActivityRecognitionClient() {
+		if (mActivityRecognitionClient == null) {
 
-            mActivityRecognitionClient =
-                    new ActivityRecognitionClient(mContext, this, this);
-        }
-        return mActivityRecognitionClient;
-    }
+			mActivityRecognitionClient =
+					new ActivityRecognitionClient(mContext, this, this);
+		}
+		return mActivityRecognitionClient;
+	}
 
-    /**
-     * Get the current activity recognition client and disconnect from Location Services
-     */
-    private void requestDisconnection() {
-        getActivityRecognitionClient().disconnect();
-    }
+	/**
+	 * Get the current activity recognition client and disconnect from Location Services
+	 */
+	private void requestDisconnection() {
+		getActivityRecognitionClient().disconnect();
+	}
 
-    /*
-     * Called by Location Services once the activity recognition client is connected.
-     *
-     * Continue by requesting activity updates.
-     */
-    @Override
-    public void onConnected(Bundle arg0) {
-        // If debugging, log the connection
-        Log.d(ActivityUtils.APPTAG, "connected to location services");
+	/*
+	 * Called by Location Services once the activity recognition client is connected.
+	 *
+	 * Continue by requesting activity updates.
+	 */
+	@Override
+	public void onConnected(Bundle arg0) {
+		// If debugging, log the connection
+		Log.d(ActivityUtils.APPTAG, "connected to location services");
 
-        // Continue the process of requesting activity recognition updates
-        continueRequestActivityUpdates();
-    }
+		// Continue the process of requesting activity recognition updates
+		continueRequestActivityUpdates();
+	}
 
-    /*
-     * Called by Location Services once the activity recognition client is disconnected.
-     */
-    @Override
-    public void onDisconnected() {
-        // In debug mode, log the disconnection
-        Log.d(ActivityUtils.APPTAG, "disconnected to location services");
+	/*
+	 * Called by Location Services once the activity recognition client is disconnected.
+	 */
+	@Override
+	public void onDisconnected() {
+		// In debug mode, log the disconnection
+		Log.d(ActivityUtils.APPTAG, "disconnected to location services");
 
-        // Destroy the current activity recognition client
-        mActivityRecognitionClient = null;
-    }
+		// Destroy the current activity recognition client
+		mActivityRecognitionClient = null;
+	}
 
-    /**
-     * Get a PendingIntent to send with the request to get activity recognition updates. Location
-     * Services issues the Intent inside this PendingIntent whenever a activity recognition update
-     * occurs.
-     *
-     * @return A PendingIntent for the IntentService that handles activity recognition updates.
-     */
-    private PendingIntent createRequestPendingIntent() {
+	/**
+	 * Get a PendingIntent to send with the request to get activity recognition updates. Location
+	 * Services issues the Intent inside this PendingIntent whenever a activity recognition update
+	 * occurs.
+	 *
+	 * @return A PendingIntent for the IntentService that handles activity recognition updates.
+	 */
+	private PendingIntent createRequestPendingIntent() {
 
-        // If the PendingIntent already exists
-        if (null != getRequestPendingIntent()) {
+		// If the PendingIntent already exists
+		if (null != getRequestPendingIntent()) {
 
-            // Return the existing intent
-            return mActivityRecognitionPendingIntent;
+			// Return the existing intent
+			return mActivityRecognitionPendingIntent;
 
-            // If no PendingIntent exists
-        } else {
-            // Create an Intent pointing to the IntentService
-            Intent intent = new Intent(mContext, ActivityRecognitionIntentService.class);
+			// If no PendingIntent exists
+		} else {
+			// Create an Intent pointing to the IntentService
+			Intent intent = new Intent(mContext, ActivityRecognitionIntentService.class);
 
             /*
              * Return a PendingIntent to start the IntentService.
@@ -190,41 +190,41 @@ public class DetectionRequester
              * again updates the original. Otherwise, Location Services
              * can't match the PendingIntent to requests made with it.
              */
-            PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+			PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
 
-            setRequestPendingIntent(pendingIntent);
-            return pendingIntent;
-        }
+			setRequestPendingIntent(pendingIntent);
+			return pendingIntent;
+		}
 
-    }
+	}
 
-    /*
-     * Implementation of OnConnectionFailedListener.onConnectionFailed
-     * If a connection or disconnection request fails, report the error
-     * connectionResult is passed in from Location Services
-     */
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+	/*
+	 * Implementation of OnConnectionFailedListener.onConnectionFailed
+	 * If a connection or disconnection request fails, report the error
+	 * connectionResult is passed in from Location Services
+	 */
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
         /*
          * Google Play services can resolve some errors it detects.
          * If the error has a resolution, try sending an Intent to
          * start a Google Play services activity that can resolve
          * error.
          */
-        if (connectionResult.hasResolution()) {
+		if (connectionResult.hasResolution()) {
 
-            try {
-                connectionResult.startResolutionForResult((Activity) mContext,
-                        ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+			try {
+				connectionResult.startResolutionForResult((Activity) mContext,
+						ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
 
             /*
              * Thrown if Google Play services canceled the original
              * PendingIntent
              */
-            } catch (SendIntentException e) {
-                // display an error or log it here.
-            }
+			} catch (SendIntentException e) {
+				// display an error or log it here.
+			}
 
         /*
          * If no resolution is available, display Google
@@ -232,14 +232,14 @@ public class DetectionRequester
          * user to Google Play Store if Google Play services
          * is out of date.
          */
-        } else {
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
-                    connectionResult.getErrorCode(),
-                    (Activity) mContext,
-                    ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            if (dialog != null) {
-                dialog.show();
-            }
-        }
-    }
+		} else {
+			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
+					connectionResult.getErrorCode(),
+					(Activity) mContext,
+					ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+			if (dialog != null) {
+				dialog.show();
+			}
+		}
+	}
 }

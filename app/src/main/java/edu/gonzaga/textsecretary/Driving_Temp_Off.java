@@ -11,17 +11,17 @@ import android.util.Log;
 //Receiver
 public class Driving_Temp_Off extends BroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.cancel(11001100);
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		manager.cancel(11001100);
 
-        Log.d("NOTIFICATION", "BROADCAST RECEIVED");
+		Log.d("NOTIFICATION", "BROADCAST RECEIVED");
 
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("isPassenger", true);
-        editor.apply();
-    }
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putBoolean("isPassenger", true);
+		editor.apply();
+	}
 
 }

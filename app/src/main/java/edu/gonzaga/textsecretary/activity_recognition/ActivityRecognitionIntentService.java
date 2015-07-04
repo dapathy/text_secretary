@@ -29,77 +29,77 @@ import com.google.android.gms.location.DetectedActivity;
  */
 public class ActivityRecognitionIntentService extends IntentService {
 
-    private ActivityRecognizer activityRecognizer;
+	private ActivityRecognizer activityRecognizer;
 
-    public ActivityRecognitionIntentService() {
-        // Set the label for the service's background thread
-        super("ActivityRecognitionIntentService");
-        activityRecognizer = ActivityRecognizer.getInstance(null);
-    }
+	public ActivityRecognitionIntentService() {
+		// Set the label for the service's background thread
+		super("ActivityRecognitionIntentService");
+		activityRecognizer = ActivityRecognizer.getInstance(null);
+	}
 
-    /**
-     * Determine if an activity means that the user is in a vehicle.
-     *
-     * @param type The type of activity the user is doing (see DetectedActivity constants)
-     * @return true if the user seems to be moving from one location to another, otherwise false
-     */
-    public static boolean isMoving(int type) {
-        switch (type) {
-            // These types mean that the user is probably in a vehicle
-            case DetectedActivity.IN_VEHICLE:
-            case DetectedActivity.ON_BICYCLE:
-                return true;
-            default:
-                return false;
-        }
-    }
+	/**
+	 * Determine if an activity means that the user is in a vehicle.
+	 *
+	 * @param type The type of activity the user is doing (see DetectedActivity constants)
+	 * @return true if the user seems to be moving from one location to another, otherwise false
+	 */
+	public static boolean isMoving(int type) {
+		switch (type) {
+			// These types mean that the user is probably in a vehicle
+			case DetectedActivity.IN_VEHICLE:
+			case DetectedActivity.ON_BICYCLE:
+				return true;
+			default:
+				return false;
+		}
+	}
 
-    /**
-     * Called when a new activity detection update is available.
-     */
-    @Override
-    protected void onHandleIntent(Intent intent) {
+	/**
+	 * Called when a new activity detection update is available.
+	 */
+	@Override
+	protected void onHandleIntent(Intent intent) {
 
-        // If the intent contains an update
-        if (ActivityRecognitionResult.hasResult(intent)) {
-            Log.d(ActivityUtils.APPTAG, "new activity update available");
-            // Get the update
-            ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
+		// If the intent contains an update
+		if (ActivityRecognitionResult.hasResult(intent)) {
+			Log.d(ActivityUtils.APPTAG, "new activity update available");
+			// Get the update
+			ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 
-            // Get the most probable activity from the list of activities in the update
-            DetectedActivity mostProbableActivity = result.getMostProbableActivity();
+			// Get the most probable activity from the list of activities in the update
+			DetectedActivity mostProbableActivity = result.getMostProbableActivity();
 
-            // Get the confidence percentage for the most probable activity
-            int confidence = mostProbableActivity.getConfidence();
+			// Get the confidence percentage for the most probable activity
+			int confidence = mostProbableActivity.getConfidence();
 
-            // Get the type of activity
-            int activityType = mostProbableActivity.getType();
+			// Get the type of activity
+			int activityType = mostProbableActivity.getType();
 
-            // if confident, change overall confidence level
-            if (confidence >= 50)
-                activityRecognizer.raiseLowerDrivingConfidence(activityType);
+			// if confident, change overall confidence level
+			if (confidence >= 50)
+				activityRecognizer.raiseLowerDrivingConfidence(activityType);
 
-            decideToBroadcast();
-        }
-    }
+			decideToBroadcast();
+		}
+	}
 
-    private void decideToBroadcast() {
-        //if driving and was not previously driving, broadcast
-        if (activityRecognizer.isDriving() && !activityRecognizer.wasDriving) {
-            broadcastActivityState();
-            activityRecognizer.wasDriving = true;
-        }
-        //if not driving and was previously driving, broadcast
-        else if (!activityRecognizer.isDriving() && activityRecognizer.wasDriving) {
-            broadcastActivityState();
-            activityRecognizer.wasDriving = false;
-        }
-    }
+	private void decideToBroadcast() {
+		//if driving and was not previously driving, broadcast
+		if (activityRecognizer.isDriving() && !activityRecognizer.wasDriving) {
+			broadcastActivityState();
+			activityRecognizer.wasDriving = true;
+		}
+		//if not driving and was previously driving, broadcast
+		else if (!activityRecognizer.isDriving() && activityRecognizer.wasDriving) {
+			broadcastActivityState();
+			activityRecognizer.wasDriving = false;
+		}
+	}
 
-    private void broadcastActivityState() {
-        Intent state = new Intent();
-        state.setAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE");
-        sendBroadcast(state);
-        Log.d(ActivityUtils.APPTAG, "activity broadcast sent");
-    }
+	private void broadcastActivityState() {
+		Intent state = new Intent();
+		state.setAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE");
+		sendBroadcast(state);
+		Log.d(ActivityUtils.APPTAG, "activity broadcast sent");
+	}
 }
