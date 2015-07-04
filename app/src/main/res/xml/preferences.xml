@@ -51,6 +51,12 @@
 	        android:title="Driving Detection"
 	        android:summary="Text Secretary will auto-respond when you are driving."
 	        android:defaultValue="false"/>
+
+		<CheckBoxPreference
+			android:title="Do Not Disturb"
+			android:summary="Silence your device when Text Secretary would normally auto-reply."
+			android:key="silence_preference"
+			android:defaultValue="false"/>
         
         <CheckBoxPreference
 			android:key="start_on_boot_preference"
@@ -63,12 +69,6 @@
             android:title="Notifications"
             android:summary="A notification will be displayed for every auto-reply Text Secretary sends."
             android:defaultValue="true"/>
-            
-	    <CheckBoxPreference
-		    android:title="Do Not Disturb"
-		    android:summary="Silence your device when Text Secretary would normally auto-reply."
-		    android:key="silence_preference"
-			android:defaultValue="false"/>
 	    
 	    <ListPreference
 	        android:key="single_response_preference"

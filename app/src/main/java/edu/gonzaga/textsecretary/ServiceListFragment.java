@@ -47,7 +47,7 @@ public class ServiceListFragment extends ListFragment{
       }
 	  
 	  private ArrayList<Map<String, String>> buildData() {
-	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());	  
+	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 	        list = new ArrayList<>();
 
 	        //respond to
@@ -69,20 +69,25 @@ public class ServiceListFragment extends ListFragment{
         		list.add(putData("Replying to", "Texts & Calls"));
         		break;
 	        }
-	        
-	    	
+
 		    //Calendar
 		    if(prefs.getBoolean("calendar_preference", true))
 		    	list.add(putData("Calendar", "ON"));
 		    else
 		    	list.add(putData("Calendar", "OFF"));
-		    
+
 		    //Driving
 		    if(prefs.getBoolean("driving_preference", true))
 		    	list.add(putData("Driving Detection", "ON"));
 		    else
 		    	list.add(putData("Driving Detection", "OFF"));
-		    
+
+		  //Do Not Disturb
+		  if (prefs.getBoolean("silence_preference", false))
+			  list.add(putData("Do Not Disturb", "ON"));
+		  else
+			  list.add(putData("Do Not Disturb", "OFF"));
+
 		    //Start on Boot
 			if(prefs.getBoolean("start_on_boot_preference", false))
 				list.add(putData("Start on Boot", "ON"));
@@ -95,19 +100,13 @@ public class ServiceListFragment extends ListFragment{
 			else
 				list.add(putData("Notifications", "OFF"));
 
-	    	//Do Not Disturb
-	        if (prefs.getBoolean("silence_preference", false))
-                list.add(putData("Do Not Disturb", "ON"));
-            else
-                list.add(putData("Do Not Disturb", "OFF"));
-
 			//Single Response
 	        long singleResponse = Long.valueOf(prefs.getString("single_response_preference", "0"));
 	        if (singleResponse == 0)
 	        	list.add(putData("Single Response", "Off"));
-	        else 
+	        else
 	        	list.add(putData("Single Response", Long.valueOf(prefs.getString("list_preference", "1800000"))/60000 + " minutes"));
-			
+
 		    return list;
 		  }
 
