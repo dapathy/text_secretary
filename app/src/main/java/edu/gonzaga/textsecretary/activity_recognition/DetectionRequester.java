@@ -16,12 +16,6 @@
 
 package edu.gonzaga.textsecretary.activity_recognition;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
-import com.google.android.gms.location.ActivityRecognitionClient;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -31,16 +25,21 @@ import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.ActivityRecognitionClient;
+
 /**
  * Class for connecting to Location Services and activity recognition updates.
  * <b>
  * Note: Clients must ensure that Google Play services is available before requesting updates.
  * </b> Use GooglePlayServicesUtil.isGooglePlayServicesAvailable() to check.
- *
- *
+ * <p/>
+ * <p/>
  * To use a DetectionRequester, instantiate it and call requestUpdates(). Everything else is done
  * automatically.
- *
  */
 public class DetectionRequester
         implements ConnectionCallbacks, OnConnectionFailedListener {
@@ -63,6 +62,7 @@ public class DetectionRequester
         mActivityRecognitionClient = null;
 
     }
+
     /**
      * Returns the current PendingIntent to the caller.
      *
@@ -74,6 +74,7 @@ public class DetectionRequester
 
     /**
      * Sets the PendingIntent used to make activity recognition update requests
+     *
      * @param intent The PendingIntent
      */
     public void setRequestPendingIntent(PendingIntent intent) {
@@ -177,7 +178,7 @@ public class DetectionRequester
             // Return the existing intent
             return mActivityRecognitionPendingIntent;
 
-        // If no PendingIntent exists
+            // If no PendingIntent exists
         } else {
             // Create an Intent pointing to the IntentService
             Intent intent = new Intent(mContext, ActivityRecognitionIntentService.class);
@@ -215,14 +216,14 @@ public class DetectionRequester
 
             try {
                 connectionResult.startResolutionForResult((Activity) mContext,
-                    ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+                        ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
 
             /*
              * Thrown if Google Play services canceled the original
              * PendingIntent
              */
             } catch (SendIntentException e) {
-               // display an error or log it here.
+                // display an error or log it here.
             }
 
         /*
@@ -233,9 +234,9 @@ public class DetectionRequester
          */
         } else {
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
-                            connectionResult.getErrorCode(),
-                            (Activity) mContext,
-                            ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+                    connectionResult.getErrorCode(),
+                    (Activity) mContext,
+                    ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
             if (dialog != null) {
                 dialog.show();
             }

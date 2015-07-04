@@ -1,48 +1,49 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="edu.gonzaga.textsecretary.HelpBootFragment" >
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context="edu.gonzaga.textsecretary.HelpBootFragment">
 
-    <ImageView
-        android:id="@+id/imageSilencer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dip"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/silencer" />
-    
-    <ScrollView
-	  	android:orientation="vertical"
-	  	android:layout_marginTop="24dp"
-	  	android:layout_width="fill_parent"
-	  	android:layout_height="fill_parent"
-	  	android:layout_alignParentLeft="true"
-		android:layout_below="@+id/imageSilencer">
-		    <LinearLayout
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginLeft="10dip"
-		        android:layout_marginRight="10dip"
-		        android:orientation="vertical" >
-		
-		        <TextView
-		            android:id="@+id/calendarHeader"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:text="Do Not Disturb"
-		            android:textAppearance="?android:attr/textAppearanceLarge" />
-		        
-				<TextView
-		            android:id="@+id/calendarBody"
-		            android:layout_marginLeft="10dip"
-		            android:layout_marginTop="5dip"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:lineSpacingExtra="8dp"
-		            android:text="@string/silencer_body"
-		            android:textAppearance="?android:attr/textAppearanceMedium" />
-		    </LinearLayout>
-	 </ScrollView>
+	<ImageView
+		android:id="@+id/imageSilencer"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="30dip"
+		android:src="@drawable/silencer" />
+
+	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@+id/imageSilencer"
+		android:layout_marginTop="24dp"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dip"
+			android:layout_marginRight="10dip"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/calendarHeader"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Do Not Disturb"
+				android:textAppearance="?android:attr/textAppearanceLarge" />
+
+			<TextView
+				android:id="@+id/calendarBody"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="10dip"
+				android:layout_marginTop="5dip"
+				android:lineSpacingExtra="8dp"
+				android:text="@string/silencer_body"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+		</LinearLayout>
+	</ScrollView>
 </RelativeLayout>

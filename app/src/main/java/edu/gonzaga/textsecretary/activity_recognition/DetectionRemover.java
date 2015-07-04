@@ -16,12 +16,6 @@
 
 package edu.gonzaga.textsecretary.activity_recognition;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
-import com.google.android.gms.location.ActivityRecognitionClient;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -30,16 +24,21 @@ import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.ActivityRecognitionClient;
+
 /**
  * Class for connecting to Location Services and removing activity recognition updates.
  * <b>
- * Note: Clients must ensure that Google Play services is available before removing activity 
+ * Note: Clients must ensure that Google Play services is available before removing activity
  * recognition updates.
  * </b> Use GooglePlayServicesUtil.isGooglePlayServicesAvailable() to check.
- *
- *
+ * <p/>
+ * <p/>
  * To use a DetectionRemover, instantiate it, then call removeUpdates().
- *
  */
 public class DetectionRemover
         implements ConnectionCallbacks, OnConnectionFailedListener {
@@ -69,7 +68,7 @@ public class DetectionRemover
     }
 
     /**
-     * Remove the activity recognition updates associated with a PendIntent. The PendingIntent is 
+     * Remove the activity recognition updates associated with a PendIntent. The PendingIntent is
      * the one used in the request to add activity recognition updates.
      *
      * @param requestIntent The PendingIntent used to request activity recognition updates
@@ -115,6 +114,16 @@ public class DetectionRemover
     }
 
     /**
+     * Set the global activity recognition client
+     *
+     * @param client An ActivityRecognitionClient object
+     */
+    public void setActivityRecognitionClient(ActivityRecognitionClient client) {
+        mActivityRecognitionClient = client;
+
+    }
+
+    /**
      * Get a activity recognition client and disconnect from Location Services
      */
     private void requestDisconnection() {
@@ -124,15 +133,6 @@ public class DetectionRemover
 
         // Set the client to null
         setActivityRecognitionClient(null);
-    }
-
-    /**
-     * Set the global activity recognition client
-     * @param client An ActivityRecognitionClient object
-     */
-    public void setActivityRecognitionClient(ActivityRecognitionClient client) {
-        mActivityRecognitionClient = client;
-
     }
 
     /*
@@ -149,10 +149,10 @@ public class DetectionRemover
     }
 
     /**
-     * Once the connection is available, send a request to remove activity recognition updates. 
+     * Once the connection is available, send a request to remove activity recognition updates.
      */
     private void continueRemoveUpdates() {
-        
+
         // Remove the updates
         mActivityRecognitionClient.removeActivityUpdates(mCurrentIntent);
         
@@ -161,7 +161,7 @@ public class DetectionRemover
          * request fails. 
          */
         mCurrentIntent.cancel();
-        
+
         // Disconnect the client
         requestDisconnection();
     }
@@ -197,14 +197,14 @@ public class DetectionRemover
 
             try {
                 connectionResult.startResolutionForResult((Activity) mContext,
-                    ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+                        ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
 
             /*
              * Thrown if Google Play services canceled the original
              * PendingIntent
              */
             } catch (SendIntentException e) {
-               // display an error or log it here.
+                // display an error or log it here.
             }
 
         /*
@@ -215,9 +215,9 @@ public class DetectionRemover
          */
         } else {
             Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
-                            connectionResult.getErrorCode(),
-                            (Activity) mContext,
-                            ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
+                    connectionResult.getErrorCode(),
+                    (Activity) mContext,
+                    ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST);
             if (dialog != null) {
                 dialog.show();
             }

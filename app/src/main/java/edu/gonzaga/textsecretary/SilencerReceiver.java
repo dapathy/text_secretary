@@ -19,12 +19,10 @@ public class SilencerReceiver extends BroadcastReceiver {
         if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.CALENDAR_UPDATE") && !silencer.isSilenced()) {
             Log.d(TAG, "UPDATE");
             silencer.scheduleSilencing();
-        }
-        else if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.ENABLE")) {
+        } else if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.ENABLE")) {
             Log.d(TAG, "ENABLE");
             silencer.silenceRinger();
-        }
-        else if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.DISABLE")) {
+        } else if (intent.getAction().equals("edu.gonzaga.text_secretary.silencer.DISABLE")) {
             Log.d(TAG, "DISABLE");
             silencer.restoreRingerMode();
             silencer.scheduleSilencing(); //since we're up, let's do an update

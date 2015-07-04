@@ -1,22 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>  
-<set xmlns:android="http://schemas.android.com/apk/res/android"  
-   android:shareInterpolator="false">    
-   <translate   
-  	 android:interpolator="@android:anim/decelerate_interpolator"
-     android:toYDelta="45"  
-     android:fillAfter="true"  
-     android:duration="150"/>  
-     
-    <translate
-     android:startOffset="150"   
-     android:toYDelta="-60"  
-     android:fillAfter="true" 
-     android:duration="150"/>  
-     
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+	android:shareInterpolator="false">
 	<translate
-	 android:interpolator="@android:anim/overshoot_interpolator"
-     android:startOffset="300"   
-     android:toYDelta="15"  
-     android:fillAfter="true" 
-     android:duration="150"/>  
+		android:duration="150"
+		android:fillAfter="true"
+		android:interpolator="@android:anim/decelerate_interpolator"
+		android:toYDelta="45" />
+
+	<translate
+		android:duration="150"
+		android:fillAfter="true"
+		android:startOffset="150"
+		android:toYDelta="-60" />
+
+	<translate
+		android:duration="150"
+		android:fillAfter="true"
+		android:interpolator="@android:anim/overshoot_interpolator"
+		android:startOffset="300"
+		android:toYDelta="15" />
 </set>  

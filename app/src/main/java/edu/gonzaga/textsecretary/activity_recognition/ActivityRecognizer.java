@@ -14,16 +14,16 @@ import edu.gonzaga.textsecretary.Silencer;
 import edu.gonzaga.textsecretary.activity_recognition.ActivityUtils.REQUEST_TYPE;
 
 public class ActivityRecognizer {
-	
-	private static volatile ActivityRecognizer instance;    //instance of self
+
+    private static volatile ActivityRecognizer instance;    //instance of self
     protected boolean wasDriving;
     protected int drivingConfidence;     // -2 <= dC <= 3
-	private REQUEST_TYPE mRequestType;
-	private DetectionRequester mDetectionRequester;
+    private REQUEST_TYPE mRequestType;
+    private DetectionRequester mDetectionRequester;
     private DetectionRemover mDetectionRemover;
     private Context mContext;
 
-    private ActivityRecognizer (Context context) {
+    private ActivityRecognizer(Context context) {
         mContext = context;
     }
 
@@ -38,7 +38,7 @@ public class ActivityRecognizer {
 
         return instance;
     }
-    
+
     private boolean servicesConnected() {
         // Check that Google Play services is available
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
@@ -46,14 +46,14 @@ public class ActivityRecognizer {
         //return Google Services availability
         return ConnectionResult.SUCCESS == resultCode;
     }
-	
-	//start listening for updates
-	public void startUpdates() {
-		wasDriving = false;
+
+    //start listening for updates
+    public void startUpdates() {
+        wasDriving = false;
         drivingConfidence = 0;
-		mDetectionRequester = new DetectionRequester(mContext);
+        mDetectionRequester = new DetectionRequester(mContext);
         mDetectionRemover = new DetectionRemover(mContext);
-        
+
         // Check for Google Play services
         if (!servicesConnected()) {
             return;
@@ -69,9 +69,9 @@ public class ActivityRecognizer {
         mDetectionRequester.requestUpdates();
         Log.d(ActivityUtils.APPTAG, "started driving service");
     }
-	
-	//stop checking for activity updates
-	public void stopUpdates() {
+
+    //stop checking for activity updates
+    public void stopUpdates() {
         // Check for Google Play services
         if (!servicesConnected()) {
             return;
@@ -91,7 +91,7 @@ public class ActivityRecognizer {
          * will stop the updates.
          */
         mDetectionRequester.getRequestPendingIntent().cancel();
-        
+
         //kill any remaining notification
         ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11001100);
         //ensure ringer is restored if necessary
@@ -104,14 +104,14 @@ public class ActivityRecognizer {
         //if driving
         if (((activityType == DetectedActivity.IN_VEHICLE) || (activityType == DetectedActivity.ON_BICYCLE)) && (drivingConfidence < 3))
             drivingConfidence += 1;
-        //if not driving and not unknown
+            //if not driving and not unknown
         else if ((activityType != DetectedActivity.IN_VEHICLE) && (activityType != DetectedActivity.ON_BICYCLE) && (activityType != DetectedActivity.UNKNOWN) && (drivingConfidence > -2))
             drivingConfidence -= 1;
 
         Log.d(ActivityUtils.APPTAG, "driving confidence: " + drivingConfidence);
     }
-	
-	/*
+
+    /*
      * Handle results returned to this Activity by other Activities started with
      * startActivityForResult(). In particular, the method onConnectionFailed() in
      * DetectionRemover and DetectionRequester may call startResolutionForResult() to
@@ -124,7 +124,7 @@ public class ActivityRecognizer {
         switch (requestCode) {
 
             // If the request code matches the code sent in onConnectionFailed
-            case ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST :
+            case ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST:
 
                 switch (resultCode) {
                     // If Google Play services resolved the problem
@@ -136,18 +136,18 @@ public class ActivityRecognizer {
                             // Restart the process of requesting activity recognition updates
                             mDetectionRequester.requestUpdates();
 
-                        // If the request was to remove activity recognition updates
-                        } else if (ActivityUtils.REQUEST_TYPE.REMOVE == mRequestType ){
+                            // If the request was to remove activity recognition updates
+                        } else if (ActivityUtils.REQUEST_TYPE.REMOVE == mRequestType) {
 
                                 /*
                                  * Restart the removal of all activity recognition updates for the 
                                  * PendingIntent.
                                  */
-                                mDetectionRemover.removeUpdates(
+                            mDetectionRemover.removeUpdates(
                                     mDetectionRequester.getRequestPendingIntent());
 
                         }
-                    break;
+                        break;
 
                     // If any other result was returned by Google Play services
                     default:
@@ -156,12 +156,12 @@ public class ActivityRecognizer {
                         Log.e(ActivityUtils.APPTAG, "google play couldn't do anything useful");
                 }
 
-            // If any other request code was received
+                // If any other request code was received
             default:
-               // Report that this Activity received an unknown requestCode
-               Log.e(ActivityUtils.APPTAG, "I'm not sure what happened but it wasn't good");
+                // Report that this Activity received an unknown requestCode
+                Log.e(ActivityUtils.APPTAG, "I'm not sure what happened but it wasn't good");
 
-               break;
+                break;
         }
     }
 

@@ -30,7 +30,7 @@ public class Silencer {
     private PendingIntent updatePendingIntent;
 
     //do not create an instance
-    private Silencer (Context context) {
+    private Silencer(Context context) {
         mContext = context;
         calendarService = new Calendar_Service(mContext);
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -63,7 +63,7 @@ public class Silencer {
 
     //starts periodic check of calendar for times to enable/disable silencer
     public void startSilencerPoller() {
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(),AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES,
                 updatePendingIntent);
 
         Log.d(TAG, "started poller");
@@ -96,7 +96,7 @@ public class Silencer {
             while (cursor.moveToNext()) {
                 //get first event
                 tempStart = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
-                if(tempStart < start) {
+                if (tempStart < start) {
                     start = tempStart;
                     end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
                 }
@@ -106,8 +106,7 @@ public class Silencer {
                 setExactAlarm(start, enablePendingIntent);
                 setExactAlarm(end, disablePendingIntent);
                 Log.d(TAG, "event found");
-            }
-            else
+            } else
                 Log.d(TAG, "event not found");
             cursor.close();
         }
@@ -116,11 +115,11 @@ public class Silencer {
     private void setExactAlarm(long time, PendingIntent pendingIntent) {
         //if running 4.4 or higher ensure os uses exact timing
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP,time,pendingIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
         }
         //android didn't manage alarms at this point, so use regular method
         else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP,time,pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
         }
     }
 
@@ -139,7 +138,7 @@ public class Silencer {
             isSilenced = true;
             Log.d(TAG, tempRingerMode + " silence");
             ringerManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            prevRingerMode = tempRingerMode;	//save current mode
+            prevRingerMode = tempRingerMode;    //save current mode
         }
     }
 

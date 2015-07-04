@@ -1,77 +1,78 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="edu.gonzaga.textsecretary.HelpBootFragment" >
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context="edu.gonzaga.textsecretary.HelpBootFragment">
 
-    <ImageView
-        android:id="@+id/imageCalendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dip"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/calendar" />
+	<ImageView
+		android:id="@+id/imageCalendar"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="30dip"
+		android:src="@drawable/calendar" />
 
-	    <ScrollView
-		  	android:orientation="vertical"
-		  	android:layout_marginTop="24dp"
-		  	android:layout_width="fill_parent"
-		  	android:layout_height="fill_parent"
-		  	android:layout_alignParentLeft="true"
-			android:layout_below="@+id/imageCalendar">
-			    <LinearLayout
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:layout_marginLeft="10dip"
-			        android:layout_marginRight="10dip"
-			        android:orientation="vertical" >
-			
-			        <TextView
-			            android:id="@+id/calendarHeader"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:text="Calendar Integration"
-			            android:textAppearance="?android:attr/textAppearanceLarge" />
-			        
-					<TextView
-			            android:id="@+id/calendarBody"
-			            android:layout_marginLeft="10dip"
-			            android:layout_marginTop="5dip"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:lineSpacingExtra="8dp"
-			            android:text="@string/calendar_body"
-			            android:textAppearance="?android:attr/textAppearanceMedium" />
-			
-					
-				    <ImageView
-				        android:id="@+id/imageCalendarHelpOFF"
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:orientation="vertical"
-		    			android:layout_gravity="center_horizontal"
-				        android:src="@drawable/calendar_help_graphicoff" />
-				    
-				    <TextView
-			            android:id="@+id/calendarBody2"
-			            android:layout_marginLeft="10dip"
-			            android:layout_marginTop="5dip"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:lineSpacingExtra="8dp"
-			            android:text="will become the following if Calendar Integration is on:"
-			            android:textAppearance="?android:attr/textAppearanceMedium" />
-				    
-				    <ImageView
-				        android:id="@+id/imageCalendarHelpON"
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:layout_marginBottom="15dip"
-				        android:orientation="vertical"
-		    			android:layout_gravity="center_horizontal"
-				        android:src="@drawable/calendar_help_graphicon" />
-			    </LinearLayout>
-		 </ScrollView>
+	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@+id/imageCalendar"
+		android:layout_marginTop="24dp"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dip"
+			android:layout_marginRight="10dip"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/calendarHeader"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Calendar Integration"
+				android:textAppearance="?android:attr/textAppearanceLarge" />
+
+			<TextView
+				android:id="@+id/calendarBody"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="10dip"
+				android:layout_marginTop="5dip"
+				android:lineSpacingExtra="8dp"
+				android:text="@string/calendar_body"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+			<ImageView
+				android:id="@+id/imageCalendarHelpOFF"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:orientation="vertical"
+				android:src="@drawable/calendar_help_graphicoff" />
+
+			<TextView
+				android:id="@+id/calendarBody2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="10dip"
+				android:layout_marginTop="5dip"
+				android:lineSpacingExtra="8dp"
+				android:text="will become the following if Calendar Integration is on:"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<ImageView
+				android:id="@+id/imageCalendarHelpON"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:layout_marginBottom="15dip"
+				android:orientation="vertical"
+				android:src="@drawable/calendar_help_graphicon" />
+		</LinearLayout>
+	</ScrollView>
 
 </RelativeLayout>
