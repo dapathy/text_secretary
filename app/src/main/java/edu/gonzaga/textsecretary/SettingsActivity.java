@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
 import android.util.Log;
 
 import java.util.concurrent.ExecutionException;
@@ -26,7 +25,7 @@ public class SettingsActivity extends PreferenceActivity {
 		super.onCreate(savedInstanceState);
 
 		//create fragment
-		getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefFrag()).commit();
+		getFragmentManager().beginTransaction().replace(android.R.id.content, new PreferencesFragment()).commit();
 
 		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApNk2gDi9RLPvIqu/7bHAHglCv31OY+3JoBYNam6ROslAAT2ZC8TVd3obZKaXkZuU8aa+EP3Br1G210vfQsNvb+nb37z10f5sL3HrKLfxUuqZB9p26El36yAN5AuxAyqNJHH5S5AYcaqelYU3xk6Kj5Z6d701xvoF2V1SbWFGCA9cT5FqWiCcTZ8FSUn/BTHa/zVdJ+coWm6d/VuAzlCmvsMt1oUIzyHk/KBo1x/88BQ7yJw7cYBHd1Ge4EGBI3dTlYR0nM3WJyQj/yTO9pOXmxzp6bPEZCGG5tt/ieFhjlbSN9+nXZSiA9NZuwLmkcVvDflzMzjIRpOgka/9R5xidQIDAQAB";
 		mHelper = new IabHelper(this, base64EncodedPublicKey);
@@ -77,7 +76,7 @@ public class SettingsActivity extends PreferenceActivity {
 
 	//remove purchase option from preference fragment
 	private void removeUnlockItem() {
-		PreferenceFragment preferenceFragment = (PreferenceFragment) getFragmentManager().findFragmentById(android.R.id.content);
+		android.preference.PreferenceFragment preferenceFragment = (android.preference.PreferenceFragment) getFragmentManager().findFragmentById(android.R.id.content);
 		PreferenceCategory activationCategory = (PreferenceCategory) preferenceFragment.findPreference("Activation");
 		preferenceFragment.getPreferenceScreen().removePreference(activationCategory);
 	}
@@ -118,7 +117,7 @@ public class SettingsActivity extends PreferenceActivity {
 	//securely stores data locally, then stores on server
 	private void storeActivation() {
 		//store on server
-		Register task = new Register(getApplicationContext());
+		RegistrationTask task = new RegistrationTask(getApplicationContext());
 		task.execute(true);
 
 		//retry task until true or 5 times tried
@@ -126,7 +125,7 @@ public class SettingsActivity extends PreferenceActivity {
 			int count = 0;
 
 			while (!task.get() && count < 5) {
-				task = new Register(getApplicationContext());
+				task = new RegistrationTask(getApplicationContext());
 				task.execute(true);
 				count++;
 			}

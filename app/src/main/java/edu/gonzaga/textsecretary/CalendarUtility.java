@@ -10,21 +10,21 @@ import android.util.Log;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Calendar_Service {
+public class CalendarUtility {
 
 	private static final String TAG = "CALENDAR";
 	private Context context;
 	private long eventEnd = Long.MAX_VALUE;
 	private String eventName = "";
 
-	public Calendar_Service(Context context) {
+	public CalendarUtility(Context context) {
 		this.context = context;
 	}
 
 	//adjust start time for all day events
-	private static long getAllDayStart(long origStart) {
+	private static long getAllDayStart(long originalStart) {
 		Calendar allStart = Calendar.getInstance();
-		allStart.setTime(new Date(origStart));
+		allStart.setTime(new Date(originalStart));
 
 		//if already start of day, probably fine
 		if (allStart.get(Calendar.HOUR_OF_DAY) != 0) {
@@ -45,16 +45,16 @@ public class Calendar_Service {
 
 	public boolean inEvent() {
 		//establish search time frame
-		Calendar cStart = Calendar.getInstance();
-		Calendar cEnd = Calendar.getInstance();
-		cStart.add(Calendar.DATE, -1);
-		cEnd.add(Calendar.DATE, 1);
+		Calendar calendarStart = Calendar.getInstance();
+		Calendar calendarEnd = Calendar.getInstance();
+		calendarStart.add(Calendar.DATE, -1);
+		calendarEnd.add(Calendar.DATE, 1);
 
 		long start, end;
 		long currentMillis = Calendar.getInstance().getTimeInMillis();
 
 		try {
-			Cursor calendarCursor = getCursorForDates(cStart, cEnd);
+			Cursor calendarCursor = getCursorForDates(calendarStart, calendarEnd);
 			//iterate over all events returned by query checking existence during current time
 			while (calendarCursor.moveToNext()) {
 				start = calendarCursor.getLong(ProjectionAttributes.BEGIN);

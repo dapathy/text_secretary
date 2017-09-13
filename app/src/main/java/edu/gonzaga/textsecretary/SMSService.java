@@ -32,7 +32,7 @@ import java.util.Locale;
 
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 
-public class SMS_Service extends Service {
+public class SMSService extends Service {
 
 	private static final String TAG = "SMS_SERVICE";
 	private static final String defMessage = "Sorry, I'm busy at the moment. I'll get back to you as soon as possible.";
@@ -40,10 +40,10 @@ public class SMS_Service extends Service {
 	private static final String defDrivingMsg = "Sorry, I'm on the road. I'll get back to you as soon as possible.";
 	private static final String appendMsg = " Sent by Text Secretary.";
 
-	private Calendar_Service calendar;
+	private CalendarUtility calendar;
 	private SharedPreferences prefs;
 	private int respondTo;
-	private Notification_Service mNotification = new Notification_Service(this);
+	private NotificationUtility mNotification = new NotificationUtility(this);
 	private NotificationManager notificationManager;
 	private PhoneStateChangeListener pscl;
 	private TelephonyManager tm;
@@ -174,7 +174,7 @@ public class SMS_Service extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		calendar = new Calendar_Service(getApplicationContext());
+		calendar = new CalendarUtility(getApplicationContext());
 		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		prefs.edit().putBoolean("isPassenger", false).apply();        //"set passenget to false on start up
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -294,7 +294,7 @@ public class SMS_Service extends Service {
 	private void sendSMS(String phoneNumber, String message) {
 		SmsManager sms = SmsManager.getDefault();
 		//if not activated, append
-		if (!RegCheck.isActivated(getApplicationContext())) {
+		if (!RegistrationValidator.isActivated(getApplicationContext())) {
 			message = message + appendMsg;
 			Log.d(TAG, "auto: not activated so appending message");
 		}

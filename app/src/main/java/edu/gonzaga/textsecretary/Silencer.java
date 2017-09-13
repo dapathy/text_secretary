@@ -23,7 +23,7 @@ public class Silencer {
 	private boolean isSilenced = false;
 	private int prevRingerMode = SILENCER_GARBAGE_MODE;
 	private Context mContext;
-	private Calendar_Service calendarService;
+	private CalendarUtility calendarUtility;
 	private AlarmManager alarmManager;
 	private PendingIntent enablePendingIntent;
 	private PendingIntent disablePendingIntent;
@@ -32,7 +32,7 @@ public class Silencer {
 	//do not create an instance
 	private Silencer(Context context) {
 		mContext = context;
-		calendarService = new Calendar_Service(mContext);
+		calendarUtility = new CalendarUtility(mContext);
 		alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
 		//create intents now
@@ -81,9 +81,9 @@ public class Silencer {
 
 	protected void scheduleSilencing() {
 		//if in event, then silence
-		if (calendarService.inEvent()) {
+		if (calendarUtility.inEvent()) {
 			silenceRinger();
-			setExactAlarm(calendarService.getEventEnd(), disablePendingIntent);
+			setExactAlarm(calendarUtility.getEventEnd(), disablePendingIntent);
 		}
 		//else check future events to schedule
 		else {
@@ -95,10 +95,10 @@ public class Silencer {
 			//iterate over events
 			while (cursor.moveToNext()) {
 				//get first event
-				tempStart = cursor.getLong(Calendar_Service.ProjectionAttributes.BEGIN);
+				tempStart = cursor.getLong(CalendarUtility.ProjectionAttributes.BEGIN);
 				if (tempStart < start) {
 					start = tempStart;
-					end = cursor.getLong(Calendar_Service.ProjectionAttributes.END);
+					end = cursor.getLong(CalendarUtility.ProjectionAttributes.END);
 				}
 			}
 
@@ -127,7 +127,7 @@ public class Silencer {
 		Calendar start = Calendar.getInstance();
 		Calendar end = Calendar.getInstance();
 		end.add(Calendar.DATE, 1);
-		return calendarService.getCursorForDates(start, end);
+		return calendarUtility.getCursorForDates(start, end);
 	}
 
 	public void silenceRinger() {

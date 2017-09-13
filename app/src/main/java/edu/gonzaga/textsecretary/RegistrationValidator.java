@@ -7,7 +7,7 @@ import android.util.Log;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-public class RegCheck {
+public class RegistrationValidator {
 
 	private final static String TAG = "REGCHECK";
 	private final static long NUM_MILLIS_IN_YEAR = 31556952000L;
@@ -29,7 +29,7 @@ public class RegCheck {
 		}
 		//not in shared preferences, so check server
 		else {
-			Register task = new Register(context);
+			RegistrationTask task = new RegistrationTask(context);
 			task.execute(false);
 			try {
 				Log.d(TAG, "hitting server");

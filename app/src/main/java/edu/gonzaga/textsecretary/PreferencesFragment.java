@@ -9,7 +9,7 @@ import android.preference.PreferenceScreen;
 
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
 
-public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceChangeListener {
+public class PreferencesFragment extends android.preference.PreferenceFragment implements OnSharedPreferenceChangeListener {
 
 	private String unlockMsg;
 
@@ -89,7 +89,7 @@ public class PrefFrag extends PreferenceFragment implements OnSharedPreferenceCh
 
 	private void changeUnlockMsg() {
 		Preference unlockPreference = findPreference("unlock");
-		int daysLeft = RegCheck.getTrialDaysRemaining(getActivity().getApplicationContext());
+		int daysLeft = RegistrationValidator.getTrialDaysRemaining(getActivity().getApplicationContext());
 		final String msgSuf = " remaining in your trial. After the trial, a signature will be appended to every auto-reply. Purchase the Unlock here to remove the signature.";
 
 		//grammar!

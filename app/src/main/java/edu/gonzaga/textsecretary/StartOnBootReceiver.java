@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class StartOnBoot extends BroadcastReceiver {
+public class StartOnBootReceiver extends BroadcastReceiver {
 
 	private static final String TAG = "BOOT";
 
@@ -21,7 +21,7 @@ public class StartOnBoot extends BroadcastReceiver {
 			//if boot is enabled, start service
 			if (settings.getBoolean("start_on_boot_preference", false)) {
 				Log.d(TAG, "auto start");
-				Intent smsService = new Intent(context, SMS_Service.class);
+				Intent smsService = new Intent(context, SMSService.class);
 				context.startService(smsService);
 				editor.putBoolean("smsState", true);
 			} else {

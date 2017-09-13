@@ -21,15 +21,15 @@ public class HelpAboutFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		View myInflatedView = inflater.inflate(R.layout.fragment_help_about, container, false);
-		TextView t = (TextView) myInflatedView.findViewById(R.id.aboutVersion);
+		View view = inflater.inflate(R.layout.fragment_help_about, container, false);
+		TextView textView = view.findViewById(R.id.aboutVersion);
 		String versionName = null;
 		try {
 			versionName = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		}
-		t.setText("Version: " + versionName);
-		return myInflatedView;
+		textView.setText("Version: " + versionName);
+		return view;
 	}
 }

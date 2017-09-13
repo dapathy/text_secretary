@@ -11,16 +11,16 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
-public class Notification_Service {
+public class NotificationUtility {
 	private static final String TAG = "NOTIFICATION";
 	private Context mContext;
 
-	public Notification_Service(Context context) {
+	public NotificationUtility(Context context) {
 		mContext = context;
 	}
 
 	private String getId(String number) {
-		String id = "";
+		String id;
 		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
 		String[] projection = new String[]{
 				PhoneLookup.DISPLAY_NAME
@@ -42,13 +42,13 @@ public class Notification_Service {
 		String id = getId(number);
 
 		/* Invoking the default notification service */
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext);
+		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext);
 
-		mBuilder.setContentTitle("Auto Replied");
-		mBuilder.setContentText("Text Secretary auto replied to: " + id);
-		mBuilder.setTicker("Text Secretary Auto Reply");
-		mBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
-		mBuilder.setAutoCancel(true);
+		notificationBuilder.setContentTitle("Auto Replied");
+		notificationBuilder.setContentText("Text Secretary auto replied to: " + id);
+		notificationBuilder.setTicker("Text Secretary Auto Reply");
+		notificationBuilder.setSmallIcon(R.drawable.ic_action_notification_holo_light);
+		notificationBuilder.setAutoCancel(true);
 
 		/* Creates an explicit intent for an Activity in your app */
 		Intent resultIntent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null));
@@ -64,7 +64,7 @@ public class Notification_Service {
 						PendingIntent.FLAG_UPDATE_CURRENT
 				);
 
-		mBuilder.setContentIntent(resultPendingIntent);
+		notificationBuilder.setContentIntent(resultPendingIntent);
 
 		NotificationManager mNotificationManager =
 				(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -72,7 +72,7 @@ public class Notification_Service {
 		int randomInt = (int) (1000.0 * Math.random());
 		//int notificationID = 100;
 		/* notificationID allows you to update the notification later on. */
-		mNotificationManager.notify(randomInt, mBuilder.build());
+		mNotificationManager.notify(randomInt, notificationBuilder.build());
 	}
 
 }

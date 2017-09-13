@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Register extends AsyncTask<Boolean, Void, Boolean> {
+public class RegistrationTask extends AsyncTask<Boolean, Void, Boolean> {
 
 	private static final String TAG = "REGISTER";
 	//server URL:
@@ -32,7 +32,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	// JSON parser class
 	private JSONParser jsonParser = new JSONParser();
 
-	public Register(Context context) {
+	public RegistrationTask(Context context) {
 		mContext = context;
 	}
 

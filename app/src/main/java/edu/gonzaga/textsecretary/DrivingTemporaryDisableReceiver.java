@@ -9,7 +9,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 //Receiver
-public class Driving_Temp_Off extends BroadcastReceiver {
+public class DrivingTemporaryDisableReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {

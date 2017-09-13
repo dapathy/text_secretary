@@ -21,7 +21,7 @@ public class DrivingNotification {
 		/* Invoking the default notification service */
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext);
 
-		Intent myIntent = new Intent(mContext, Driving_Temp_Off.class);
+		Intent myIntent = new Intent(mContext, DrivingTemporaryDisableReceiver.class);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, myIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
 		long[] pattern = {0, 500};

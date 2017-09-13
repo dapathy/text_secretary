@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void run() {
 			//check unlock
-			RegCheck.isActivated(MainActivity.this);
+			RegistrationValidator.isActivated(MainActivity.this);
 
 			//remove spinner
 			MainActivity.this.runOnUiThread(new Runnable() {
@@ -197,19 +197,19 @@ public class MainActivity extends Activity {
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 			return true;
 		} else if (id == R.id.action_help) {
-			startActivity(new Intent(getApplicationContext(), Help_Activity.class));
+			startActivity(new Intent(getApplicationContext(), HelpActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
 	private void startService() {
-		startService(new Intent(this, SMS_Service.class));
+		startService(new Intent(this, SMSService.class));
 		Log.d(TAG, "Started service");
 	}
 
 	private void stopService() {
-		stopService(new Intent(this, SMS_Service.class));
+		stopService(new Intent(this, SMSService.class));
 		Log.d(TAG, "Stoppped service");
 	}
 

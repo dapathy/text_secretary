@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
-public class Help_Activity extends FragmentActivity implements TabListener {
+public class HelpActivity extends FragmentActivity implements TabListener {
 
 	private ActionBar actionBar;
 	private ViewPager view;
@@ -26,8 +26,8 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 
 		//set View Pager (ability to swipe the view from left to right)
 		//and set its adapter
-		view = (ViewPager) findViewById(R.id.pager);
-		view.setAdapter(new Help_Adapter(getSupportFragmentManager()));
+		view = findViewById(R.id.pager);
+		view.setAdapter(new HelpAdapter(getSupportFragmentManager()));
 		view.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageSelected(int arg0) {
@@ -55,7 +55,6 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 
 		createTabs();
 		addTabs();
-
 	}
 
 	@Override
@@ -107,6 +106,4 @@ public class Help_Activity extends FragmentActivity implements TabListener {
 		actionBar.addTab(silencerTab);
 		actionBar.addTab(aboutTab);
 	}
-
-
 }

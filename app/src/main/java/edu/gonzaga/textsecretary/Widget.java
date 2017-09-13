@@ -39,7 +39,7 @@ public class Widget extends AppWidgetProvider {
 		if (SYNC_CLICKED.equals(intent.getAction())) {
 			settings = PreferenceManager.getDefaultSharedPreferences(context);
 			SMS_Service_State = settings.getBoolean("smsState", false);
-			Intent serviceIntent = new Intent(context, SMS_Service.class);
+			Intent serviceIntent = new Intent(context, SMSService.class);
 			SharedPreferences.Editor editor = settings.edit();
 
 			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
