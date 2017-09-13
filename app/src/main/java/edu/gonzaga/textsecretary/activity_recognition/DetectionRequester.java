@@ -64,77 +64,11 @@ public class DetectionRequester
 	}
 
 	/**
-	 * Returns the current PendingIntent to the caller.
-	 *
-	 * @return The PendingIntent used to request activity recognition updates
-	 */
-	public PendingIntent getRequestPendingIntent() {
-		return mActivityRecognitionPendingIntent;
-	}
-
-	/**
-	 * Sets the PendingIntent used to make activity recognition update requests
-	 *
-	 * @param intent The PendingIntent
-	 */
-	public void setRequestPendingIntent(PendingIntent intent) {
-		mActivityRecognitionPendingIntent = intent;
-	}
-
-	/**
 	 * Start the activity recognition update request process by
 	 * getting a connection.
 	 */
 	public void requestUpdates() {
 		requestConnection();
-	}
-
-	/**
-	 * Make the actual update request. This is called from onConnected().
-	 */
-	private void continueRequestActivityUpdates() {
-		/*
-         * Request updates, using the default detection interval.
-         * The PendingIntent sends updates to ActivityRecognitionIntentService
-         */
-		getActivityRecognitionClient().requestActivityUpdates(
-				ActivityUtils.DETECTION_INTERVAL_MILLISECONDS,
-				createRequestPendingIntent());
-
-		// Disconnect the client
-		requestDisconnection();
-	}
-
-	/**
-	 * Request a connection to Location Services. This call returns immediately,
-	 * but the request is not complete until onConnected() or onConnectionFailure() is called.
-	 */
-	private void requestConnection() {
-		getActivityRecognitionClient().connect();
-	}
-
-	/**
-	 * Get the current activity recognition client, or create a new one if necessary.
-	 * This method facilitates multiple requests for a client, even if a previous
-	 * request wasn't finished. Since only one client object exists while a connection
-	 * is underway, no memory leaks occur.
-	 *
-	 * @return An ActivityRecognitionClient object
-	 */
-	private ActivityRecognitionClient getActivityRecognitionClient() {
-		if (mActivityRecognitionClient == null) {
-
-			mActivityRecognitionClient =
-					new ActivityRecognitionClient(mContext, this, this);
-		}
-		return mActivityRecognitionClient;
-	}
-
-	/**
-	 * Get the current activity recognition client and disconnect from Location Services
-	 */
-	private void requestDisconnection() {
-		getActivityRecognitionClient().disconnect();
 	}
 
 	/*
@@ -164,39 +98,21 @@ public class DetectionRequester
 	}
 
 	/**
-	 * Get a PendingIntent to send with the request to get activity recognition updates. Location
-	 * Services issues the Intent inside this PendingIntent whenever a activity recognition update
-	 * occurs.
+	 * Returns the current PendingIntent to the caller.
 	 *
-	 * @return A PendingIntent for the IntentService that handles activity recognition updates.
+	 * @return The PendingIntent used to request activity recognition updates
 	 */
-	private PendingIntent createRequestPendingIntent() {
+	public PendingIntent getRequestPendingIntent() {
+		return mActivityRecognitionPendingIntent;
+	}
 
-		// If the PendingIntent already exists
-		if (null != getRequestPendingIntent()) {
-
-			// Return the existing intent
-			return mActivityRecognitionPendingIntent;
-
-			// If no PendingIntent exists
-		} else {
-			// Create an Intent pointing to the IntentService
-			Intent intent = new Intent(mContext, ActivityRecognitionIntentService.class);
-
-            /*
-             * Return a PendingIntent to start the IntentService.
-             * Always create a PendingIntent sent to Location Services
-             * with FLAG_UPDATE_CURRENT, so that sending the PendingIntent
-             * again updates the original. Otherwise, Location Services
-             * can't match the PendingIntent to requests made with it.
-             */
-			PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
-
-			setRequestPendingIntent(pendingIntent);
-			return pendingIntent;
-		}
-
+	/**
+	 * Sets the PendingIntent used to make activity recognition update requests
+	 *
+	 * @param intent The PendingIntent
+	 */
+	public void setRequestPendingIntent(PendingIntent intent) {
+		mActivityRecognitionPendingIntent = intent;
 	}
 
 	/*
@@ -241,5 +157,89 @@ public class DetectionRequester
 				dialog.show();
 			}
 		}
+	}
+
+	/**
+	 * Request a connection to Location Services. This call returns immediately,
+	 * but the request is not complete until onConnected() or onConnectionFailure() is called.
+	 */
+	private void requestConnection() {
+		getActivityRecognitionClient().connect();
+	}
+
+	/**
+	 * Get the current activity recognition client, or create a new one if necessary.
+	 * This method facilitates multiple requests for a client, even if a previous
+	 * request wasn't finished. Since only one client object exists while a connection
+	 * is underway, no memory leaks occur.
+	 *
+	 * @return An ActivityRecognitionClient object
+	 */
+	private ActivityRecognitionClient getActivityRecognitionClient() {
+		if (mActivityRecognitionClient == null) {
+
+			mActivityRecognitionClient =
+					new ActivityRecognitionClient(mContext, this, this);
+		}
+		return mActivityRecognitionClient;
+	}
+
+	/**
+	 * Make the actual update request. This is called from onConnected().
+	 */
+	private void continueRequestActivityUpdates() {
+		/*
+		 * Request updates, using the default detection interval.
+         * The PendingIntent sends updates to ActivityRecognitionIntentService
+         */
+		getActivityRecognitionClient().requestActivityUpdates(
+				ActivityUtils.DETECTION_INTERVAL_MILLISECONDS,
+				createRequestPendingIntent());
+
+		// Disconnect the client
+		requestDisconnection();
+	}
+
+	/**
+	 * Get a PendingIntent to send with the request to get activity recognition updates. Location
+	 * Services issues the Intent inside this PendingIntent whenever a activity recognition update
+	 * occurs.
+	 *
+	 * @return A PendingIntent for the IntentService that handles activity recognition updates.
+	 */
+	private PendingIntent createRequestPendingIntent() {
+
+		// If the PendingIntent already exists
+		if (null != getRequestPendingIntent()) {
+
+			// Return the existing intent
+			return mActivityRecognitionPendingIntent;
+
+			// If no PendingIntent exists
+		} else {
+			// Create an Intent pointing to the IntentService
+			Intent intent = new Intent(mContext, ActivityRecognitionIntentService.class);
+
+            /*
+			 * Return a PendingIntent to start the IntentService.
+             * Always create a PendingIntent sent to Location Services
+             * with FLAG_UPDATE_CURRENT, so that sending the PendingIntent
+             * again updates the original. Otherwise, Location Services
+             * can't match the PendingIntent to requests made with it.
+             */
+			PendingIntent pendingIntent = PendingIntent.getService(mContext, 0, intent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+
+			setRequestPendingIntent(pendingIntent);
+			return pendingIntent;
+		}
+
+	}
+
+	/**
+	 * Get the current activity recognition client and disconnect from Location Services
+	 */
+	private void requestDisconnection() {
+		getActivityRecognitionClient().disconnect();
 	}
 }

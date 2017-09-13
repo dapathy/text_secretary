@@ -21,28 +21,6 @@ public class CalendarUtility {
 		this.context = context;
 	}
 
-	//adjust start time for all day events
-	private static long getAllDayStart(long originalStart) {
-		Calendar allStart = Calendar.getInstance();
-		allStart.setTime(new Date(originalStart));
-
-		//if already start of day, probably fine
-		if (allStart.get(Calendar.HOUR_OF_DAY) != 0) {
-			//if PM then increment up to beginning of next day
-			if (allStart.get(Calendar.AM_PM) == Calendar.PM) {
-				allStart.add(Calendar.DATE, 1);
-				allStart.set(Calendar.HOUR_OF_DAY, 0);
-				allStart.set(Calendar.MINUTE, 0);
-			}
-			//else, AM so increment back to beginning of current day
-			else {
-				allStart.set(Calendar.HOUR_OF_DAY, 0);
-				allStart.set(Calendar.MINUTE, 0);
-			}
-		}
-		return allStart.getTimeInMillis();
-	}
-
 	public boolean inEvent() {
 		//establish search time frame
 		Calendar calendarStart = Calendar.getInstance();
@@ -111,6 +89,28 @@ public class CalendarUtility {
 
 	public String getEventName() {
 		return eventName;
+	}
+
+	//adjust start time for all day events
+	private static long getAllDayStart(long originalStart) {
+		Calendar allStart = Calendar.getInstance();
+		allStart.setTime(new Date(originalStart));
+
+		//if already start of day, probably fine
+		if (allStart.get(Calendar.HOUR_OF_DAY) != 0) {
+			//if PM then increment up to beginning of next day
+			if (allStart.get(Calendar.AM_PM) == Calendar.PM) {
+				allStart.add(Calendar.DATE, 1);
+				allStart.set(Calendar.HOUR_OF_DAY, 0);
+				allStart.set(Calendar.MINUTE, 0);
+			}
+			//else, AM so increment back to beginning of current day
+			else {
+				allStart.set(Calendar.HOUR_OF_DAY, 0);
+				allStart.set(Calendar.MINUTE, 0);
+			}
+		}
+		return allStart.getTimeInMillis();
 	}
 
 	public class ProjectionAttributes {

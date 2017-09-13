@@ -79,6 +79,33 @@ public class Silencer {
 		Log.d(TAG, "stopped poller");
 	}
 
+	public void restoreRingerMode() {
+		Log.d(TAG, prevRingerMode + " restore");
+		//if restore necessary
+		if (prevRingerMode != SILENCER_GARBAGE_MODE) {
+			AudioManager ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+			ringerManager.setRingerMode(prevRingerMode);
+			prevRingerMode = SILENCER_GARBAGE_MODE;   //restore garbage mode
+			isSilenced = false;
+		}
+	}
+
+	public boolean isSilenced() {
+		return isSilenced;
+	}
+
+	public void silenceRinger() {
+		AudioManager ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+		int tempRingerMode = ringerManager.getRingerMode();
+		//prevents possible conflicts between listeners
+		if (tempRingerMode != AudioManager.RINGER_MODE_SILENT) {
+			isSilenced = true;
+			Log.d(TAG, tempRingerMode + " silence");
+			ringerManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+			prevRingerMode = tempRingerMode;    //save current mode
+		}
+	}
+
 	protected void scheduleSilencing() {
 		//if in event, then silence
 		if (calendarUtility.inEvent()) {
@@ -128,32 +155,5 @@ public class Silencer {
 		Calendar end = Calendar.getInstance();
 		end.add(Calendar.DATE, 1);
 		return calendarUtility.getCursorForDates(start, end);
-	}
-
-	public void silenceRinger() {
-		AudioManager ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-		int tempRingerMode = ringerManager.getRingerMode();
-		//prevents possible conflicts between listeners
-		if (tempRingerMode != AudioManager.RINGER_MODE_SILENT) {
-			isSilenced = true;
-			Log.d(TAG, tempRingerMode + " silence");
-			ringerManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-			prevRingerMode = tempRingerMode;    //save current mode
-		}
-	}
-
-	public void restoreRingerMode() {
-		Log.d(TAG, prevRingerMode + " restore");
-		//if restore necessary
-		if (prevRingerMode != SILENCER_GARBAGE_MODE) {
-			AudioManager ringerManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-			ringerManager.setRingerMode(prevRingerMode);
-			prevRingerMode = SILENCER_GARBAGE_MODE;   //restore garbage mode
-			isSilenced = false;
-		}
-	}
-
-	public boolean isSilenced() {
-		return isSilenced;
 	}
 }

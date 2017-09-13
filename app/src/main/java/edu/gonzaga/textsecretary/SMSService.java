@@ -116,61 +116,6 @@ public class SMSService extends Service {
 		}
 	};
 
-	private static boolean isMobileContact(String number, Context context) {
-		if (number.isEmpty())
-			return false;
-		else {
-			Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-			String[] projection = new String[]{
-					PhoneLookup.TYPE
-			};
-			Cursor contactCursor = context.getContentResolver().query(uri, projection, null, null, null);
-			Log.d(TAG, "query completed");
-			if (contactCursor.moveToFirst()
-					&& (contactCursor.getInt(0) == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)) {
-
-				Log.d(TAG, "mobile found");
-				contactCursor.close();
-				return true;
-			}
-			Log.d(TAG, "no mobile found");
-			contactCursor.close();
-			return false;
-		}
-	}
-
-	//converts milliseconds to date
-	public static String convertDateToString(long date) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a", Locale.US);
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(date);
-		return dateFormat.format(calendar.getTime());
-	}
-
-	private static String formatPhoneNumber(String number) {
-		String newNumber = number;
-
-		//replace non-numbers
-		newNumber = newNumber.replaceAll("\\W", "");
-
-		try {
-			//replace starting '1' if exists
-			if (newNumber.charAt(0) == '1')
-				newNumber = newNumber.substring(1);
-		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
-		}
-
-		Log.d(TAG, "formatted number is: " + newNumber);
-
-		return newNumber;
-	}
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
-	}
-
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -222,6 +167,42 @@ public class SMSService extends Service {
 		if (prefs.getBoolean("silence_preference", false))
 			silencer.stopSilencerPoller();
 		super.onDestroy();
+	}
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		return null;
+	}
+
+	//converts milliseconds to date
+	public static String convertDateToString(long date) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a", Locale.US);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(date);
+		return dateFormat.format(calendar.getTime());
+	}
+
+	private static boolean isMobileContact(String number, Context context) {
+		if (number.isEmpty())
+			return false;
+		else {
+			Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+			String[] projection = new String[]{
+					PhoneLookup.TYPE
+			};
+			Cursor contactCursor = context.getContentResolver().query(uri, projection, null, null, null);
+			Log.d(TAG, "query completed");
+			if (contactCursor.moveToFirst()
+					&& (contactCursor.getInt(0) == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)) {
+
+				Log.d(TAG, "mobile found");
+				contactCursor.close();
+				return true;
+			}
+			Log.d(TAG, "no mobile found");
+			contactCursor.close();
+			return false;
+		}
 	}
 
 	private void handleSMSReply(String msg_from) {
@@ -278,16 +259,19 @@ public class SMSService extends Service {
 		}
 	}
 
-	//parses message for [end] and [name] and replaces with info from calendar
-	private String replaceInsertables(String oldMessage) {
-		String newMessage;
-		CharSequence end = "[end]";
-		CharSequence name = "[name]";
-
-		newMessage = oldMessage.replace(end, convertDateToString(calendar.getEventEnd()));
-		newMessage = newMessage.replace(name, calendar.getEventName());
-
-		return newMessage;
+	//retrieves correct message
+	private String getCorrectMessage() {
+		String message;
+		//check driving, then calendar, then get default
+		if (isDriving()) {
+			message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
+		} else if (prefs.getBoolean("calendar_preference", true)) {
+			message = prefs.getString("custom_calendar_message_preference", defCalMsg);
+			message = replaceInsertables(message);
+		} else {
+			message = prefs.getString("custom_message_preference", defMessage);
+		}
+		return message;
 	}
 
 	//sends auto reply
@@ -310,31 +294,47 @@ public class SMSService extends Service {
 		getContentResolver().insert(Uri.parse("content://sms/sent"), values);
 	}
 
-	//retrieves correct message
-	private String getCorrectMessage() {
-		String message;
-		//check driving, then calendar, then get default
-		if (isDriving()) {
-			message = prefs.getString("custom_driving_message_preference", defDrivingMsg);
-		} else if (prefs.getBoolean("calendar_preference", true)) {
-			message = prefs.getString("custom_calendar_message_preference", defCalMsg);
-			message = replaceInsertables(message);
-		} else {
-			message = prefs.getString("custom_message_preference", defMessage);
+	private static String formatPhoneNumber(String number) {
+		String newNumber = number;
+
+		//replace non-numbers
+		newNumber = newNumber.replaceAll("\\W", "");
+
+		try {
+			//replace starting '1' if exists
+			if (newNumber.charAt(0) == '1')
+				newNumber = newNumber.substring(1);
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage());
 		}
-		return message;
+
+		Log.d(TAG, "formatted number is: " + newNumber);
+
+		return newNumber;
 	}
 
 	private boolean isDriving() {
 		return activityRecognizer.isDriving() && !prefs.getBoolean("isPassenger", false) && prefs.getBoolean("driving_preference", false);
 	}
 
-	private boolean shouldAlwaysReply() {
-		return !prefs.getBoolean("driving_preference", false) && !prefs.getBoolean("calendar_preference", true);
+	//parses message for [end] and [name] and replaces with info from calendar
+	private String replaceInsertables(String oldMessage) {
+		String newMessage;
+		CharSequence end = "[end]";
+		CharSequence name = "[name]";
+
+		newMessage = oldMessage.replace(end, convertDateToString(calendar.getEventEnd()));
+		newMessage = newMessage.replace(name, calendar.getEventName());
+
+		return newMessage;
 	}
 
 	private boolean shouldReply() {
 		return isDriving() || shouldAlwaysReply() || calendar.inEvent();
+	}
+
+	private boolean shouldAlwaysReply() {
+		return !prefs.getBoolean("driving_preference", false) && !prefs.getBoolean("calendar_preference", true);
 	}
 
 	private class PhoneStateChangeListener extends PhoneStateListener {

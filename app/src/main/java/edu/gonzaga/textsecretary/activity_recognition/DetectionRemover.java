@@ -86,21 +86,13 @@ public class DetectionRemover
 	}
 
 	/**
-	 * Request a connection to Location Services. This call returns immediately,
-	 * but the request is not complete until onConnected() or onConnectionFailure() is called.
-	 */
-	private void requestConnection() {
-		getActivityRecognitionClient().connect();
-	}
-
-	/**
 	 * Get the current activity recognition client, or create a new one if necessary.
 	 *
 	 * @return An ActivityRecognitionClient object
 	 */
 	public ActivityRecognitionClient getActivityRecognitionClient() {
-        /*
-         * If a client doesn't already exist, create a new one, otherwise
+		/*
+		 * If a client doesn't already exist, create a new one, otherwise
          * return the existing one. This allows multiple attempts to send
          * a request without causing memory leaks by constantly creating
          * new clients.
@@ -123,18 +115,6 @@ public class DetectionRemover
 
 	}
 
-	/**
-	 * Get a activity recognition client and disconnect from Location Services
-	 */
-	private void requestDisconnection() {
-
-		// Disconnect the client
-		getActivityRecognitionClient().disconnect();
-
-		// Set the client to null
-		setActivityRecognitionClient(null);
-	}
-
 	/*
 	 * Called by Location Services once the activity recognition client is connected.
 	 *
@@ -146,24 +126,6 @@ public class DetectionRemover
 		Log.d(ActivityUtils.APPTAG, "connected to location services");
 		// Send a request to Location Services to remove activity recognition updates
 		continueRemoveUpdates();
-	}
-
-	/**
-	 * Once the connection is available, send a request to remove activity recognition updates.
-	 */
-	private void continueRemoveUpdates() {
-
-		// Remove the updates
-		mActivityRecognitionClient.removeActivityUpdates(mCurrentIntent);
-        
-        /*
-         * Cancel the PendingIntent. This stops Intents from arriving at the IntentService, even if
-         * request fails. 
-         */
-		mCurrentIntent.cancel();
-
-		// Disconnect the client
-		requestDisconnection();
 	}
 
 	/*
@@ -222,5 +184,43 @@ public class DetectionRemover
 				dialog.show();
 			}
 		}
+	}
+
+	/**
+	 * Request a connection to Location Services. This call returns immediately,
+	 * but the request is not complete until onConnected() or onConnectionFailure() is called.
+	 */
+	private void requestConnection() {
+		getActivityRecognitionClient().connect();
+	}
+
+	/**
+	 * Once the connection is available, send a request to remove activity recognition updates.
+	 */
+	private void continueRemoveUpdates() {
+
+		// Remove the updates
+		mActivityRecognitionClient.removeActivityUpdates(mCurrentIntent);
+
+        /*
+         * Cancel the PendingIntent. This stops Intents from arriving at the IntentService, even if
+         * request fails.
+         */
+		mCurrentIntent.cancel();
+
+		// Disconnect the client
+		requestDisconnection();
+	}
+
+	/**
+	 * Get a activity recognition client and disconnect from Location Services
+	 */
+	private void requestDisconnection() {
+
+		// Disconnect the client
+		getActivityRecognitionClient().disconnect();
+
+		// Set the client to null
+		setActivityRecognitionClient(null);
 	}
 }

@@ -19,23 +19,6 @@ public class NotificationUtility {
 		mContext = context;
 	}
 
-	private String getId(String number) {
-		String id;
-		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-		String[] projection = new String[]{
-				PhoneLookup.DISPLAY_NAME
-		};
-		Cursor contactCursor = mContext.getContentResolver().query(uri, projection, null, null, null);
-		Log.d(TAG, "query completed");
-		if (contactCursor.moveToFirst()) {
-			id = contactCursor.getString(0);
-		} else {
-			id = number;
-		}
-		contactCursor.close();
-		return id;
-	}
-
 	public void displayNotification(String number) {
 		Log.d(TAG, "notification");
 
@@ -55,7 +38,7 @@ public class NotificationUtility {
 
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
 		//stackBuilder.addParentStack(NotificationView.class);
-	
+
 		/* Adds the Intent that starts the Activity to the top of the stack */
 		stackBuilder.addNextIntent(resultIntent);
 		PendingIntent resultPendingIntent =
@@ -73,6 +56,23 @@ public class NotificationUtility {
 		//int notificationID = 100;
 		/* notificationID allows you to update the notification later on. */
 		mNotificationManager.notify(randomInt, notificationBuilder.build());
+	}
+
+	private String getId(String number) {
+		String id;
+		Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+		String[] projection = new String[]{
+				PhoneLookup.DISPLAY_NAME
+		};
+		Cursor contactCursor = mContext.getContentResolver().query(uri, projection, null, null, null);
+		Log.d(TAG, "query completed");
+		if (contactCursor.moveToFirst()) {
+			id = contactCursor.getString(0);
+		} else {
+			id = number;
+		}
+		contactCursor.close();
+		return id;
 	}
 
 }

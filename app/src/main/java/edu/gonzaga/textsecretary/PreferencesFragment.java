@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
 import edu.gonzaga.textsecretary.activity_recognition.ActivityRecognizer;
@@ -27,6 +26,14 @@ public class PreferencesFragment extends android.preference.PreferenceFragment i
 		changeUnlockMsg();
 	}
 
+	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key) {
+		//this is ridiculous
+		if (key.toString().equals("Remove Signature " + unlockMsg)) {
+			((SettingsActivity) getActivity()).purchaseUnlock();
+		}
+		return false;
+	}
+
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -37,14 +44,6 @@ public class PreferencesFragment extends android.preference.PreferenceFragment i
 	public void onPause() {
 		super.onPause();
 		getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-	}
-
-	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference key) {
-		//this is ridiculous
-		if (key.toString().equals("Remove Signature " + unlockMsg)) {
-			((SettingsActivity) getActivity()).purchaseUnlock();
-		}
-		return false;
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

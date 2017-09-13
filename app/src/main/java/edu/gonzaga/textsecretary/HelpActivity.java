@@ -20,6 +20,20 @@ public class HelpActivity extends FragmentActivity implements TabListener {
 	private ActionBar.Tab drivingTab;
 
 	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
+		//when a tab is selected, move the view page to that tab
+		view.setCurrentItem(tab.getPosition());
+	}
+
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction arg1) {
+	}
+
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction arg1) {
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_help_);
@@ -30,14 +44,14 @@ public class HelpActivity extends FragmentActivity implements TabListener {
 		view.setAdapter(new HelpAdapter(getSupportFragmentManager()));
 		view.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
+
+			@Override
 			public void onPageSelected(int arg0) {
 				//when a page is swiped to, change the tab to that
 				//corresponding page
 				actionBar.setSelectedNavigationItem(arg0);
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
 			}
 
 			@Override
@@ -56,21 +70,6 @@ public class HelpActivity extends FragmentActivity implements TabListener {
 		createTabs();
 		addTabs();
 	}
-
-	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction arg1) {
-	}
-
-	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction arg1) {
-		//when a tab is selected, move the view page to that tab
-		view.setCurrentItem(tab.getPosition());
-	}
-
-	@Override
-	public void onTabUnselected(Tab tab, FragmentTransaction arg1) {
-	}
-
 
 	private void createTabs() {
 		calendarTab = actionBar.newTab();

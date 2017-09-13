@@ -50,6 +50,27 @@ public class SettingsActivity extends PreferenceActivity {
 		mHelper = null;
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + "," + data);
+		if (mHelper == null) return;
+
+		// Pass on the activity result to the helper for handling
+		if (!mHelper.handleActivityResult(requestCode, resultCode, data)) {
+			// handling of non in app billing stuff
+			super.onActivityResult(requestCode, resultCode, data);
+		} else {
+			Log.d(TAG, "onActivityResult handled by IABUtil.");
+		}
+	}
+
+	//remove purchase option from preference fragment
+	private void removeUnlockItem() {
+		android.preference.PreferenceFragment preferenceFragment = (android.preference.PreferenceFragment) getFragmentManager().findFragmentById(android.R.id.content);
+		PreferenceCategory activationCategory = (PreferenceCategory) preferenceFragment.findPreference("Activation");
+		preferenceFragment.getPreferenceScreen().removePreference(activationCategory);
+	}
+
 	//checks if unlock has already been purchased and remove unlock item if so
 	protected void isPurchased() {
 		SharedPreferences securePreferences = new SecurePreferences(getApplicationContext());
@@ -74,13 +95,6 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 	}
 
-	//remove purchase option from preference fragment
-	private void removeUnlockItem() {
-		android.preference.PreferenceFragment preferenceFragment = (android.preference.PreferenceFragment) getFragmentManager().findFragmentById(android.R.id.content);
-		PreferenceCategory activationCategory = (PreferenceCategory) preferenceFragment.findPreference("Activation");
-		preferenceFragment.getPreferenceScreen().removePreference(activationCategory);
-	}
-
 	//purchases unlock
 	protected void purchaseUnlock() {
 		mHelper.launchPurchaseFlow(this, UNLOCK_SKU, 10001,
@@ -98,20 +112,6 @@ public class SettingsActivity extends PreferenceActivity {
 						}
 					}
 				}, UserEmailFetcher.getEmail(getApplicationContext()));
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + "," + data);
-		if (mHelper == null) return;
-
-		// Pass on the activity result to the helper for handling
-		if (!mHelper.handleActivityResult(requestCode, resultCode, data)) {
-			// handling of non in app billing stuff
-			super.onActivityResult(requestCode, resultCode, data);
-		} else {
-			Log.d(TAG, "onActivityResult handled by IABUtil.");
-		}
 	}
 
 	//securely stores data locally, then stores on server

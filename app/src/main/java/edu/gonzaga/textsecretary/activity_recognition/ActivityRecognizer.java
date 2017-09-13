@@ -39,14 +39,6 @@ public class ActivityRecognizer {
 		return instance;
 	}
 
-	private boolean servicesConnected() {
-		// Check that Google Play services is available
-		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
-
-		//return Google Services availability
-		return ConnectionResult.SUCCESS == resultCode;
-	}
-
 	//start listening for updates
 	public void startUpdates() {
 		wasDriving = false;
@@ -78,7 +70,7 @@ public class ActivityRecognizer {
 		}
 
         /*
-         * Set the request type. If a connection error occurs, and Google Play services can
+		 * Set the request type. If a connection error occurs, and Google Play services can
          * handle it, then onActivityResult will use the request type to retry the request
          */
 		mRequestType = ActivityUtils.REQUEST_TYPE.REMOVE;
@@ -87,7 +79,7 @@ public class ActivityRecognizer {
 		mDetectionRemover.removeUpdates(mDetectionRequester.getRequestPendingIntent());
 
         /*
-         * Cancel the PendingIntent. Even if the removal request fails, canceling the PendingIntent
+		 * Cancel the PendingIntent. Even if the removal request fails, canceling the PendingIntent
          * will stop the updates.
          */
 		mDetectionRequester.getRequestPendingIntent().cancel();
@@ -98,6 +90,18 @@ public class ActivityRecognizer {
 		if (isDriving())
 			Silencer.getInstance(mContext).restoreRingerMode();
 		Log.d(ActivityUtils.APPTAG, "stopped driving service");
+	}
+
+	public boolean isDriving() {
+		return drivingConfidence > 0;
+	}
+
+	private boolean servicesConnected() {
+		// Check that Google Play services is available
+		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
+
+		//return Google Services availability
+		return ConnectionResult.SUCCESS == resultCode;
 	}
 
 	protected void raiseLowerDrivingConfidence(int activityType) {
@@ -140,7 +144,7 @@ public class ActivityRecognizer {
 						} else if (ActivityUtils.REQUEST_TYPE.REMOVE == mRequestType) {
 
                                 /*
-                                 * Restart the removal of all activity recognition updates for the 
+                                 * Restart the removal of all activity recognition updates for the
                                  * PendingIntent.
                                  */
 							mDetectionRemover.removeUpdates(
@@ -163,9 +167,5 @@ public class ActivityRecognizer {
 
 				break;
 		}
-	}
-
-	public boolean isDriving() {
-		return drivingConfidence > 0;
 	}
 }

@@ -38,11 +38,38 @@ public class ServiceListFragment extends ListFragment {
 		Log.d("TAG", "set adapter");
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		list.clear();
+		Log.d("TAG", "cleared adapter");
+		buildData();
+		Log.d("TAG", "setValues");
+
+		adapter = new SimpleAdapter(getActivity(), list,
+				R.layout.list_fragment_layout, from, to);
+
+		adapteroff = new SimpleAdapter(getActivity(), list,
+				R.layout.list_fragment_layout_off, from, to);
+
+		if (settings.getBoolean("smsState", true)) {
+			setListAdapter(adapter);
+		} else {
+			setListAdapter(adapteroff);
+		}
+	}
+
 	public void changeTextColor(boolean dark) {
 		if (dark) {
 			setListAdapter(adapter);
 		} else
 			setListAdapter(adapteroff);
+	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		startActivity(new Intent(getActivity(), SettingsActivity.class));
 	}
 
 	private ArrayList<Map<String, String>> buildData() {
@@ -114,32 +141,5 @@ public class ServiceListFragment extends ListFragment {
 		item.put("name", name);
 		item.put("purpose", purpose);
 		return item;
-	}
-
-	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		startActivity(new Intent(getActivity(), SettingsActivity.class));
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-
-		list.clear();
-		Log.d("TAG", "cleared adapter");
-		buildData();
-		Log.d("TAG", "setValues");
-
-		adapter = new SimpleAdapter(getActivity(), list,
-				R.layout.list_fragment_layout, from, to);
-
-		adapteroff = new SimpleAdapter(getActivity(), list,
-				R.layout.list_fragment_layout_off, from, to);
-
-		if (settings.getBoolean("smsState", true)) {
-			setListAdapter(adapter);
-		} else {
-			setListAdapter(adapteroff);
-		}
 	}
 }
