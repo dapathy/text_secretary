@@ -155,18 +155,18 @@ public class MainActivity extends Activity {
 
 	private void setUpGui() {
 		//GUI stuff
-		spinner = (ProgressBar) findViewById(R.id.progressBar1);
-		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
-		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
-		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
-		imageState = (ImageButton) findViewById(R.id.stateImage);
+		spinner = findViewById(R.id.progressBar1);
+		lowerBar = findViewById(R.id.bottomBar);
+		lowerHalf = findViewById(R.id.bottomHalf);
+		listFragment = findViewById(R.id.listFragmentLayout);
+		imageState = findViewById(R.id.stateImage);
 		if (!settings.getBoolean("smsState", false)) {        //if setting is off, button should be off
 			imageState.setImageResource(R.drawable.button_off);
 		}
 		imageState.setOnClickListener(imgButtonHandler);
 
 		//Set the on click listener for the custom message
-		custom = (EditText) findViewById(R.id.customMessage);
+		custom = findViewById(R.id.customMessage);
 		custom.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

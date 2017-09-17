@@ -192,6 +192,7 @@ public class SMSService extends Service {
 			};
 			Cursor contactCursor = context.getContentResolver().query(uri, projection, null, null, null);
 			Log.d(TAG, "query completed");
+			assert contactCursor != null;
 			if (contactCursor.moveToFirst()
 					&& (contactCursor.getInt(0) == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)) {
 
@@ -392,6 +393,7 @@ public class SMSService extends Service {
 						Uri.parse("content://sms"), null, null, null, null);
 
 				//last outgoing message
+				assert cursor != null;
 				if (cursor.moveToNext()) {
 					String protocol = cursor.getString(cursor.getColumnIndex("protocol"));
 					int type = cursor.getInt(cursor.getColumnIndex("type"));

@@ -93,7 +93,7 @@ public class SecurePreferences implements SharedPreferences {
 			String value = SecurePreferences.sFile.getString(key, null);
 			if (value == null) {
 				value = SecurePreferences.generateAesKeyValue();
-				SecurePreferences.sFile.edit().putString(key, value).commit();
+				SecurePreferences.sFile.edit().putString(key, value).apply();
 			}
 			SecurePreferences.sKey = SecurePreferences.decode(value);
 		} catch (Exception e) {

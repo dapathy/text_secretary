@@ -51,38 +51,42 @@ public class PreferencesFragment extends android.preference.PreferenceFragment i
 		boolean calendarOn = sharedPreferences.getBoolean("calendar_preference", false);
 		boolean silencerOn = sharedPreferences.getBoolean("silence_preference", false);
 
-		if (key.equals("calendar_preference")) {
-			//set custom message enablement opposite of calendar preference
-			Preference messagePreference = findPreference("custom_message_preference");
-			messagePreference.setEnabled(!calendarOn);
+		switch (key) {
+			case "calendar_preference":
+				//set custom message enablement opposite of calendar preference
+				Preference messagePreference = findPreference("custom_message_preference");
+				messagePreference.setEnabled(!calendarOn);
 
-			//handle silencer service
-			if (smsState) {
-				//if both enabled start service
-				if (silencerOn && calendarOn)
-					Silencer.getInstance(getActivity().getApplicationContext()).startSilencerPoller();
-					//if only silencer enabled, turn off service
-				else if (silencerOn)
-					Silencer.getInstance(getActivity().getApplicationContext()).stopSilencerPoller();
-			}
-		} else if (key.equals("driving_preference")) {
-			//starts or stops driving service when selected or deselected on preference screen and sms service is already enabled
-			if (smsState) {
-				if (sharedPreferences.getBoolean("driving_preference", false))
-					ActivityRecognizer.getInstance(getActivity().getApplicationContext()).startUpdates();
-				else
-					ActivityRecognizer.getInstance(getActivity().getApplicationContext()).stopUpdates();
-			}
-		} else if (key.equals("silence_preference")) {
-			//starts or stops silencer service when selected or deselected on preference screen and sms service is already enabled
-			if (smsState) {
-				//if both enabled start service
-				if (silencerOn && calendarOn)
-					Silencer.getInstance(getActivity().getApplicationContext()).startSilencerPoller();
-					//if silencer off, turn off
-				else if (calendarOn)
-					Silencer.getInstance(getActivity().getApplicationContext()).stopSilencerPoller();
-			}
+				//handle silencer service
+				if (smsState) {
+					//if both enabled start service
+					if (silencerOn && calendarOn)
+						Silencer.getInstance(getActivity().getApplicationContext()).startSilencerPoller();
+						//if only silencer enabled, turn off service
+					else if (silencerOn)
+						Silencer.getInstance(getActivity().getApplicationContext()).stopSilencerPoller();
+				}
+				break;
+			case "driving_preference":
+				//starts or stops driving service when selected or deselected on preference screen and sms service is already enabled
+				if (smsState) {
+					if (sharedPreferences.getBoolean("driving_preference", false))
+						ActivityRecognizer.getInstance(getActivity().getApplicationContext()).startUpdates();
+					else
+						ActivityRecognizer.getInstance(getActivity().getApplicationContext()).stopUpdates();
+				}
+				break;
+			case "silence_preference":
+				//starts or stops silencer service when selected or deselected on preference screen and sms service is already enabled
+				if (smsState) {
+					//if both enabled start service
+					if (silencerOn && calendarOn)
+						Silencer.getInstance(getActivity().getApplicationContext()).startSilencerPoller();
+						//if silencer off, turn off
+					else if (calendarOn)
+						Silencer.getInstance(getActivity().getApplicationContext()).stopSilencerPoller();
+				}
+				break;
 		}
 	}
 
