@@ -8,15 +8,12 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class RegistrationTask extends AsyncTask<Boolean, Void, Boolean> {
@@ -52,9 +49,9 @@ public class RegistrationTask extends AsyncTask<Boolean, Void, Boolean> {
 			paid = "0";
 
 		// Building Parameters
-		List<NameValuePair> params = new ArrayList<>();
-		params.add(new BasicNameValuePair("userIDD", userEmail));
-		params.add(new BasicNameValuePair("just_paid", paid));
+		HashMap<String, String> parameters = new HashMap<>();
+		parameters.put("userIDD", userEmail);
+		parameters.put("just_paid", paid);
 
 		//try up to 5 times
 		while (count < 5) {
@@ -63,7 +60,7 @@ public class RegistrationTask extends AsyncTask<Boolean, Void, Boolean> {
 
 				//Posting user data to script
 				json = jsonParser.makeHttpRequest(
-						LOGIN_URL, "POST", params);
+						LOGIN_URL, "POST", parameters);
 
 				Log.d(TAG, "connected");
 				Log.d(TAG, "JSON response" + json.toString());
@@ -123,9 +120,9 @@ public class RegistrationTask extends AsyncTask<Boolean, Void, Boolean> {
 			boolean inTrial = false;
 			if (date != null) {
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-				String currentDateandTime = sdf.format(new Date());
-				Log.d(TAG, date + "  " + currentDateandTime);
-				inTrial = isInTrialDate(date, currentDateandTime);
+				String currentDateAndTime = sdf.format(new Date());
+				Log.d(TAG, date + "  " + currentDateAndTime);
+				inTrial = isInTrialDate(date, currentDateAndTime);
 				if (inTrial)
 					storeTrialInfo(date);
 			}
