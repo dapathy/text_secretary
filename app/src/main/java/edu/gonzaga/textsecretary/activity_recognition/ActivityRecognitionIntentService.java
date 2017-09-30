@@ -29,6 +29,7 @@ import com.google.android.gms.location.DetectedActivity;
  */
 public class ActivityRecognitionIntentService extends IntentService {
 
+	private final static String TAG = "ActivityRecognitionIS";
 	private ActivityRecognizer activityRecognizer;
 
 	public ActivityRecognitionIntentService() {
@@ -62,7 +63,7 @@ public class ActivityRecognitionIntentService extends IntentService {
 
 		// If the intent contains an update
 		if (ActivityRecognitionResult.hasResult(intent)) {
-			Log.d(ActivityUtils.APPTAG, "new activity update available");
+			Log.d(TAG, "new activity update available");
 			// Get the update
 			ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 
@@ -100,6 +101,6 @@ public class ActivityRecognitionIntentService extends IntentService {
 		Intent state = new Intent();
 		state.setAction("edu.gonzaga.text_secretary.activity_recognition.ACTIVITY_STATE");
 		sendBroadcast(state);
-		Log.d(ActivityUtils.APPTAG, "activity broadcast sent");
+		Log.d(TAG, "activity broadcast sent");
 	}
 }

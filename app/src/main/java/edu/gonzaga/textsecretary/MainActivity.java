@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void run() {
 			//check unlock
-			RegCheck.isActivated(MainActivity.this);
+			RegistrationValidator.isActivated(MainActivity.this);
 
 			//remove spinner
 			MainActivity.this.runOnUiThread(new Runnable() {
@@ -112,56 +112,6 @@ public class MainActivity extends Activity {
 			showToggleDialogue();
 	}
 
-	private void setUpGui() {
-		//GUI stuff
-		spinner = (ProgressBar) findViewById(R.id.progressBar1);
-		lowerBar = (RelativeLayout) findViewById(R.id.bottomBar);
-		lowerHalf = (RelativeLayout) findViewById(R.id.bottomHalf);
-		listFragment = (RelativeLayout) findViewById(R.id.listFragmentLayout);
-		imageState = (ImageButton) findViewById(R.id.stateImage);
-		if (!settings.getBoolean("smsState", false)) {        //if setting is off, button should be off
-			imageState.setImageResource(R.drawable.button_off);
-		}
-		imageState.setOnClickListener(imgButtonHandler);
-
-		//Set the on click listener for the custom message
-		custom = (EditText) findViewById(R.id.customMessage);
-		custom.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-			}
-		});
-
-		setMessage();
-		Log.d(TAG, "gui");
-	}
-
-	private void setUpWidget() {
-		//WidgetStuff
-		remoteViews = new RemoteViews(getApplicationContext().getPackageName(), R.layout.widgetlayout);
-		widget = new ComponentName(getApplicationContext(), Widget.class);
-		appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-		Log.d(TAG, "widget setup");
-	}
-
-	// Put the custom Message in the Edit Text
-	private void setMessage() {
-		String customMessage = "You can change custom message in Settings";
-		if (settings.getBoolean("calendar_preference", true))
-			customMessage = settings.getString("custom_calendar_message_preference", customMessage);
-		else
-			customMessage = settings.getString("custom_message_preference", customMessage);
-
-		custom.setText(customMessage);
-	}
-
-	private void jiggleGui() {
-		jiggleLayout(lowerBar);
-		jiggleLayout(lowerHalf);
-		jiggleLayout(listFragment);
-	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -197,40 +147,43 @@ public class MainActivity extends Activity {
 			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 			return true;
 		} else if (id == R.id.action_help) {
-			startActivity(new Intent(getApplicationContext(), Help_Activity.class));
+			startActivity(new Intent(getApplicationContext(), HelpActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void startService() {
-		startService(new Intent(this, SMS_Service.class));
-		Log.d(TAG, "Started service");
-	}
+	private void setUpGui() {
+		//GUI stuff
+		spinner = findViewById(R.id.progressBar1);
+		lowerBar = findViewById(R.id.bottomBar);
+		lowerHalf = findViewById(R.id.bottomHalf);
+		listFragment = findViewById(R.id.listFragmentLayout);
+		imageState = findViewById(R.id.stateImage);
+		if (!settings.getBoolean("smsState", false)) {        //if setting is off, button should be off
+			imageState.setImageResource(R.drawable.button_off);
+		}
+		imageState.setOnClickListener(imgButtonHandler);
 
-	private void stopService() {
-		stopService(new Intent(this, SMS_Service.class));
-		Log.d(TAG, "Stoppped service");
-	}
-
-	private void jiggleLayout(final RelativeLayout l) {
-		l.clearAnimation();
-		//load the "bounce" animation
-		out = AnimationUtils.loadAnimation(this, R.anim.animationout);
-		//run the animation on a thread other than the
-		//main UI thread
-		final Runnable r = new Runnable() {
-			public void run() {
-				l.setAnimation(out);
-				l.animate();
+		//Set the on click listener for the custom message
+		custom = findViewById(R.id.customMessage);
+		custom.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 			}
-		};
-		r.run();
+		});
+
+		setMessage();
+		Log.d(TAG, "gui");
 	}
 
-	private void changeFragmentTextColor(boolean dark) {
-		if (serviceList != null)
-			serviceList.changeTextColor(dark);
+	private void setUpWidget() {
+		//WidgetStuff
+		remoteViews = new RemoteViews(getApplicationContext().getPackageName(), R.layout.widgetlayout);
+		widget = new ComponentName(getApplicationContext(), Widget.class);
+		appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+		Log.d(TAG, "widget setup");
 	}
 
 	//This dialogue is here to teach users how to toggle the service on and off
@@ -251,5 +204,52 @@ public class MainActivity extends Activity {
 					}
 				})
 				.show();
+	}
+
+	// Put the custom Message in the Edit Text
+	private void setMessage() {
+		String customMessage = "You can change custom message in Settings";
+		if (settings.getBoolean("calendar_preference", true))
+			customMessage = settings.getString("custom_calendar_message_preference", customMessage);
+		else
+			customMessage = settings.getString("custom_message_preference", customMessage);
+
+		custom.setText(customMessage);
+	}
+
+	private void jiggleGui() {
+		jiggleLayout(lowerBar);
+		jiggleLayout(lowerHalf);
+		jiggleLayout(listFragment);
+	}
+
+	private void jiggleLayout(final RelativeLayout l) {
+		l.clearAnimation();
+		//load the "bounce" animation
+		out = AnimationUtils.loadAnimation(this, R.anim.animationout);
+		//run the animation on a thread other than the
+		//main UI thread
+		final Runnable r = new Runnable() {
+			public void run() {
+				l.setAnimation(out);
+				l.animate();
+			}
+		};
+		r.run();
+	}
+
+	private void startService() {
+		startService(new Intent(this, SMSService.class));
+		Log.d(TAG, "Started service");
+	}
+
+	private void stopService() {
+		stopService(new Intent(this, SMSService.class));
+		Log.d(TAG, "Stoppped service");
+	}
+
+	private void changeFragmentTextColor(boolean dark) {
+		if (serviceList != null)
+			serviceList.changeTextColor(dark);
 	}
 }

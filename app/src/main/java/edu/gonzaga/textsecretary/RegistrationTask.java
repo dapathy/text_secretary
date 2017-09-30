@@ -8,18 +8,15 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
 
-public class Register extends AsyncTask<Boolean, Void, Boolean> {
+public class RegistrationTask extends AsyncTask<Boolean, Void, Boolean> {
 
 	private static final String TAG = "REGISTER";
 	//server URL:
@@ -32,39 +29,8 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 	// JSON parser class
 	private JSONParser jsonParser = new JSONParser();
 
-	public Register(Context context) {
+	public RegistrationTask(Context context) {
 		mContext = context;
-	}
-
-	//securely stores data locally
-	private static void storeActivation(Context context) {
-		//securely store in shared preference
-		SharedPreferences secureSettings = new SecurePreferences(context);
-		String account = UserEmailFetcher.getEmail(context);
-
-		//update preference
-		SharedPreferences.Editor secureEdit = secureSettings.edit();
-		secureEdit.putBoolean(account + "_paid", true);
-		secureEdit.apply();
-	}
-
-	private static boolean isInTrialDate(String endTrial, String currentDate) {
-		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-			Date end = sdf.parse(endTrial);
-			Date current = sdf.parse(currentDate);
-
-			if (end.compareTo(current) > 0) {
-				Log.v(TAG, "end is after current");
-				return true;
-			} else if (end.compareTo(current) <= 0) {
-				Log.v(TAG, "end is before current");
-				return false;
-			}
-		} catch (Exception e) {
-			Log.d(TAG, "CATCH compare " + e.toString());
-		}
-		return false;
 	}
 
 	@Override
@@ -83,9 +49,9 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 			paid = "0";
 
 		// Building Parameters
-		List<NameValuePair> params = new ArrayList<>();
-		params.add(new BasicNameValuePair("userIDD", userEmail));
-		params.add(new BasicNameValuePair("just_paid", paid));
+		HashMap<String, String> parameters = new HashMap<>();
+		parameters.put("userIDD", userEmail);
+		parameters.put("just_paid", paid);
 
 		//try up to 5 times
 		while (count < 5) {
@@ -94,7 +60,7 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 
 				//Posting user data to script
 				json = jsonParser.makeHttpRequest(
-						LOGIN_URL, "POST", params);
+						LOGIN_URL, "POST", parameters);
 
 				Log.d(TAG, "connected");
 				Log.d(TAG, "JSON response" + json.toString());
@@ -133,6 +99,18 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 		}
 	}
 
+	//securely stores data locally
+	private static void storeActivation(Context context) {
+		//securely store in shared preference
+		SharedPreferences secureSettings = new SecurePreferences(context);
+		String account = UserEmailFetcher.getEmail(context);
+
+		//update preference
+		SharedPreferences.Editor secureEdit = secureSettings.edit();
+		secureEdit.putBoolean(account + "_paid", true);
+		secureEdit.apply();
+	}
+
 	//ensures current date is within server trial dates
 	//firstActivation determines if this is first time being activated and will therefore skip the storing process this time
 	private boolean checkActivation(String date, String serverPay, boolean firstActivation) {
@@ -142,9 +120,9 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 			boolean inTrial = false;
 			if (date != null) {
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-				String currentDateandTime = sdf.format(new Date());
-				Log.d(TAG, date + "  " + currentDateandTime);
-				inTrial = isInTrialDate(date, currentDateandTime);
+				String currentDateAndTime = sdf.format(new Date());
+				Log.d(TAG, date + "  " + currentDateAndTime);
+				inTrial = isInTrialDate(date, currentDateAndTime);
 				if (inTrial)
 					storeTrialInfo(date);
 			}
@@ -159,6 +137,25 @@ public class Register extends AsyncTask<Boolean, Void, Boolean> {
 				storeActivation(mContext);
 			return true;
 		}
+	}
+
+	private static boolean isInTrialDate(String endTrial, String currentDate) {
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+			Date end = sdf.parse(endTrial);
+			Date current = sdf.parse(currentDate);
+
+			if (end.compareTo(current) > 0) {
+				Log.v(TAG, "end is after current");
+				return true;
+			} else if (end.compareTo(current) <= 0) {
+				Log.v(TAG, "end is before current");
+				return false;
+			}
+		} catch (Exception e) {
+			Log.d(TAG, "CATCH compare " + e.toString());
+		}
+		return false;
 	}
 
 	//securely stores trial information

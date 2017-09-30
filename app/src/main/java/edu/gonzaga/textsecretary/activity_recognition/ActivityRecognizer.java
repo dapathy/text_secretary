@@ -1,30 +1,46 @@
 package edu.gonzaga.textsecretary.activity_recognition;
 
-import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
 
 import edu.gonzaga.textsecretary.Silencer;
-import edu.gonzaga.textsecretary.activity_recognition.ActivityUtils.REQUEST_TYPE;
 
-public class ActivityRecognizer {
+public class ActivityRecognizer implements
+		ConnectionCallbacks, OnConnectionFailedListener, ResultCallback<Status>  {
+
+	private final static String TAG = "ActivityRecognizer";
+	/**
+	 * The desired time between activity detections. Larger values result in fewer activity
+	 * detections while improving battery life. A value of 0 results in activity detections at the
+	 * fastest possible rate. Getting frequent updates negatively impact battery life and a real
+	 * app may prefer to request less frequent updates.
+	 */
+	static final long DETECTION_INTERVAL_IN_MILLISECONDS = 500;
 
 	private static volatile ActivityRecognizer instance;    //instance of self
 	protected boolean wasDriving;
-	protected int drivingConfidence;     // -2 <= dC <= 3
-	private REQUEST_TYPE mRequestType;
-	private DetectionRequester mDetectionRequester;
-	private DetectionRemover mDetectionRemover;
+	private int drivingConfidence;     // -2 <= dC <= 3
+	private GoogleApiClient mGoogleApiClient;
 	private Context mContext;
 
 	private ActivityRecognizer(Context context) {
 		mContext = context;
+		buildGoogleApiClient(mContext);
 	}
 
 	public static ActivityRecognizer getInstance(Context context) {
@@ -39,133 +55,100 @@ public class ActivityRecognizer {
 		return instance;
 	}
 
-	private boolean servicesConnected() {
-		// Check that Google Play services is available
-		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
-
-		//return Google Services availability
-		return ConnectionResult.SUCCESS == resultCode;
-	}
-
 	//start listening for updates
 	public void startUpdates() {
 		wasDriving = false;
 		drivingConfidence = 0;
-		mDetectionRequester = new DetectionRequester(mContext);
-		mDetectionRemover = new DetectionRemover(mContext);
 
-		// Check for Google Play services
-		if (!servicesConnected()) {
-			return;
-		}
-
-        /*
-		 * Set the request type. If a connection error occurs, and Google Play services can
-         * handle it, then onActivityResult will use the request type to retry the request
-         */
-		mRequestType = ActivityUtils.REQUEST_TYPE.ADD;
-
-		// Pass the update request to the requester object
-		mDetectionRequester.requestUpdates();
-		Log.d(ActivityUtils.APPTAG, "started driving service");
+		mGoogleApiClient.connect();
+		ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
+				mGoogleApiClient,
+				DETECTION_INTERVAL_IN_MILLISECONDS,
+				getActivityDetectionPendingIntent()
+		).setResultCallback(this);
 	}
 
 	//stop checking for activity updates
 	public void stopUpdates() {
-		// Check for Google Play services
-		if (!servicesConnected()) {
-			return;
-		}
-
-        /*
-         * Set the request type. If a connection error occurs, and Google Play services can
-         * handle it, then onActivityResult will use the request type to retry the request
-         */
-		mRequestType = ActivityUtils.REQUEST_TYPE.REMOVE;
-
-		// Pass the remove request to the remover object
-		mDetectionRemover.removeUpdates(mDetectionRequester.getRequestPendingIntent());
-
-        /*
-         * Cancel the PendingIntent. Even if the removal request fails, canceling the PendingIntent
-         * will stop the updates.
-         */
-		mDetectionRequester.getRequestPendingIntent().cancel();
+		// Remove all activity updates for the PendingIntent that was used to request activity
+		// updates.
+		ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(
+				mGoogleApiClient,
+				getActivityDetectionPendingIntent()
+		).setResultCallback(this);
+		mGoogleApiClient.disconnect();
 
 		//kill any remaining notification
 		((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE)).cancel(11001100);
 		//ensure ringer is restored if necessary
 		if (isDriving())
 			Silencer.getInstance(mContext).restoreRingerMode();
-		Log.d(ActivityUtils.APPTAG, "stopped driving service");
+		Log.d(TAG, "stopped driving service");
+	}
+
+	public boolean isDriving() {
+		return drivingConfidence > 0;
+	}
+
+	@Override
+	public void onConnected(@Nullable Bundle bundle) {
+		Log.i(TAG, "Connected to GoogleApiClient");
+	}
+
+	@Override
+	public void onConnectionSuspended(int i) {
+		// The connection to Google Play services was lost for some reason. We call connect() to
+		// attempt to re-establish the connection.
+		Log.i(TAG, "Connection suspended");
+		mGoogleApiClient.connect();
+	}
+
+	@Override
+	public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+		Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
+	}
+
+	/**
+	 * Runs when the result of calling requestActivityUpdates() and removeActivityUpdates() becomes
+	 * available. Either method can complete successfully or with an error.
+	 *
+	 * @param status The Status returned through a PendingIntent when requestActivityUpdates()
+	 *               or removeActivityUpdates() are called.
+	 */
+	@Override
+	public void onResult(@NonNull Status status) {
+		if (!status.isSuccess()) {
+			Log.e(TAG, "Error adding or removing activity detection: " + status.getStatusMessage());
+		}
 	}
 
 	protected void raiseLowerDrivingConfidence(int activityType) {
 		//if driving
 		if (((activityType == DetectedActivity.IN_VEHICLE) || (activityType == DetectedActivity.ON_BICYCLE)) && (drivingConfidence < 3))
 			drivingConfidence += 1;
-			//if not driving and not unknown
+		//if not driving and not unknown
 		else if ((activityType != DetectedActivity.IN_VEHICLE) && (activityType != DetectedActivity.ON_BICYCLE) && (activityType != DetectedActivity.UNKNOWN) && (drivingConfidence > -2))
 			drivingConfidence -= 1;
 
-		Log.d(ActivityUtils.APPTAG, "driving confidence: " + drivingConfidence);
+		Log.d(TAG, "driving confidence: " + drivingConfidence);
 	}
 
-	/*
-	 * Handle results returned to this Activity by other Activities started with
-	 * startActivityForResult(). In particular, the method onConnectionFailed() in
-	 * DetectionRemover and DetectionRequester may call startResolutionForResult() to
-	 * start an Activity that handles Google Play services problems. The result of this
-	 * call returns here, to onActivityResult.
+	private synchronized void buildGoogleApiClient(Context context) {
+		mGoogleApiClient = new GoogleApiClient.Builder(context)
+				.addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(ActivityRecognition.API)
+				.build();
+	}
+
+	/**
+	 * Gets a PendingIntent to be sent for each activity detection.
 	 */
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+	private PendingIntent getActivityDetectionPendingIntent() {
+		Intent intent = new Intent(mContext, ActivityRecognitionIntentService.class);
 
-		// Choose what to do based on the request code
-		switch (requestCode) {
-
-			// If the request code matches the code sent in onConnectionFailed
-			case ActivityUtils.CONNECTION_FAILURE_RESOLUTION_REQUEST:
-
-				switch (resultCode) {
-					// If Google Play services resolved the problem
-					case Activity.RESULT_OK:
-
-						// If the request was to start activity recognition updates
-						if (ActivityUtils.REQUEST_TYPE.ADD == mRequestType) {
-
-							// Restart the process of requesting activity recognition updates
-							mDetectionRequester.requestUpdates();
-
-							// If the request was to remove activity recognition updates
-						} else if (ActivityUtils.REQUEST_TYPE.REMOVE == mRequestType) {
-
-                                /*
-                                 * Restart the removal of all activity recognition updates for the 
-                                 * PendingIntent.
-                                 */
-							mDetectionRemover.removeUpdates(
-									mDetectionRequester.getRequestPendingIntent());
-
-						}
-						break;
-
-					// If any other result was returned by Google Play services
-					default:
-
-						// Report that Google Play services was unable to resolve the problem.
-						Log.e(ActivityUtils.APPTAG, "google play couldn't do anything useful");
-				}
-
-				// If any other request code was received
-			default:
-				// Report that this Activity received an unknown requestCode
-				Log.e(ActivityUtils.APPTAG, "I'm not sure what happened but it wasn't good");
-
-				break;
-		}
-	}
-
-	public boolean isDriving() {
-		return drivingConfidence > 0;
+		// We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+		// requestActivityUpdates() and removeActivityUpdates().
+		return PendingIntent.getService(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 }

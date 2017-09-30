@@ -30,12 +30,12 @@
 			android:value="@integer/google_play_services_version" />
 
 		<service
-			android:name="edu.gonzaga.textsecretary.SMS_Service"
+			android:name="edu.gonzaga.textsecretary.SMSService"
 			android:exported="false" />
 
 		<service android:name="edu.gonzaga.textsecretary.activity_recognition.ActivityRecognitionIntentService" />
 
-		<receiver android:name="edu.gonzaga.textsecretary.StartOnBoot">
+		<receiver android:name="edu.gonzaga.textsecretary.StartOnBootReceiver">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 			</intent-filter>
@@ -70,7 +70,7 @@
 				android:value="edu.gonzaga.textsecretary.MainActivity" />
 		</activity>
 		<activity
-			android:name="edu.gonzaga.textsecretary.Help_Activity"
+			android:name="edu.gonzaga.textsecretary.HelpActivity"
 			android:label="@string/title_activity_help_"
 			android:parentActivityName="edu.gonzaga.textsecretary.MainActivity"
 			android:screenOrientation="portrait">
@@ -79,7 +79,7 @@
 				android:value="edu.gonzaga.textsecretary.MainActivity" />
 		</activity>
 
-		<receiver android:name="edu.gonzaga.textsecretary.Driving_Temp_Off" />
+		<receiver android:name="edu.gonzaga.textsecretary.DrivingTemporaryDisableReceiver" />
 
 		<receiver android:name="edu.gonzaga.textsecretary.SilencerReceiver" />
 

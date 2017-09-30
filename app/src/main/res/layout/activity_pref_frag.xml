@@ -3,5 +3,5 @@
 	android:id="@+id/container"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context="edu.gonzaga.textsecretary.PrefFrag"
+	tools:context="edu.gonzaga.textsecretary.PreferencesFragment"
 	tools:ignore="MergeRootFrame" />

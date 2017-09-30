@@ -93,7 +93,7 @@ public class SecurePreferences implements SharedPreferences {
 			String value = SecurePreferences.sFile.getString(key, null);
 			if (value == null) {
 				value = SecurePreferences.generateAesKeyValue();
-				SecurePreferences.sFile.edit().putString(key, value).commit();
+				SecurePreferences.sFile.edit().putString(key, value).apply();
 			}
 			SecurePreferences.sKey = SecurePreferences.decode(value);
 		} catch (Exception e) {
@@ -101,148 +101,6 @@ public class SecurePreferences implements SharedPreferences {
 				Log.e(TAG, "Error init:" + e.getMessage());
 			}
 			throw new IllegalStateException(e);
-		}
-	}
-
-	private static String encode(byte[] input) {
-		return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP);
-	}
-
-	private static byte[] decode(String input) {
-		return Base64.decode(input, Base64.NO_PADDING | Base64.NO_WRAP);
-	}
-
-	private static String generateAesKeyName(Context context)
-			throws InvalidKeySpecException, NoSuchAlgorithmException,
-			NoSuchProviderException {
-		final char[] password = context.getPackageName().toCharArray();
-
-		final byte[] salt = getDeviceSerialNumber(context).getBytes();
-
-		SecretKey key;
-		try {
-			// TODO: what if there's an OS upgrade and now supports the primary
-			// PBE
-			key = SecurePreferences.generatePBEKey(password, salt,
-					PRIMARY_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
-		} catch (NoSuchAlgorithmException e) {
-			// older devices may not support the have the implementation try
-			// with a weaker
-			// algorthm
-			key = SecurePreferences.generatePBEKey(password, salt,
-					BACKUP_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
-		}
-		return SecurePreferences.encode(key.getEncoded());
-	}
-
-	/**
-	 * Derive a secure key based on the passphraseOrPin
-	 *
-	 * @param passphraseOrPin
-	 * @param salt
-	 * @param algorthm        - which PBE algorthm to use. some <4.0 devices don;t support
-	 *                        the prefered PBKDF2WithHmacSHA1
-	 * @param iterations      - Number of PBKDF2 hardening rounds to use. Larger values
-	 *                        increase computation time (a good thing), defaults to 1000 if
-	 *                        not set.
-	 * @param keyLength
-	 * @return Derived Secretkey
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 * @throws NoSuchProviderException
-	 */
-	private static SecretKey generatePBEKey(char[] passphraseOrPin,
-											byte[] salt, String algorthm, int iterations, int keyLength)
-			throws NoSuchAlgorithmException, InvalidKeySpecException,
-			NoSuchProviderException {
-
-		if (iterations == 0) {
-			iterations = 1000;
-		}
-
-		SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(
-				algorthm, PROVIDER);
-		KeySpec keySpec = new PBEKeySpec(passphraseOrPin, salt, iterations,
-				keyLength);
-		SecretKey secretKey = secretKeyFactory.generateSecret(keySpec);
-		return secretKey;
-	}
-
-	/**
-	 * Gets the hardware serial number of this device.
-	 *
-	 * @return serial number or Settings.Secure.ANDROID_ID if not available.
-	 */
-	private static String getDeviceSerialNumber(Context context) {
-		// We're using the Reflection API because Build.SERIAL is only available
-		// since API Level 9 (Gingerbread, Android 2.3).
-		try {
-			String deviceSerial = (String) Build.class.getField("SERIAL").get(
-					null);
-			if (TextUtils.isEmpty(deviceSerial)) {
-				deviceSerial = Settings.Secure.getString(
-						context.getContentResolver(),
-						Settings.Secure.ANDROID_ID);
-			}
-			return deviceSerial;
-		} catch (Exception ignored) {
-			// default to Android_ID
-			return Settings.Secure.getString(context.getContentResolver(),
-					Settings.Secure.ANDROID_ID);
-		}
-	}
-
-	private static String generateAesKeyValue() throws NoSuchAlgorithmException {
-		// Do *not* seed secureRandom! Automatically seeded from system entropy
-		final SecureRandom random = new SecureRandom();
-
-		// Use the largest AES key length which is supported by the OS
-		final KeyGenerator generator = KeyGenerator.getInstance("AES");
-		try {
-			generator.init(KEY_SIZE, random);
-		} catch (Exception e) {
-			try {
-				generator.init(192, random);
-			} catch (Exception e1) {
-				generator.init(128, random);
-			}
-		}
-		return SecurePreferences.encode(generator.generateKey().getEncoded());
-	}
-
-	private static String encrypt(String cleartext) {
-		if (cleartext == null || cleartext.length() == 0) {
-			return cleartext;
-		}
-		try {
-			final Cipher cipher = Cipher.getInstance(AES_KEY_ALG, PROVIDER);
-			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(
-					SecurePreferences.sKey, AES_KEY_ALG));
-			return SecurePreferences.encode(cipher.doFinal(cleartext
-					.getBytes("UTF-8")));
-		} catch (Exception e) {
-			if (sLoggingEnabled) {
-				Log.w(TAG, "encrypt", e);
-			}
-			return null;
-		}
-	}
-
-	private static String decrypt(String ciphertext) {
-		if (ciphertext == null || ciphertext.length() == 0) {
-			return ciphertext;
-		}
-		try {
-			final Cipher cipher = Cipher.getInstance(AES_KEY_ALG, PROVIDER);
-			cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(
-					SecurePreferences.sKey, AES_KEY_ALG));
-			return new String(cipher.doFinal(SecurePreferences
-					.decode(ciphertext)), "UTF-8");
-		} catch (Exception e) {
-			if (sLoggingEnabled) {
-				Log.w(TAG, "decrypt", e);
-			}
-			return null;
 		}
 	}
 
@@ -276,20 +134,6 @@ public class SecurePreferences implements SharedPreferences {
 				SecurePreferences.encrypt(key), null);
 		return (encryptedValue != null) ? SecurePreferences
 				.decrypt(encryptedValue) : defaultValue;
-	}
-
-	/**
-	 * Added to get a values as as it can be useful to store values that are
-	 * already encrypted and encoded
-	 *
-	 * @param key
-	 * @param defaultValue
-	 * @return Unencrypted value of the key or the defaultValue if
-	 */
-	public String getStringUnencrypted(String key, String defaultValue) {
-		final String nonEncryptedValue = SecurePreferences.sFile.getString(
-				SecurePreferences.encrypt(key), null);
-		return (nonEncryptedValue != null) ? nonEncryptedValue : defaultValue;
 	}
 
 	@Override
@@ -390,6 +234,162 @@ public class SecurePreferences implements SharedPreferences {
 	}
 
 	/**
+	 * Added to get a values as as it can be useful to store values that are
+	 * already encrypted and encoded
+	 *
+	 * @param key
+	 * @param defaultValue
+	 * @return Unencrypted value of the key or the defaultValue if
+	 */
+	public String getStringUnencrypted(String key, String defaultValue) {
+		final String nonEncryptedValue = SecurePreferences.sFile.getString(
+				SecurePreferences.encrypt(key), null);
+		return (nonEncryptedValue != null) ? nonEncryptedValue : defaultValue;
+	}
+
+	private static String generateAesKeyName(Context context)
+			throws InvalidKeySpecException, NoSuchAlgorithmException,
+			NoSuchProviderException {
+		final char[] password = context.getPackageName().toCharArray();
+
+		final byte[] salt = getDeviceSerialNumber(context).getBytes();
+
+		SecretKey key;
+		try {
+			// TODO: what if there's an OS upgrade and now supports the primary
+			// PBE
+			key = SecurePreferences.generatePBEKey(password, salt,
+					PRIMARY_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
+		} catch (NoSuchAlgorithmException e) {
+			// older devices may not support the have the implementation try
+			// with a weaker
+			// algorthm
+			key = SecurePreferences.generatePBEKey(password, salt,
+					BACKUP_PBE_KEY_ALG, ITERATIONS, KEY_SIZE);
+		}
+		return SecurePreferences.encode(key.getEncoded());
+	}
+
+	private static String generateAesKeyValue() throws NoSuchAlgorithmException {
+		// Do *not* seed secureRandom! Automatically seeded from system entropy
+		final SecureRandom random = new SecureRandom();
+
+		// Use the largest AES key length which is supported by the OS
+		final KeyGenerator generator = KeyGenerator.getInstance("AES");
+		try {
+			generator.init(KEY_SIZE, random);
+		} catch (Exception e) {
+			try {
+				generator.init(192, random);
+			} catch (Exception e1) {
+				generator.init(128, random);
+			}
+		}
+		return SecurePreferences.encode(generator.generateKey().getEncoded());
+	}
+
+	private static byte[] decode(String input) {
+		return Base64.decode(input, Base64.NO_PADDING | Base64.NO_WRAP);
+	}
+
+	/**
+	 * Gets the hardware serial number of this device.
+	 *
+	 * @return serial number or Settings.Secure.ANDROID_ID if not available.
+	 */
+	private static String getDeviceSerialNumber(Context context) {
+		// We're using the Reflection API because Build.SERIAL is only available
+		// since API Level 9 (Gingerbread, Android 2.3).
+		try {
+			String deviceSerial = (String) Build.class.getField("SERIAL").get(
+					null);
+			if (TextUtils.isEmpty(deviceSerial)) {
+				deviceSerial = Settings.Secure.getString(
+						context.getContentResolver(),
+						Settings.Secure.ANDROID_ID);
+			}
+			return deviceSerial;
+		} catch (Exception ignored) {
+			// default to Android_ID
+			return Settings.Secure.getString(context.getContentResolver(),
+					Settings.Secure.ANDROID_ID);
+		}
+	}
+
+	/**
+	 * Derive a secure key based on the passphraseOrPin
+	 *
+	 * @param passphraseOrPin
+	 * @param salt
+	 * @param algorthm        - which PBE algorthm to use. some <4.0 devices don;t support
+	 *                        the prefered PBKDF2WithHmacSHA1
+	 * @param iterations      - Number of PBKDF2 hardening rounds to use. Larger values
+	 *                        increase computation time (a good thing), defaults to 1000 if
+	 *                        not set.
+	 * @param keyLength
+	 * @return Derived Secretkey
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 * @throws NoSuchProviderException
+	 */
+	private static SecretKey generatePBEKey(char[] passphraseOrPin,
+											byte[] salt, String algorthm, int iterations, int keyLength)
+			throws NoSuchAlgorithmException, InvalidKeySpecException,
+			NoSuchProviderException {
+
+		if (iterations == 0) {
+			iterations = 1000;
+		}
+
+		SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(
+				algorthm, PROVIDER);
+		KeySpec keySpec = new PBEKeySpec(passphraseOrPin, salt, iterations,
+				keyLength);
+		SecretKey secretKey = secretKeyFactory.generateSecret(keySpec);
+		return secretKey;
+	}
+
+	private static String encode(byte[] input) {
+		return Base64.encodeToString(input, Base64.NO_PADDING | Base64.NO_WRAP);
+	}
+
+	private static String decrypt(String ciphertext) {
+		if (ciphertext == null || ciphertext.length() == 0) {
+			return ciphertext;
+		}
+		try {
+			final Cipher cipher = Cipher.getInstance(AES_KEY_ALG, PROVIDER);
+			cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(
+					SecurePreferences.sKey, AES_KEY_ALG));
+			return new String(cipher.doFinal(SecurePreferences
+					.decode(ciphertext)), "UTF-8");
+		} catch (Exception e) {
+			if (sLoggingEnabled) {
+				Log.w(TAG, "decrypt", e);
+			}
+			return null;
+		}
+	}
+
+	private static String encrypt(String cleartext) {
+		if (cleartext == null || cleartext.length() == 0) {
+			return cleartext;
+		}
+		try {
+			final Cipher cipher = Cipher.getInstance(AES_KEY_ALG, PROVIDER);
+			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(
+					SecurePreferences.sKey, AES_KEY_ALG));
+			return SecurePreferences.encode(cipher.doFinal(cleartext
+					.getBytes("UTF-8")));
+		} catch (Exception e) {
+			if (sLoggingEnabled) {
+				Log.w(TAG, "encrypt", e);
+			}
+			return null;
+		}
+	}
+
+	/**
 	 * Wrapper for Android's {@link android.content.SharedPreferences.Editor}.
 	 * <p/>
 	 * Used for modifying values in a {@link SecurePreferences} object. All
@@ -411,20 +411,6 @@ public class SecurePreferences implements SharedPreferences {
 		public SharedPreferences.Editor putString(String key, String value) {
 			mEditor.putString(SecurePreferences.encrypt(key),
 					SecurePreferences.encrypt(value));
-			return this;
-		}
-
-		/**
-		 * This is useful for storing values that have be encrypted by something
-		 * else
-		 *
-		 * @param key   - encrypted as usual
-		 * @param value will not be encrypted
-		 * @return
-		 */
-		public SharedPreferences.Editor putStringNoEncrypted(String key,
-															 String value) {
-			mEditor.putString(SecurePreferences.encrypt(key), value);
 			return this;
 		}
 
@@ -495,6 +481,20 @@ public class SecurePreferences implements SharedPreferences {
 			} else {
 				commit();
 			}
+		}
+
+		/**
+		 * This is useful for storing values that have be encrypted by something
+		 * else
+		 *
+		 * @param key   - encrypted as usual
+		 * @param value will not be encrypted
+		 * @return
+		 */
+		public SharedPreferences.Editor putStringNoEncrypted(String key,
+															 String value) {
+			mEditor.putString(SecurePreferences.encrypt(key), value);
+			return this;
 		}
 	}
 }
